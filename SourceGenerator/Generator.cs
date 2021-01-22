@@ -18,49 +18,58 @@ namespace SourceGenerator
     {
         public void Initialize(GeneratorInitializationContext context)
         {
-            if (!Debugger.IsAttached) Debugger.Launch();
+            //if (!Debugger.IsAttached) Debugger.Launch();
 
             context.RegisterForSyntaxNotifications(() => new RecieveExtensionCalls());
         }
 
         public void Execute(GeneratorExecutionContext context)
         {
-            if (context.SyntaxReceiver is not RecieveExtensionCalls receiver)
-                return;
-
-            var compilation = context.Compilation;
-
-            var serviceCollectionSymbol = compilation.GetTypeByMetadataName("Microsoft.Extensions.DependencyInjection.IServiceCollection");
-
             var calls = new List<ScopedMemoizerCall>();
 
-            foreach (var addMemoizedScopeCall in receiver.Candidate)
+            if (context.SyntaxReceiver is RecieveExtensionCalls receiver)
             {
-                var model = compilation.GetSemanticModel(addMemoizedScopeCall.SyntaxTree);
+                var compilation = context.Compilation;
 
-                if (model.GetSymbolInfo(addMemoizedScopeCall.Name).Symbol is IMethodSymbol {IsGenericMethod: true} s && SymbolEqualityComparer.Default.Equals(s.ReturnType, serviceCollectionSymbol) && s.TypeArguments.Length == 2)
+                var serviceCollectionSymbol = compilation.GetTypeByMetadataName("Microsoft.Extensions.DependencyInjection.IServiceCollection");
+
+                foreach (var addMemoizedScopeCall in receiver.Candidate)
                 {
-                    calls.Add(new ScopedMemoizerCall(s, addMemoizedScopeCall));
+                    var model = compilation.GetSemanticModel(addMemoizedScopeCall.SyntaxTree);
+
+                    var name = addMemoizedScopeCall.Name as GenericNameSyntax;
+                    if (name != null && name.TypeArgumentList.Arguments.Count == 2)
+                    {
+                        var interfaceArg = model.GetSymbolInfo(name.TypeArgumentList.Arguments[0]).Symbol as ITypeSymbol;
+                        var implArg = model.GetSymbolInfo(name.TypeArgumentList.Arguments[1]).Symbol as ITypeSymbol;
+
+                        if (interfaceArg == null || implArg == null)
+                        {
+                            var label = new DiagnosticDescriptor("MemoService001", "Wrong Type", "Generic Arguments not found", "MemoizerDISourceGenerator", DiagnosticSeverity.Error, true);
+                            context.ReportDiagnostic(Diagnostic.Create(label, name.GetLocation()));
+                            continue;
+                        }
+
+                        calls.Add(new ScopedMemoizerCall(addMemoizedScopeCall, interfaceArg, implArg));
+                    }
                 }
             }
-        }
 
-        private static bool HasAttribute(INamedTypeSymbol classSymbol, INamedTypeSymbol attributeSymbol)
-        {
-            return classSymbol.GetAttributes().Any(ad => SymbolEqualityComparer.Default.Equals(ad.AttributeClass, attributeSymbol));
+            context.AddSource("Memoized_ServiceCollectionExtensions", AddMemoizedExtensionCall.Generate(calls));
         }
     }
 
     public class ScopedMemoizerCall
     {
-        public IMethodSymbol MethodSymbol { get; }
         public MemberAccessExpressionSyntax ExpressionSyntax { get; }
+        public ITypeSymbol ImplementationsType { get; }
+        public ITypeSymbol InterfaceType { get; }
 
-        public ScopedMemoizerCall(IMethodSymbol methodSymbol, MemberAccessExpressionSyntax expressionSyntax)
+        public ScopedMemoizerCall(MemberAccessExpressionSyntax expressionSyntax, ITypeSymbol interfaceType, ITypeSymbol implementationType)
         {
-            MethodSymbol = methodSymbol;
             ExpressionSyntax = expressionSyntax;
-            throw new NotImplementedException();
+            InterfaceType = interfaceType;
+            ImplementationsType = implementationType;
         }
     }
 

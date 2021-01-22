@@ -14,9 +14,26 @@ namespace ConsoleApp
                 Console.WriteLine(t.FullName);
             }
 
+            Console.WriteLine();
+            Console.WriteLine();
+
             var s = new ServiceCollection();
             s.AddLogging();
             s.AddMemoizedScoped<IDoMaths, DoMaths>();
+
+            var services = s.BuildServiceProvider();
+
+            using (var scope = services.CreateScope())
+            {
+                var maths = scope.ServiceProvider.GetRequiredService<IDoMaths>();
+
+                var result = maths.Add(5, 10);
+                Console.WriteLine($"Result: {result}");
+
+                // Should not see Adding {arg1} with {arg2} log as it was cached
+                var result2 = maths.Add(5, 10);
+                Console.WriteLine($"Result: {result2}");
+            }
         }
     }
 
@@ -27,16 +44,9 @@ namespace ConsoleApp
 
     public class DoMaths : IDoMaths
     {
-        private readonly ILogger<DoMaths> _logger;
-
-        public DoMaths(ILogger<DoMaths> logger)
-        {
-            _logger = logger;
-        }
-
         public int Add(int arg1, int arg2)
         {
-            _logger.LogInformation("Adding {arg1} with {arg2}", arg1, arg2);
+            Console.WriteLine($"Adding {arg1} with {arg2}");
             return arg1 + arg2;
         }
     }

@@ -2,8 +2,9 @@
 
 namespace SourceGenerator.Attribute
 {
-    [AttributeUsage(AttributeTargets.Class, Inherited =  false)]
+    [AttributeUsage(AttributeTargets.Interface, Inherited = false)]
     public class CreateMemoizedImplementationAttribute : System.Attribute
     {
+        public string? Name { get; set; }
     }
 }

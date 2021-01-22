@@ -1,6 +1,7 @@
 ﻿using System;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using SourceGenerator.Attribute;
 
 namespace ConsoleApp
 {
@@ -37,6 +38,7 @@ namespace ConsoleApp
         }
     }
 
+    [CreateMemoizedImplementation]
     public interface IDoMaths
     {
         int Add(int arg1, int arg2);

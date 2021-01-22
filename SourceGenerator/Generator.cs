@@ -25,13 +25,46 @@ namespace SourceGenerator
 
         public void Execute(GeneratorExecutionContext context)
         {
+            try
+            {
+                Generate(context);
+            }
+            catch (Exception e)
+            {
+                //This is temporary till https://github.com/dotnet/roslyn/issues/46084 is fixed
+                context.ReportDiagnostic(Diagnostic.Create(
+                    new DiagnosticDescriptor(
+                        "SI0000",
+                        "An exception was thrown by the JsonSrcGen generator",
+                        "An exception was thrown by the MockDI generator: '{0}'",
+                        "MockDISrcGen",
+                        DiagnosticSeverity.Error,
+                        isEnabledByDefault: true),
+                    Location.None,
+                    e.ToString() + e.StackTrace));
+            }
+        }
+
+        private void Generate(GeneratorExecutionContext context)
+        {
             var calls = new List<ScopedMemoizerCall>();
 
             if (context.SyntaxReceiver is RecieveExtensionCalls receiver)
             {
                 var compilation = context.Compilation;
 
-                var serviceCollectionSymbol = compilation.GetTypeByMetadataName("Microsoft.Extensions.DependencyInjection.IServiceCollection");
+                var createMemoizedAttribute = compilation.GetTypeByMetadataName("SourceGenerator.Attribute.CreateMemoizedImplementationAttribute");
+
+                foreach (var possibleAttribute in receiver.CandidateAttributes)
+                {
+                    var model = compilation.GetSemanticModel(possibleAttribute.SyntaxTree);
+                    var symbol = model.GetSymbolInfo(possibleAttribute).Symbol;
+
+                    if (SymbolEqualityComparer.Default.Equals(symbol, createMemoizedAttribute))
+                    {
+
+                    }
+                }
 
                 foreach (var addMemoizedScopeCall in receiver.Candidate)
                 {
@@ -49,6 +82,8 @@ namespace SourceGenerator
                             context.ReportDiagnostic(Diagnostic.Create(label, name.GetLocation()));
                             continue;
                         }
+
+                        // TODO ensure interfaceArg has a [CreateMemoizedImplementation] attribute
 
                         calls.Add(new ScopedMemoizerCall(addMemoizedScopeCall, interfaceArg, implArg));
                     }
@@ -76,12 +111,18 @@ namespace SourceGenerator
     public class RecieveExtensionCalls : ISyntaxReceiver
     {
         public List<MemberAccessExpressionSyntax> Candidate { get; } = new();
+        public List<InterfaceDeclarationSyntax> CandidateAttributes { get; } = new();
 
         public void OnVisitSyntaxNode(SyntaxNode syntaxNode)
         {
             if (syntaxNode is MemberAccessExpressionSyntax memberAccessExpressionSyntax && memberAccessExpressionSyntax.Name.Identifier.ValueText == "AddMemoizedScoped")
             {
                 Candidate.Add(memberAccessExpressionSyntax);
+            }
+
+            if (syntaxNode is InterfaceDeclarationSyntax interfaceDeclarationSyntax && interfaceDeclarationSyntax.AttributeLists.Count > 0)
+            {
+                CandidateAttributes.Add(interfaceDeclarationSyntax);
             }
         }
     }

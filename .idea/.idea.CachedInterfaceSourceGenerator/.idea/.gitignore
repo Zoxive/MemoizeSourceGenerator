@@ -1,0 +1,13 @@
+# Default ignored files
+/shelf/
+/workspace.xml
+# Rider ignored files
+/modules.xml
+/contentModel.xml
+/projectSettingsUpdater.xml
+/.idea.CachedInterfaceSourceGenerator.iml
+# Datasource local storage ignored files
+/../../../../../../:\Github\CachedInterfaceSourceGenerator\.idea\.idea.CachedInterfaceSourceGenerator\.idea/dataSources/
+/dataSources.local.xml
+# Editor-based HTTP Client requests
+/httpRequests/

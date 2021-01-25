@@ -11,7 +11,9 @@ namespace SourceGenerator
             var fullInterfaceName = scopedCall.InterfaceType.ToDisplayString();
 
             var sb = new StringBuilder(@$"using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Logging;
 using System;
+using SourceGenerator.Attribute;
 
 namespace {scopedCall.Namespace}
 {{
@@ -20,10 +22,12 @@ namespace {scopedCall.Namespace}
 ");
             sb.AppendLine($"\t\tprivate readonly {fullInterfaceName} _impl;");
             sb.AppendLine($"\t\tprivate readonly IMemoryCache _cache;");
-            sb.AppendLine($"\t\tpublic {scopedCall.ClassName}(IMemoryCache cache, {fullInterfaceName} impl)");
+            sb.AppendLine($"\t\tprivate readonly ILogger<{scopedCall.ClassName}> _logger;");
+            sb.AppendLine($"\t\tpublic {scopedCall.ClassName}(IMemoryCache cache, {fullInterfaceName} impl, ILogger<{scopedCall.ClassName}> logger)");
             sb.AppendLine("\t\t{");
             sb.AppendLine("\t\t\t_cache = cache;");
             sb.AppendLine("\t\t\t_impl = impl;");
+            sb.AppendLine("\t\t\t_logger = logger;");
             sb.AppendLine("\t\t}");
 
             sb.AppendLine();
@@ -65,8 +69,10 @@ namespace {scopedCall.Namespace}
                 sb.AppendLine(");");
                 sb.AppendLine($"\t\t\tif (_cache.TryGetValue<{returnType}>(key, out var value))");
                 sb.AppendLine("\t\t\t{");
+                //sb.AppendLine("\t\t\t\t_logger.LogInformation(\"CACHE HIT!!\");");
                 sb.AppendLine("\t\t\t\treturn value;");
                 sb.AppendLine("\t\t\t}");
+                //sb.AppendLine("\t\t\t_logger.LogInformation(\"CACHE MISS\");");
                 sb.AppendLine("\t\t\tvar entry = _cache.CreateEntry(key);");
                 sb.Append($"\t\t\tvar result = _impl.{methodName}(");
                 foreach (var arg in method.Parameters)
@@ -77,6 +83,10 @@ namespace {scopedCall.Namespace}
                 }
                 sb.AppendLine(");");
                 sb.AppendLine("\t\t\tentry.SetValue(result);");
+                sb.AppendLine("\t\t\t// TODO fix cache duration");
+                sb.AppendLine("\t\t\tentry.SetSlidingExpiration(MemoizedInterfaceOptions.DefaultExpirationTime * MemoizedInterfaceOptions.DefaultCacheDurationFactor);");
+                sb.AppendLine("\t\t\t// TODO fix cache token expiration");
+                sb.AppendLine("\t\t\tentry.Dispose();");
                 sb.AppendLine("\t\t\treturn result;");
 
                 sb.AppendLine("\t\t}");

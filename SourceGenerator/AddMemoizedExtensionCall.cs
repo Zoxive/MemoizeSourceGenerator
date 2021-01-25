@@ -19,11 +19,13 @@ namespace Microsoft.Extensions.DependencyInjection
     }
 }";
 
+
         public static string Generate(IEnumerable<ScopedMemoizerCall> calls)
         {
             var sb = new StringBuilder(
 @"using System;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Logging;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
@@ -48,7 +50,7 @@ namespace Microsoft.Extensions.DependencyInjection
                 sb.AppendLine($"\t\t\t\tservices.AddScoped<{implName}>();");
                 sb.AppendLine($"\t\t\t\tservices.AddScoped<{interfaceName}>(s =>");
                 sb.AppendLine("\t\t\t\t{");
-                sb.AppendLine($"\t\t\t\t\treturn new {call.Namespace}.{call.ClassName}(s.GetRequiredService<IMemoryCache>(), s.GetRequiredService<{implName}>());");
+                sb.AppendLine($"\t\t\t\t\treturn new {call.Namespace}.{call.ClassName}(s.GetRequiredService<IMemoryCache>(), s.GetRequiredService<{implName}>(), s.GetRequiredService<ILogger<{call.Namespace}.{call.ClassName}>>());");
                 sb.AppendLine("\t\t\t\t});");
                 sb.AppendLine("\t\t\t\treturn services;");
                 sb.AppendLine("\t\t\t}");

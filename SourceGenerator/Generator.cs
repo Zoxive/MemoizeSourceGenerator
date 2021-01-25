@@ -10,6 +10,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
+using SourceGenerator.Attribute;
 
 namespace SourceGenerator
 {
@@ -83,9 +84,20 @@ namespace SourceGenerator
                             continue;
                         }
 
-                        // TODO ensure interfaceArg has a [CreateMemoizedImplementation] attribute
+                        var interfaceAttribute = interfaceArg.GetAttributes().FirstOrDefault(x => SymbolEqualityComparer.Default.Equals(x.AttributeClass, createMemoizedAttribute));
 
-                        calls.Add(new ScopedMemoizerCall(addMemoizedScopeCall, interfaceArg, implArg));
+                        if (interfaceAttribute == null)
+                        {
+                            var label = new DiagnosticDescriptor("MemoService002", "Missing Memoized Attribute", "Interface must have the [CreateMemoizedImplementation] attribute attached", "MemoizerDISourceGenerator", DiagnosticSeverity.Error, true);
+                            context.ReportDiagnostic(Diagnostic.Create(label, name.GetLocation()));
+                            continue;
+                        }
+
+                        var scopedCall = new ScopedMemoizerCall(addMemoizedScopeCall, interfaceArg, implArg, interfaceAttribute);
+
+                        calls.Add(scopedCall);
+
+                        context.AddSource(scopedCall.ClassName, MemoizedClass.Generate(scopedCall));
                     }
                 }
             }
@@ -98,13 +110,36 @@ namespace SourceGenerator
     {
         public MemberAccessExpressionSyntax ExpressionSyntax { get; }
         public ITypeSymbol ImplementationsType { get; }
+        public AttributeData InterfaceAttribute { get; }
         public ITypeSymbol InterfaceType { get; }
 
-        public ScopedMemoizerCall(MemberAccessExpressionSyntax expressionSyntax, ITypeSymbol interfaceType, ITypeSymbol implementationType)
+        public string ClassName { get; }
+        public string Namespace => InterfaceType.ContainingNamespace.ToDisplayString();
+
+        public ScopedMemoizerCall
+        (
+            MemberAccessExpressionSyntax expressionSyntax,
+            ITypeSymbol interfaceType,
+            ITypeSymbol implementationType,
+            AttributeData interfaceAttribute
+        )
         {
             ExpressionSyntax = expressionSyntax;
             InterfaceType = interfaceType;
             ImplementationsType = implementationType;
+
+            InterfaceAttribute = interfaceAttribute;
+
+            var name = InterfaceAttribute.NamedArguments.FirstOrDefault(x => x.Key == nameof(CreateMemoizedImplementationAttribute.Name)).Value;
+
+            string? className = null;
+            if (!name.IsNull)
+            {
+                className = name.Value?.ToString();
+            }
+
+            ClassName = className ?? $"{InterfaceType.Name}_Memoized";
+
         }
     }
 

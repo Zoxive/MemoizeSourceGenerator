@@ -54,6 +54,8 @@ namespace SourceGenerator
                 var compilation = context.Compilation;
 
                 var createMemoizedAttribute = compilation.GetTypeByMetadataName("SourceGenerator.Attribute.CreateMemoizedImplementationAttribute");
+                if (createMemoizedAttribute == null)
+                    throw new Exception("Could not locate CreateMemoizedImplementationAttribute");
 
                 foreach (var possibleAttribute in receiver.CandidateAttributes)
                 {
@@ -78,21 +80,12 @@ namespace SourceGenerator
 
                         if (interfaceArg == null || implArg == null)
                         {
-                            var label = new DiagnosticDescriptor("MemoService001", "Wrong Type", "Generic Arguments not found", "MemoizerDISourceGenerator", DiagnosticSeverity.Error, true);
+                            var label = DiagError.CreateError("Wrong Type", "Generic Arguments not found");
                             context.ReportDiagnostic(Diagnostic.Create(label, name.GetLocation()));
                             continue;
                         }
 
-                        var interfaceAttribute = interfaceArg.GetAttributes().FirstOrDefault(x => SymbolEqualityComparer.Default.Equals(x.AttributeClass, createMemoizedAttribute));
-
-                        if (interfaceAttribute == null)
-                        {
-                            var label = new DiagnosticDescriptor("MemoService002", "Missing Memoized Attribute", "Interface must have the [CreateMemoizedImplementation] attribute attached", "MemoizerDISourceGenerator", DiagnosticSeverity.Error, true);
-                            context.ReportDiagnostic(Diagnostic.Create(label, name.GetLocation()));
-                            continue;
-                        }
-
-                        if (!ScopedMemoizerCall.TryCreate(addMemoizedScopeCall, interfaceArg, implArg, interfaceAttribute, out var scopedCall))
+                        if (!ScopedMemoizerCall.TryCreate(context, addMemoizedScopeCall, interfaceArg, implArg, createMemoizedAttribute, out var scopedCall))
                             continue;
 
                         calls.Add(scopedCall);

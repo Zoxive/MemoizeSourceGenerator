@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -24,13 +23,25 @@ namespace SourceGenerator
 
         public static bool TryCreate
         (
+            GeneratorExecutionContext context,
             MemberAccessExpressionSyntax expressionSyntax,
             ITypeSymbol interfaceType,
             ITypeSymbol implementationType,
-            AttributeData interfaceAttribute,
-            [NotNullWhen(true)] out ScopedMemoizerCall? call
-        )
+            INamedTypeSymbol createMemoizedAttribute,
+            [NotNullWhen(true)] out ScopedMemoizerCall? call)
         {
+            var interfaceAttribute = interfaceType.GetAttributes().FirstOrDefault(x => SymbolEqualityComparer.Default.Equals(x.AttributeClass, createMemoizedAttribute));
+
+            var errorLocation = expressionSyntax.Name.GetLocation();
+
+            if (interfaceAttribute == null)
+            {
+                var label = DiagError.CreateError("Missing Memoized Attribute", "Interface must have the [CreateMemoizedImplementation] attribute attached");
+                context.ReportDiagnostic(Diagnostic.Create(label, errorLocation));
+                call = null;
+                return false;
+            }
+
             var name = interfaceAttribute.NamedArguments.FirstOrDefault(x => x.Key == nameof(CreateMemoizedImplementationAttribute.Name)).Value;
 
             string? classNameFromAttribute = null;
@@ -44,9 +55,14 @@ namespace SourceGenerator
             var members = interfaceType.GetMembers();
             var methods = new List<MemoizedMethodMember>(members.Length);
 
-            foreach (var member in members.OfType<IMethodSymbol>())
+            var methodSymbols = members.OfType<IMethodSymbol>().ToList();
+
+            // TODO Check names to see what ArgKey_ class name impl we can use
+            // Create different ArgKey class name implementations
+
+            foreach (var member in methodSymbols)
             {
-                if (MemoizedMethodMember.TryCreate(member, out var methodMember))
+                if (MemoizedMethodMember.TryCreate(context, errorLocation, member, out var methodMember))
                 {
                     methods.Add(methodMember);
                 }
@@ -83,14 +99,15 @@ namespace SourceGenerator
 
     public class MemoizedMethodMember
     {
-        public static bool TryCreate(IMethodSymbol methodSymbol, [NotNullWhen(true)] out MemoizedMethodMember? method)
+        public static bool TryCreate(GeneratorExecutionContext context, Location errorLocation, IMethodSymbol methodSymbol,
+            [NotNullWhen(true)] out MemoizedMethodMember? method)
         {
             var @params = methodSymbol.Parameters;
             var args = new List<MemoizedMethodMemberArgument>(@params.Length);
 
             foreach (var param in @params)
             {
-                if (MemoizedMethodMemberArgument.TryCreate(param, out var arg))
+                if (MemoizedMethodMemberArgument.TryCreate(context, errorLocation, param, out var arg))
                 {
                     args.Add(arg);
                 }
@@ -108,13 +125,21 @@ namespace SourceGenerator
 
         private MemoizedMethodMember(IMethodSymbol methodSymbol, IReadOnlyList<MemoizedMethodMemberArgument> parameters)
         {
-            Name = methodSymbol.Name;
-            ReturnsVoid = methodSymbol.ReturnsVoid;
             ReturnType = methodSymbol.ReturnType.ToDisplayString();
+
+            Name = methodSymbol.Name;
+
+            var argNames = parameters.Select(x => x.ArgType.Replace('.', '_')).ToArray();
+            ClassName = $"ArgKey_{ReturnType}_{methodSymbol.Name}_{(string.Join('_', argNames))}";
+
+            ReturnsVoid = methodSymbol.ReturnsVoid;
 
             _lastArg = parameters.LastOrDefault();
             Parameters = parameters;
         }
+
+        public string ClassName { get; }
+
         private readonly MemoizedMethodMemberArgument? _lastArg;
         public IReadOnlyList<MemoizedMethodMemberArgument> Parameters { get; }
         public string Name { get; }
@@ -139,11 +164,50 @@ namespace SourceGenerator
 
     public class MemoizedMethodMemberArgument
     {
-        public static bool TryCreate(IParameterSymbol parameterSymbol, [NotNullWhen(true)] out MemoizedMethodMemberArgument? arg)
+        public static bool TryCreate
+        (
+            GeneratorExecutionContext context,
+            Location errorLocation,
+            IParameterSymbol parameterSymbol,
+            [NotNullWhen(true)] out MemoizedMethodMemberArgument? arg
+        )
         {
-            // TODO validate method args are IEquatable<>
+            var type = parameterSymbol.Type;
+
+            // TODO structs
+
+            if (!parameterSymbol.DeclaringSyntaxReferences.IsEmpty)
+            {
+                var syntaxReference = parameterSymbol.DeclaringSyntaxReferences.First();
+                errorLocation = syntaxReference.SyntaxTree.GetLocation(syntaxReference.Span);
+            }
+
+            if (TypeRequiresEquatable(type))
+            {
+                if (!type.AllInterfaces.Any(x => x.MetadataName == "IEquatable`1"))
+                {
+                    var label = DiagError.CreateError("Must implement IEquatable<>", $"Type {parameterSymbol.ToDisplayString()} must implement IEquatable<>");
+                    context.ReportDiagnostic(Diagnostic.Create(label, errorLocation));
+                    arg = null;
+                    return false;
+                }
+            }
+
             arg = new MemoizedMethodMemberArgument(parameterSymbol);
             return true;
+        }
+
+        private static bool TypeRequiresEquatable(ITypeSymbol type)
+        {
+            switch (type.TypeKind)
+            {
+                case TypeKind.Class:
+                case TypeKind.Struct:
+                case TypeKind.Interface:
+                    return true;
+            }
+
+            return false;
         }
 
         private MemoizedMethodMemberArgument(IParameterSymbol parameterSymbol)

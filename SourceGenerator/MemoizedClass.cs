@@ -51,7 +51,7 @@ namespace {scopedCall.Namespace}
                 sb.AppendLine(")");
                 sb.AppendLine("\t\t{");
 
-                sb.Append($"\t\t\tvar key = new ArgKey_{methodName}(");
+                sb.Append($"\t\t\tvar key = new {method.ClassName}(");
                 method.WriteParameters(sb);
                 sb.AppendLine(");");
                 sb.AppendLine($"\t\t\tif (_cache.TryGetValue<{returnType}>(key, out var value))");
@@ -92,11 +92,11 @@ namespace {scopedCall.Namespace}
 
         private static void GenerateArgStruct(MemoizedMethodMember method, StringBuilder sb)
         {
-            var methodName = method.Name;
+            var methodClassName = method.ClassName;
             var lastArg = method.Parameters.LastOrDefault();
 
 
-            sb.AppendLine($"\t\tpublic struct ArgKey_{methodName} : IEquatable<ArgKey_{methodName}>");
+            sb.AppendLine($"\t\tpublic struct {methodClassName} : IEquatable<{methodClassName}>");
             sb.AppendLine("\t\t{");
 
             foreach (var arg in method.Parameters)
@@ -105,7 +105,7 @@ namespace {scopedCall.Namespace}
             }
 
             sb.AppendLine();
-            sb.Append($"\t\t\tpublic ArgKey_{methodName}(");
+            sb.Append($"\t\t\tpublic {methodClassName}(");
             method.WriteParameters(sb, writeType: true);
 
             sb.AppendLine(")");
@@ -119,7 +119,7 @@ namespace {scopedCall.Namespace}
 
             sb.AppendLine();
 
-            sb.AppendLine($"\t\t\tpublic bool Equals(ArgKey_{methodName} other)");
+            sb.AppendLine($"\t\t\tpublic bool Equals({methodClassName} other)");
             sb.AppendLine("\t\t\t{");
             sb.AppendLine("\t\t\t\tif (ReferenceEquals(null, other)) return false;");
             sb.AppendLine("\t\t\t\tif (ReferenceEquals(this, other)) return true;");
@@ -141,7 +141,7 @@ namespace {scopedCall.Namespace}
             sb.AppendLine("\t\t\t{");
             sb.AppendLine("\t\t\t\tif (ReferenceEquals(null, obj)) return false;");
             sb.AppendLine("\t\t\t\tif (ReferenceEquals(this, obj)) return true;");
-            sb.AppendLine($"\t\t\t\treturn obj is ArgKey_{methodName} castedObj && Equals(castedObj);");
+            sb.AppendLine($"\t\t\t\treturn obj is {methodClassName} castedObj && Equals(castedObj);");
             sb.AppendLine("\t\t\t}");
             sb.AppendLine();
 

@@ -32,40 +32,27 @@ namespace {scopedCall.Namespace}
 
             sb.AppendLine();
 
-            var methods= scopedCall.InterfaceType.GetMembers().OfType<IMethodSymbol>().ToList();
+            var methods= scopedCall.Methods;
             foreach (var method in methods)
             {
                 if (method.ReturnsVoid)
                 {
                     // nothing to cache here.. skip
+                    // TODO just call impl
                     continue;
                 }
 
-                var returnType = method.ReturnType.ToDisplayString();
+                var returnType = method.ReturnType;
                 var methodName = method.Name;
 
                 sb.Append($"\t\tpublic {returnType} {methodName}(");
 
-                var lastArg = method.Parameters.LastOrDefault();
-                foreach (var arg in method.Parameters)
-                {
-                    sb.Append(arg.ToDisplayString());
-                    sb.Append(" ");
-                    sb.Append(arg.Name);
-
-                    if (!ReferenceEquals(arg, lastArg))
-                        sb.Append(", ");
-                }
+                method.WriteParameters(sb, writeType: true);
                 sb.AppendLine(")");
                 sb.AppendLine("\t\t{");
 
                 sb.Append($"\t\t\tvar key = new ArgKey_{methodName}(");
-                foreach (var arg in method.Parameters)
-                {
-                    sb.Append(arg.Name);
-                    if (!ReferenceEquals(arg, lastArg))
-                        sb.Append(", ");
-                }
+                method.WriteParameters(sb);
                 sb.AppendLine(");");
                 sb.AppendLine($"\t\t\tif (_cache.TryGetValue<{returnType}>(key, out var value))");
                 sb.AppendLine("\t\t\t{");
@@ -75,17 +62,15 @@ namespace {scopedCall.Namespace}
                 //sb.AppendLine("\t\t\t_logger.LogInformation(\"CACHE MISS\");");
                 sb.AppendLine("\t\t\tvar entry = _cache.CreateEntry(key);");
                 sb.Append($"\t\t\tvar result = _impl.{methodName}(");
-                foreach (var arg in method.Parameters)
-                {
-                    sb.Append(arg.Name);
-                    if (!ReferenceEquals(arg, lastArg))
-                        sb.Append(", ");
-                }
+                method.WriteParameters(sb);
                 sb.AppendLine(");");
                 sb.AppendLine("\t\t\tentry.SetValue(result);");
                 sb.AppendLine("\t\t\t// TODO fix cache duration");
-                sb.AppendLine("\t\t\tentry.SetSlidingExpiration(MemoizedInterfaceOptions.DefaultExpirationTime * MemoizedInterfaceOptions.DefaultCacheDurationFactor);");
                 sb.AppendLine("\t\t\t// TODO fix cache token expiration");
+                sb.AppendLine("\t\t\tentry.SetSlidingExpiration(MemoizedInterfaceOptions.DefaultExpirationTime * MemoizedInterfaceOptions.DefaultCacheDurationFactor);");
+                sb.AppendLine("\t\t\t/// need to manually call dispose instead of having a using");
+                sb.AppendLine("\t\t\t// in case the factory passed in throws, in which case we");
+                sb.AppendLine("\t\t\t// do not want to add the entry to the cache");
                 sb.AppendLine("\t\t\tentry.Dispose();");
                 sb.AppendLine("\t\t\treturn result;");
 
@@ -105,30 +90,23 @@ namespace {scopedCall.Namespace}
             return sb.ToString();
         }
 
-        private static void GenerateArgStruct(IMethodSymbol method, StringBuilder sb)
+        private static void GenerateArgStruct(MemoizedMethodMember method, StringBuilder sb)
         {
             var methodName = method.Name;
             var lastArg = method.Parameters.LastOrDefault();
 
 
-            sb.AppendLine($"\t\tinternal struct ArgKey_{methodName} : IEquatable<ArgKey_{methodName}>");
+            sb.AppendLine($"\t\tpublic struct ArgKey_{methodName} : IEquatable<ArgKey_{methodName}>");
             sb.AppendLine("\t\t{");
 
             foreach (var arg in method.Parameters)
             {
-                sb.AppendLine($"\t\t\tprivate readonly {arg.ToDisplayString()} _{arg.Name};");
+                sb.AppendLine($"\t\t\tprivate readonly {arg.ArgType} _{arg.Name};");
             }
 
             sb.AppendLine();
-            sb.Append($"\t\t\tinternal ArgKey_{methodName}(");
-            foreach (var arg in method.Parameters)
-            {
-                sb.Append(arg.ToDisplayString());
-                sb.Append(" ");
-                sb.Append(arg.Name);
-                if (!ReferenceEquals(arg, lastArg))
-                    sb.Append(", ");
-            }
+            sb.Append($"\t\t\tpublic ArgKey_{methodName}(");
+            method.WriteParameters(sb, writeType: true);
 
             sb.AppendLine(")");
             sb.AppendLine("\t\t\t{");

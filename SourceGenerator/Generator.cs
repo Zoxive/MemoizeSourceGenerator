@@ -10,7 +10,6 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
-using SourceGenerator.Attribute;
 
 namespace SourceGenerator
 {
@@ -93,7 +92,8 @@ namespace SourceGenerator
                             continue;
                         }
 
-                        var scopedCall = new ScopedMemoizerCall(addMemoizedScopeCall, interfaceArg, implArg, interfaceAttribute);
+                        if (!ScopedMemoizerCall.TryCreate(addMemoizedScopeCall, interfaceArg, implArg, interfaceAttribute, out var scopedCall))
+                            continue;
 
                         calls.Add(scopedCall);
 
@@ -103,43 +103,6 @@ namespace SourceGenerator
             }
 
             context.AddSource("Memoized_ServiceCollectionExtensions", AddMemoizedExtensionCall.Generate(calls));
-        }
-    }
-
-    public class ScopedMemoizerCall
-    {
-        public MemberAccessExpressionSyntax ExpressionSyntax { get; }
-        public ITypeSymbol ImplementationsType { get; }
-        public AttributeData InterfaceAttribute { get; }
-        public ITypeSymbol InterfaceType { get; }
-
-        public string ClassName { get; }
-        public string Namespace => InterfaceType.ContainingNamespace.ToDisplayString();
-
-        public ScopedMemoizerCall
-        (
-            MemberAccessExpressionSyntax expressionSyntax,
-            ITypeSymbol interfaceType,
-            ITypeSymbol implementationType,
-            AttributeData interfaceAttribute
-        )
-        {
-            ExpressionSyntax = expressionSyntax;
-            InterfaceType = interfaceType;
-            ImplementationsType = implementationType;
-
-            InterfaceAttribute = interfaceAttribute;
-
-            var name = InterfaceAttribute.NamedArguments.FirstOrDefault(x => x.Key == nameof(CreateMemoizedImplementationAttribute.Name)).Value;
-
-            string? className = null;
-            if (!name.IsNull)
-            {
-                className = name.Value?.ToString();
-            }
-
-            ClassName = className ?? $"{InterfaceType.Name}_Memoized";
-
         }
     }
 

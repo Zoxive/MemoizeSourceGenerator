@@ -56,19 +56,28 @@ namespace {scopedCall.Namespace}
                 sb.AppendLine(");");
                 sb.AppendLine($"\t\t\tif (_cache.TryGetValue<{returnType}>(key, out var value))");
                 sb.AppendLine("\t\t\t{");
-                //sb.AppendLine("\t\t\t\t_logger.LogInformation(\"CACHE HIT!!\");");
+                sb.Append("\t\t\t\tif (_logger.IsEnabled(LogLevel.Debug))");
+                sb.AppendLine(" _logger.LogDebug(\"Cache hit. {key} {value}\", key, value);");
+                sb.AppendLine();
                 sb.AppendLine("\t\t\t\treturn value;");
                 sb.AppendLine("\t\t\t}");
-                //sb.AppendLine("\t\t\t_logger.LogInformation(\"CACHE MISS\");");
                 sb.AppendLine("\t\t\tvar entry = _cache.CreateEntry(key);");
                 sb.Append($"\t\t\tvar result = _impl.{methodName}(");
                 method.WriteParameters(sb);
                 sb.AppendLine(");");
                 sb.AppendLine("\t\t\tentry.SetValue(result);");
+
+                sb.AppendLine();
+
+                sb.Append("\t\t\tif (_logger.IsEnabled(LogLevel.Debug))");
+                sb.AppendLine(" _logger.LogDebug(\"Cache Miss. {key} {value}\", key, result);");
+                sb.AppendLine();
+
                 sb.AppendLine("\t\t\t// TODO fix cache duration");
                 sb.AppendLine("\t\t\t// TODO fix cache token expiration");
                 sb.AppendLine("\t\t\tentry.SetSlidingExpiration(MemoizedInterfaceOptions.DefaultExpirationTime * MemoizedInterfaceOptions.DefaultCacheDurationFactor);");
-                sb.AppendLine("\t\t\t/// need to manually call dispose instead of having a using");
+                sb.AppendLine("");
+                sb.AppendLine("\t\t\t// need to manually call dispose instead of having a using");
                 sb.AppendLine("\t\t\t// in case the factory passed in throws, in which case we");
                 sb.AppendLine("\t\t\t// do not want to add the entry to the cache");
                 sb.AppendLine("\t\t\tentry.Dispose();");
@@ -127,7 +136,7 @@ namespace {scopedCall.Namespace}
             sb.Append($"\t\t\t\treturn ");
             foreach (var arg in method.Parameters)
             {
-                sb.Append($"_{arg.Name} == other._{arg.Name}");
+                sb.Append($"_{arg.Name}.Equals(other._{arg.Name})");
                 if (!ReferenceEquals(arg, lastArg))
                     sb.Append(" && ");
             }

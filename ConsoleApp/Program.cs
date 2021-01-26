@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -8,7 +9,7 @@ namespace ConsoleApp
 {
     class Program
     {
-        static void Main(string[] args)
+        static async Task Main(string[] args)
         {
             Console.WriteLine("Types in this assembly:");
             foreach (var t in typeof(Program).Assembly.GetTypes())
@@ -32,7 +33,7 @@ namespace ConsoleApp
             var log = services.GetRequiredService<ILogger<Program>>();
             try
             {
-                Work(services);
+                await WorkAsync(services);
             }
             catch (Exception e)
             {
@@ -41,14 +42,18 @@ namespace ConsoleApp
             }
         }
 
-        private static void Work(ServiceProvider services)
+        private static async Task WorkAsync(ServiceProvider services)
         {
             using (var scope = services.CreateScope())
             {
                 var log = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
                 var maths = scope.ServiceProvider.GetRequiredService<IDoMaths>();
-
                 var cache = scope.ServiceProvider.GetRequiredService<IMemoryCache>();
+
+                // ValueTypes
+
+
+                log.LogWarning("Maths");
 
                 log.LogInformation("Result: {result}", maths.Add(5, 10));
 
@@ -62,16 +67,22 @@ namespace ConsoleApp
 
                 log.LogInformation("Result: {result}", maths.Add(5, 10));
 
-                // ValueTypes
-                log.LogInformation("ValueTypes:");
+                log.LogWarning("ValueTypes:");
 
+                /*
+                var org2 = new ValueType1(77);
+
+                var key1 = new DoMaths_Memoized.ArgKey_int_GetValue_ConsoleApp_IValueType1(org);
+                var key2 = new DoMaths_Memoized.ArgKey_int_GetValue_ConsoleApp_IValueType1(org2);
+                */
                 var org = new ValueType1(77);
 
                 log.LogInformation("ValueType {value}", maths.GetValue(org));
                 log.LogInformation("ValueType {value}", maths.GetValue(new ValueType1(77)));
                 log.LogInformation("ValueTypeReference {value}", maths.GetValue(org));
 
-                log.LogWarning("WHAT?");
+                // Writing to the console isnt instant do delay slightly to see all logs
+                await Task.Delay(100);
             }
         }
     }

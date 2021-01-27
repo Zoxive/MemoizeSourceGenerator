@@ -94,7 +94,10 @@ namespace ConsoleApp
 
         int GetValue(IValueType1 valueType);
 
+        [SlidingCache(1)]
         int GetValue(ValueType2 valueType);
+
+        int Find([PartitionCache]string name, ValueType2 info);
     }
 
     public class DoMaths : IDoMaths
@@ -122,6 +125,11 @@ namespace ConsoleApp
         {
             _logger.LogInformation("Calculating Value2 {value}", valueType.Value);
             return valueType.Value;
+        }
+
+        public int Find(string name, ValueType2 info)
+        {
+            throw new NotImplementedException();
         }
     }
 

@@ -1,15 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
-using System.Diagnostics;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Reflection.Metadata.Ecma335;
-using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Microsoft.CodeAnalysis.Text;
+using SourceGenerator.Models;
 
 namespace SourceGenerator
 {
@@ -35,7 +29,7 @@ namespace SourceGenerator
                 context.ReportDiagnostic(Diagnostic.Create(
                     new DiagnosticDescriptor(
                         "SI0000",
-                        "An exception was thrown by the JsonSrcGen generator",
+                        "An exception was thrown by the MockDI generator",
                         "An exception was thrown by the MockDI generator: '{0}'",
                         "MockDISrcGen",
                         DiagnosticSeverity.Error,
@@ -53,10 +47,13 @@ namespace SourceGenerator
             {
                 var compilation = context.Compilation;
 
-                var createMemoizedAttribute = compilation.GetTypeByMetadataName("SourceGenerator.Attribute.CreateMemoizedImplementationAttribute");
-                if (createMemoizedAttribute == null)
-                    throw new Exception("Could not locate CreateMemoizedImplementationAttribute");
+                var createMemoizedAttribute = compilation.GetAttribute("CreateMemoizedImplementationAttribute");
+                var partitionAttribute = compilation.GetAttribute("PartitionCacheAttribute");
+                var slidingCacheAttribute = compilation.GetAttribute("SlidingCacheAttribute");
 
+                var myContext = new GeneratorContext(context, createMemoizedAttribute, partitionAttribute, slidingCacheAttribute);
+
+                /*
                 foreach (var possibleAttribute in receiver.CandidateAttributes)
                 {
                     var model = compilation.GetSemanticModel(possibleAttribute.SyntaxTree);
@@ -67,6 +64,7 @@ namespace SourceGenerator
 
                     }
                 }
+                */
 
                 foreach (var addMemoizedScopeCall in receiver.Candidate)
                 {
@@ -85,17 +83,59 @@ namespace SourceGenerator
                             continue;
                         }
 
-                        if (!ScopedMemoizerCall.TryCreate(context, addMemoizedScopeCall, interfaceArg, implArg, createMemoizedAttribute, out var scopedCall))
+                        if (!ScopedMemoizerCall.TryCreate(myContext, addMemoizedScopeCall, interfaceArg, implArg, out var scopedCall))
                             continue;
 
                         calls.Add(scopedCall);
 
-                        context.AddSource(scopedCall.ClassName, MemoizedClass.Generate(scopedCall));
+                        var source = MemoizedClass.Generate(scopedCall);
+
+                        context.AddSource(scopedCall.ClassName, source);
                     }
                 }
             }
 
             context.AddSource("Memoized_ServiceCollectionExtensions", AddMemoizedExtensionCall.Generate(calls));
+        }
+
+
+    }
+
+    public static class CompilationExtensions
+    {
+        public static INamedTypeSymbol GetAttribute(this Compilation compilation, string name)
+        {
+            var createMemoizedAttribute = compilation.GetTypeByMetadataName($"SourceGenerator.Attribute.{name}");
+            if (createMemoizedAttribute == null)
+                throw new Exception($"Could not locate {name}");
+            return createMemoizedAttribute;
+        }
+    }
+
+    public class GeneratorContext
+    {
+        public GeneratorExecutionContext Context { get; }
+        public INamedTypeSymbol CreateMemoizedAttribute { get; }
+        public INamedTypeSymbol PartitionCacheAttribute { get; }
+        public INamedTypeSymbol SlidingCacheAttribute { get; }
+
+        public GeneratorContext
+        (
+            GeneratorExecutionContext context,
+            INamedTypeSymbol createMemoizedAttribute,
+            INamedTypeSymbol partitionCacheAttribute,
+            INamedTypeSymbol slidingCacheAttribute
+        )
+        {
+            Context = context;
+            CreateMemoizedAttribute = createMemoizedAttribute;
+            PartitionCacheAttribute = partitionCacheAttribute;
+            SlidingCacheAttribute = slidingCacheAttribute;
+        }
+
+        public void ReportDiagnostic(Diagnostic diag)
+        {
+            Context.ReportDiagnostic(diag);
         }
     }
 

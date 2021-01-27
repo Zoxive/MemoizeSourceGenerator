@@ -1,6 +1,6 @@
 ﻿using System.Linq;
 using System.Text;
-using Microsoft.CodeAnalysis;
+using SourceGenerator.Models;
 
 namespace SourceGenerator
 {
@@ -73,9 +73,11 @@ namespace {scopedCall.Namespace}
                 sb.AppendLine(" _logger.LogDebug(\"Cache Miss. {key} {value}\", key, result);");
                 sb.AppendLine();
 
+                var slidingDuration = method.SlidingCache?.InMinutes ?? scopedCall.SlidingCache?.InMinutes ?? 10; // TODO fallback in global options
+
                 sb.AppendLine("\t\t\t// TODO fix cache duration");
                 sb.AppendLine("\t\t\t// TODO fix cache token expiration");
-                sb.AppendLine("\t\t\tentry.SetSlidingExpiration(MemoizedInterfaceOptions.DefaultExpirationTime * MemoizedInterfaceOptions.DefaultCacheDurationFactor);");
+                sb.AppendLine($"\t\t\tentry.SetSlidingExpiration(TimeSpan.FromMinutes({slidingDuration}));");
                 sb.AppendLine("");
                 sb.AppendLine("\t\t\t// need to manually call dispose instead of having a using");
                 sb.AppendLine("\t\t\t// in case the factory passed in throws, in which case we");
@@ -105,7 +107,7 @@ namespace {scopedCall.Namespace}
             var lastArg = method.Parameters.LastOrDefault();
 
 
-            sb.AppendLine($"\t\tpublic struct {methodClassName} : IEquatable<{methodClassName}>");
+            sb.AppendLine($"\t\tpublic readonly struct {methodClassName} : IEquatable<{methodClassName}>");
             sb.AppendLine("\t\t{");
 
             foreach (var arg in method.Parameters)

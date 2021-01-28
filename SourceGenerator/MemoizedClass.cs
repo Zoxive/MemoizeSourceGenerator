@@ -21,11 +21,9 @@ namespace {scopedCall.Namespace}
     {{
 ");
             sb.AppendLine($"\t\tprivate readonly {fullInterfaceName} _impl;");
-            sb.AppendLine($"\t\tprivate readonly IMemoryCache _cache;");
             sb.AppendLine($"\t\tprivate readonly ILogger<{scopedCall.ClassName}> _logger;");
-            sb.AppendLine($"\t\tpublic {scopedCall.ClassName}(IMemoryCache cache, {fullInterfaceName} impl, ILogger<{scopedCall.ClassName}> logger)");
+            sb.AppendLine($"\t\tpublic {scopedCall.ClassName}({fullInterfaceName} impl, ILogger<{scopedCall.ClassName}> logger)");
             sb.AppendLine("\t\t{");
-            sb.AppendLine("\t\t\t_cache = cache;");
             sb.AppendLine("\t\t\t_impl = impl;");
             sb.AppendLine("\t\t\t_logger = logger;");
             sb.AppendLine("\t\t}");
@@ -51,6 +49,17 @@ namespace {scopedCall.Namespace}
                 sb.AppendLine(")");
                 sb.AppendLine("\t\t{");
 
+                if (method.PartitionedParameter != null)
+                {
+                    sb.AppendLine($"\t\t\tvar _cache = MemoizerFactory.GetOrCreatePartition({method.PartitionedParameter.Name});");
+                }
+                else
+                {
+                    sb.AppendLine($"\t\t\tvar _cache = MemoizerFactory.GetGlobal();");
+                }
+
+                sb.AppendLine($"\t\t\t_cache.RecordAccessCount();");
+                sb.AppendLine();
                 sb.Append($"\t\t\tvar key = new {method.ClassName}(");
                 method.WriteParameters(sb);
                 sb.AppendLine(");");
@@ -61,6 +70,10 @@ namespace {scopedCall.Namespace}
                 sb.AppendLine();
                 sb.AppendLine("\t\t\t\treturn value;");
                 sb.AppendLine("\t\t\t}");
+
+                sb.AppendLine();
+                sb.AppendLine("\t\t\t_cache.RecordMiss();");
+                sb.AppendLine();
                 sb.AppendLine("\t\t\tvar entry = _cache.CreateEntry(key);");
                 sb.Append($"\t\t\tvar result = _impl.{methodName}(");
                 method.WriteParameters(sb);
@@ -75,7 +88,6 @@ namespace {scopedCall.Namespace}
 
                 var slidingDuration = method.SlidingCache?.InMinutes ?? scopedCall.SlidingCache?.InMinutes ?? 10; // TODO fallback in global options
 
-                sb.AppendLine("\t\t\t// TODO fix cache duration");
                 sb.AppendLine("\t\t\t// TODO fix cache token expiration");
                 sb.AppendLine($"\t\t\tentry.SetSlidingExpiration(TimeSpan.FromMinutes({slidingDuration}));");
                 sb.AppendLine("");

@@ -42,7 +42,7 @@ namespace SourceGenerator.Models
 
             Name = methodSymbol.Name;
 
-            HasPartitionedParameter = parameters.Any(x => x.PartitionsCache);
+            PartitionedParameter = parameters.FirstOrDefault(x => x.PartitionsCache);
 
             var argNames = parameters.Select(x => x.ArgType.Replace('.', '_')).ToArray();
             ClassName = $"ArgKey_{ReturnType}_{methodSymbol.Name}_{(string.Join('_', argNames))}";
@@ -54,7 +54,7 @@ namespace SourceGenerator.Models
             SlidingCache = slidingCache;
         }
 
-        public bool HasPartitionedParameter { get; }
+        public MemoizedMethodMemberArgument? PartitionedParameter { get; }
 
         public string ClassName { get; }
 

@@ -65,7 +65,7 @@ namespace SourceGenerator.Models
         public bool ReturnsVoid { get; }
         public string ReturnType { get; }
 
-        public void WriteParameters(StringBuilder sb, bool writeType = false)
+        public void WriteParameters(StringBuilder sb, bool writeType = false, string? prefix = null)
         {
             foreach (var arg in Parameters)
             {
@@ -74,6 +74,8 @@ namespace SourceGenerator.Models
                     sb.Append(arg.ArgType);
                     sb.Append(" ");
                 }
+                if (prefix != null)
+                    sb.Append(prefix);
                 sb.Append(arg.Name);
                 if (!ReferenceEquals(arg, _lastArg))
                     sb.Append(", ");

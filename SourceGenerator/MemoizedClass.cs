@@ -22,8 +22,10 @@ namespace {scopedCall.Namespace}.Memoized
 ");
             sb.AppendLine($"\t\tprivate readonly {fullInterfaceName} _impl;");
             sb.AppendLine($"\t\tprivate readonly ILogger<{scopedCall.ClassName}> _logger;");
-            sb.AppendLine($"\t\tpublic {scopedCall.ClassName}({fullInterfaceName} impl, ILogger<{scopedCall.ClassName}> logger)");
+            sb.AppendLine($"\t\tprivate readonly IMemoizerFactory _cacheFactory;");
+            sb.AppendLine($"\t\tpublic {scopedCall.ClassName}(IMemoizerFactory cacheFactory, {fullInterfaceName} impl, ILogger<{scopedCall.ClassName}> logger)");
             sb.AppendLine("\t\t{");
+            sb.AppendLine("\t\t\t_cacheFactory = cacheFactory;");
             sb.AppendLine("\t\t\t_impl = impl;");
             sb.AppendLine("\t\t\t_logger = logger;");
             sb.AppendLine("\t\t}");
@@ -44,27 +46,25 @@ namespace {scopedCall.Namespace}.Memoized
                 var methodName = method.Name;
 
                 sb.Append($"\t\tpublic {returnType} {methodName}(");
-
-                method.WriteParameters(sb, writeType: true);
+                method.WriteParameters(sb, writeType: true, prefix: "__");
                 sb.AppendLine(")");
                 sb.AppendLine("\t\t{");
 
                 if (method.PartitionedParameter != null)
                 {
-                    sb.AppendLine($"\t\t\tvar _cache = MemoizerFactory.GetOrCreatePartition({method.PartitionedParameter.Name});");
+                    sb.AppendLine($"\t\t\tvar cache = _cacheFactory.GetOrCreatePartition(__{method.PartitionedParameter.Name});");
                 }
                 else
                 {
-                    sb.AppendLine($"\t\t\tvar _cache = MemoizerFactory.GetGlobal();");
+                    sb.AppendLine($"\t\t\tvar cache = _cacheFactory.GetGlobal();");
                 }
 
-                sb.AppendLine($"\t\t\tvar clearCacheTokenSource = _cache.ClearCacheTokenSource;");
-                sb.AppendLine($"\t\t\t_cache.RecordAccessCount();");
+                sb.AppendLine($"\t\t\tcache.RecordAccessCount();");
                 sb.AppendLine();
                 sb.Append($"\t\t\tvar key = new {method.ClassName}(");
-                method.WriteParameters(sb);
+                method.WriteParameters(sb, prefix: "__");
                 sb.AppendLine(");");
-                sb.AppendLine($"\t\t\tif (_cache.TryGetValue<{returnType}>(key, out var value))");
+                sb.AppendLine($"\t\t\tif (cache.TryGetValue<{returnType}>(key, out var value))");
                 sb.AppendLine("\t\t\t{");
                 sb.Append("\t\t\t\tif (_logger.IsEnabled(LogLevel.Debug))");
                 sb.AppendLine(" _logger.LogDebug(\"Cache hit. {key} {value}\", key, value);");
@@ -73,11 +73,12 @@ namespace {scopedCall.Namespace}.Memoized
                 sb.AppendLine("\t\t\t}");
 
                 sb.AppendLine();
-                sb.AppendLine("\t\t\t_cache.RecordMiss();");
+                sb.AppendLine($"\t\t\tvar clearCacheTokenSource = cache.ClearCacheTokenSource;");
+                sb.AppendLine("\t\t\tcache.RecordMiss();");
                 sb.AppendLine();
-                sb.AppendLine("\t\t\tvar entry = _cache.CreateEntry(key);");
+                sb.AppendLine("\t\t\tvar entry = cache.CreateEntry(key);");
                 sb.Append($"\t\t\tvar result = _impl.{methodName}(");
-                method.WriteParameters(sb);
+                method.WriteParameters(sb, prefix: "__");
                 sb.AppendLine(");");
                 sb.AppendLine("\t\t\tentry.SetValue(result);");
 
@@ -89,7 +90,7 @@ namespace {scopedCall.Namespace}.Memoized
 
                 var slidingDuration = method.SlidingCache?.InMinutes ?? scopedCall.SlidingCache?.InMinutes ?? 10; // TODO fallback in global options
 
-                sb.AppendLine($"\t\t\t_cache.SetExpiration(entry, clearCacheTokenSource, {slidingDuration});");
+                sb.AppendLine($"\t\t\tcache.SetExpiration(entry, clearCacheTokenSource, {slidingDuration});");
                 sb.AppendLine("");
                 sb.AppendLine("\t\t\t// need to manually call dispose instead of having a using");
                 sb.AppendLine("\t\t\t// in case the factory passed in throws, in which case we");

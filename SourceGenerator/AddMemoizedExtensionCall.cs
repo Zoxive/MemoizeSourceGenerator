@@ -27,6 +27,8 @@ namespace Microsoft.Extensions.DependencyInjection
 @"using System;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using SourceGenerator.Attribute;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
@@ -34,6 +36,7 @@ namespace Microsoft.Extensions.DependencyInjection
     {
         public static IServiceCollection AddMemoizedScoped<TInterface, TImplementation>(this IServiceCollection services) where TInterface : class where TImplementation : class, TInterface
         {
+            services.TryAddSingleton<IMemoizerFactory, MemoizerFactory>();
 ");
             /*
         }
@@ -47,12 +50,10 @@ namespace Microsoft.Extensions.DependencyInjection
 
                 sb.AppendLine($"\t\t\tif (typeof(TInterface) == typeof({interfaceName}) && typeof(TImplementation) == typeof({implName}))");
                 sb.AppendLine("\t\t\t{");
-                sb.AppendLine("\t\t\t\t//return services.AddScoped<TInterface, TImplementation>();");
-                sb.AppendLine($"\t\t\t\tservices.AddScoped<{implName}>();");
+                sb.AppendLine($"\t\t\t\tservices.TryAddScoped<{implName}>();");
                 sb.AppendLine($"\t\t\t\tservices.AddScoped<{interfaceName}>(s =>");
                 sb.AppendLine("\t\t\t\t{");
-                //sb.AppendLine($"\t\t\t\t\treturn new {call.Namespace}.{call.ClassName}(s.GetRequiredService<IMemoryCache>(), s.GetRequiredService<{implName}>(), s.GetRequiredService<ILogger<{call.Namespace}.{call.ClassName}>>());");
-                sb.AppendLine($"\t\t\t\t\treturn new {call.Namespace}.Memoized.{call.ClassName}(s.GetRequiredService<{implName}>(), s.GetRequiredService<ILogger<{call.Namespace}.Memoized.{call.ClassName}>>());");
+                sb.AppendLine($"\t\t\t\t\treturn new {call.Namespace}.Memoized.{call.ClassName}(s.GetRequiredService<IMemoizerFactory>(), s.GetRequiredService<{implName}>(), s.GetRequiredService<ILogger<{call.Namespace}.Memoized.{call.ClassName}>>());");
                 sb.AppendLine("\t\t\t\t});");
                 sb.AppendLine("\t\t\t\treturn services;");
                 sb.AppendLine("\t\t\t}");

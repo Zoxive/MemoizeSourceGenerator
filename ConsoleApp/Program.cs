@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
 using SourceGenerator.Attribute;
 
@@ -25,7 +27,6 @@ namespace ConsoleApp
             {
                 o.AddConsole();
             });
-            s.AddMemoryCache();
             s.AddMemoizedScoped<IDoMaths, DoMaths>();
 
             var services = s.BuildServiceProvider();
@@ -48,7 +49,7 @@ namespace ConsoleApp
             {
                 var log = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
                 var maths = scope.ServiceProvider.GetRequiredService<IDoMaths>();
-                var cache = scope.ServiceProvider.GetRequiredService<IMemoryCache>();
+                var cacheFactory = scope.ServiceProvider.GetRequiredService<IMemoizerFactory>();
 
                 // ValueTypes
 
@@ -63,7 +64,7 @@ namespace ConsoleApp
                 log.LogInformation("New Result: {result}", maths.Add(10, 10));
 
                 // manual bust
-                cache.Remove(new Memoized.DoMaths.ArgKey_int_Add_int_int(5, 10));
+                cacheFactory.GetGlobal().Remove(new Memoized.DoMaths.ArgKey_int_Add_int_int(5, 10));
 
                 log.LogInformation("Result: {result}", maths.Add(5, 10));
 
@@ -81,6 +82,16 @@ namespace ConsoleApp
                 log.LogInformation("ValueType {value}", maths.GetValue(new ValueType1(77)));
                 log.LogInformation("ValueTypeReference {value}", maths.GetValue(org));
 
+                maths.SpecialMath("Hello!", 1, 2);
+                maths.SpecialMath("Hello!", 1, 2);
+
+                var stats = cacheFactory.Partitions.Select(x => x.GetStatistics());
+
+                foreach (var stat in stats)
+                {
+                    log.LogInformation("Cache {@Statistics} for {Id}", stat.ToLogArg, stat.Id);
+                }
+
                 // Writing to the console isnt instant do delay slightly to see all logs
                 await Task.Delay(100);
             }
@@ -97,7 +108,7 @@ namespace ConsoleApp
         [SlidingCache(1.25)]
         int GetValue(ValueType2 valueType);
 
-        int Find([PartitionCache]string name, ValueType2 info);
+        int SpecialMath([PartitionCache]string name, int arg1, int arg2);
     }
 
     public class DoMaths : IDoMaths
@@ -127,9 +138,10 @@ namespace ConsoleApp
             return valueType.Value;
         }
 
-        public int Find(string name, ValueType2 info)
+        public int SpecialMath(string name, int arg1, int arg2)
         {
-            throw new NotImplementedException();
+            _logger.LogInformation("Calculating SpecialMath ({Name}) - {arg1} + {arg2}", name, arg1, arg2);
+            return arg1 + arg2;
         }
     }
 

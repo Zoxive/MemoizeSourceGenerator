@@ -63,7 +63,7 @@ namespace ConsoleApp
                 log.LogInformation("New Result: {result}", maths.Add(10, 10));
 
                 // manual bust
-                cache.Remove(new DoMaths_Memoized.ArgKey_int_Add_int_int(5, 10));
+                cache.Remove(new Memoized.DoMaths.ArgKey_int_Add_int_int(5, 10));
 
                 log.LogInformation("Result: {result}", maths.Add(5, 10));
 
@@ -94,7 +94,7 @@ namespace ConsoleApp
 
         int GetValue(IValueType1 valueType);
 
-        [SlidingCache(1)]
+        [SlidingCache(1.25)]
         int GetValue(ValueType2 valueType);
 
         int Find([PartitionCache]string name, ValueType2 info);

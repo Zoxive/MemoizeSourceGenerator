@@ -52,7 +52,7 @@ namespace Microsoft.Extensions.DependencyInjection
                 sb.AppendLine($"\t\t\t\tservices.AddScoped<{interfaceName}>(s =>");
                 sb.AppendLine("\t\t\t\t{");
                 //sb.AppendLine($"\t\t\t\t\treturn new {call.Namespace}.{call.ClassName}(s.GetRequiredService<IMemoryCache>(), s.GetRequiredService<{implName}>(), s.GetRequiredService<ILogger<{call.Namespace}.{call.ClassName}>>());");
-                sb.AppendLine($"\t\t\t\t\treturn new {call.Namespace}.{call.ClassName}(s.GetRequiredService<{implName}>(), s.GetRequiredService<ILogger<{call.Namespace}.{call.ClassName}>>());");
+                sb.AppendLine($"\t\t\t\t\treturn new {call.Namespace}.Memoized.{call.ClassName}(s.GetRequiredService<{implName}>(), s.GetRequiredService<ILogger<{call.Namespace}.Memoized.{call.ClassName}>>());");
                 sb.AppendLine("\t\t\t\t});");
                 sb.AppendLine("\t\t\t\treturn services;");
                 sb.AppendLine("\t\t\t}");

@@ -15,7 +15,7 @@ using Microsoft.Extensions.Logging;
 using System;
 using SourceGenerator.Attribute;
 
-namespace {scopedCall.Namespace}
+namespace {scopedCall.Namespace}.Memoized
 {{
     public class {scopedCall.ClassName} : {fullInterfaceName}
     {{
@@ -58,6 +58,7 @@ namespace {scopedCall.Namespace}
                     sb.AppendLine($"\t\t\tvar _cache = MemoizerFactory.GetGlobal();");
                 }
 
+                sb.AppendLine($"\t\t\tvar clearCacheTokenSource = _cache.ClearCacheTokenSource;");
                 sb.AppendLine($"\t\t\t_cache.RecordAccessCount();");
                 sb.AppendLine();
                 sb.Append($"\t\t\tvar key = new {method.ClassName}(");
@@ -88,8 +89,7 @@ namespace {scopedCall.Namespace}
 
                 var slidingDuration = method.SlidingCache?.InMinutes ?? scopedCall.SlidingCache?.InMinutes ?? 10; // TODO fallback in global options
 
-                sb.AppendLine("\t\t\t// TODO fix cache token expiration");
-                sb.AppendLine($"\t\t\tentry.SetSlidingExpiration(TimeSpan.FromMinutes({slidingDuration}));");
+                sb.AppendLine($"\t\t\t_cache.SetExpiration(entry, clearCacheTokenSource, {slidingDuration});");
                 sb.AppendLine("");
                 sb.AppendLine("\t\t\t// need to manually call dispose instead of having a using");
                 sb.AppendLine("\t\t\t// in case the factory passed in throws, in which case we");

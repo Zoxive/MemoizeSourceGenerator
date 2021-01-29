@@ -84,7 +84,7 @@ namespace SourceGenerator.Models
             }
 
             className = classNameFromAttribute ??
-                        $"{(interfaceType.Name.StartsWith("I", StringComparison.OrdinalIgnoreCase) ? interfaceType.Name.Substring(1) : interfaceType.Name)}_Memoized";
+                        (interfaceType.Name.StartsWith("I", StringComparison.OrdinalIgnoreCase) ? interfaceType.Name.Substring(1) : interfaceType.Name);
             return true;
         }
 

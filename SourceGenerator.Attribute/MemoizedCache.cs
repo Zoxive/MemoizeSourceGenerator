@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Threading;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Primitives;
 
 namespace SourceGenerator.Attribute
 {
@@ -58,7 +60,7 @@ namespace SourceGenerator.Attribute
         private MemoryCache Cache { get; }
         public string Name { get; }
 
-        private CancellationTokenSource _clearCacheTokenSource;
+        public CancellationTokenSource ClearCacheTokenSource { get; private set; }
         private readonly object _tokenSourceSync;
         private int _accessCount = 0;
         private int _misses = 0;
@@ -71,7 +73,7 @@ namespace SourceGenerator.Attribute
             // TODO add a way for users to customize this
             Cache = new MemoryCache(new MemoryCacheOptions());
             _tokenSourceSync = new object();
-            _clearCacheTokenSource = new CancellationTokenSource();
+            ClearCacheTokenSource = new CancellationTokenSource();
         }
 
         public bool TryGetValue(object key, out object value) => Cache.TryGetValue(key, out value);
@@ -80,7 +82,7 @@ namespace SourceGenerator.Attribute
 
         public void Invalidate()
         {
-            var tokenSource = _clearCacheTokenSource;
+            var tokenSource = ClearCacheTokenSource;
 
             lock (_tokenSourceSync)
             {
@@ -89,19 +91,43 @@ namespace SourceGenerator.Attribute
                     tokenSource.Cancel();
                     tokenSource.Dispose();
                 }
-                _clearCacheTokenSource = new CancellationTokenSource();
+                ClearCacheTokenSource = new CancellationTokenSource();
             }
         }
 
-        public void RecordAccessCount()
+        public void SetExpiration(ICacheEntry entry, CancellationTokenSource clearCacheTokenSource, double inMinutes, long? size = null)
         {
-            Interlocked.Increment(ref _accessCount);
+            lock (_tokenSourceSync)
+            {
+                if (clearCacheTokenSource != ClearCacheTokenSource)
+                {
+                    entry.SetAbsoluteExpiration(TimeSpan.FromTicks(1));
+                }
+                else
+                {
+                    entry.SetSlidingExpiration(TimeSpan.FromMinutes(inMinutes))
+                        .AddExpirationToken(new CancellationChangeToken(ClearCacheTokenSource.Token));
+                }
+            }
+
+            if (size.HasValue)
+            {
+                entry.Size = size;
+                Interlocked.Add(ref _totalSize, (int)size.Value);
+            }
+
+            entry.RegisterPostEvictionCallback(EvictionCallback);
+            void EvictionCallback(object _, object value, EvictionReason __, object ___)
+            {
+                if (size.HasValue)
+                {
+                    Interlocked.Add(ref _totalSize, -(int)size.Value);
+                }
+            }
         }
 
-        public void RecordMiss()
-        {
-            Interlocked.Increment(ref _misses);
-        }
+        public void RecordAccessCount() => Interlocked.Increment(ref _accessCount);
+        public void RecordMiss() => Interlocked.Increment(ref _misses);
 
         public CacheStatistics GetStatistics()
         {
@@ -114,11 +140,59 @@ namespace SourceGenerator.Attribute
             return new CacheStatistics(Name, count, Math.Round((double)(count - misses) / count, 3), Cache.Count, _totalSize);
         }
 
+        /*
+        private void ComputeSizeAndUpdateResult(CacheResult result, CachePartition cachePartition, ICacheEntry e)
+        {
+            var sw = Stopwatch.StartNew();
+
+            var partitionName = cachePartition.Name;
+            var m = MemorySizeComputePool.Get();
+            var size = (int)m.SizeOf(result.Value);
+            lock(result)
+            {
+                // don't cache larger objects if we are already running low on available memory
+                if (DefaultCacheDurationFactor < 0.2 && size > 20*1024)
+                {
+                    result.Status = CacheStatus.NotCached;
+                    result.ByteSize = 0;
+                    // reset expiration to the non scaled default
+                    e.SetSlidingExpiration(DefaultExpirationTime);
+                    _logger.LogWarning("Not caching item due to memory constraints ({Id}) {Factory} {size}", partitionName != null ? $"{Id}-{partitionName}" : Id, DefaultCacheDurationFactor, size);
+                }
+                else if (result.Status != CacheStatus.NotCached)
+                {
+                    result.ByteSize = size;
+                    Interlocked.Add(ref cachePartition.TotalSize, size);
+                    result.Status = CacheStatus.Cached;
+                }
+                else
+                {
+                    result.ByteSize = 0;
+                    _logger.LogWarning("Not caching item status? {status} ({Id}) {Factory} {size}", result.Status, partitionName != null ? $"{Id}-{partitionName}" : Id, DefaultCacheDurationFactor, size);
+                }
+            }
+            MemorySizeComputePool.Return(m);
+
+            sw.Stop();
+
+            if (sw.Elapsed.TotalMilliseconds > 0.1 || size >= 10000)
+            {
+                _logger.LogTrace("Computing size of cached item took {timeMs}ms, {size} bytes ({Id})", sw.Elapsed.TotalMilliseconds, size, partitionName != null ? $"{Id}-{partitionName}" : Id);
+            }
+        }
+        */
+
         public void Dispose()
         {
-            _clearCacheTokenSource.Cancel();
-            _clearCacheTokenSource.Dispose();
+            ClearCacheTokenSource.Cancel();
+            ClearCacheTokenSource.Dispose();
             Cache.Dispose();
+        }
+
+        internal sealed class CacheResult
+        {
+            public int ByteSize { get; set; }
+            public object? Value { get; set; }
         }
     }
 

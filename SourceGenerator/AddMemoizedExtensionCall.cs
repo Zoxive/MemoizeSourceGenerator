@@ -53,7 +53,15 @@ namespace Microsoft.Extensions.DependencyInjection
                 sb.AppendLine($"\t\t\t\tservices.TryAddScoped<{implName}>();");
                 sb.AppendLine($"\t\t\t\tservices.AddScoped<{interfaceName}>(s =>");
                 sb.AppendLine("\t\t\t\t{");
-                sb.AppendLine($"\t\t\t\t\treturn new {call.Namespace}.Memoized.{call.ClassName}(s.GetRequiredService<IMemoizerFactory>(), s.GetRequiredService<{implName}>(), s.GetRequiredService<ILogger<{call.Namespace}.Memoized.{call.ClassName}>>());");
+                if (call.MemoizerFactoryType != null)
+                {
+                    sb.AppendLine($"\t\t\t\t\tvar factory = s.GetRequiredService<{call.MemoizerFactoryType.ToDisplayString()}>();");
+                }
+                else
+                {
+                    sb.AppendLine($"\t\t\t\t\tvar factory = s.GetRequiredService<IMemoizerFactory>();");
+                }
+                sb.AppendLine($"\t\t\t\t\treturn new {call.Namespace}.Memoized.{call.ClassName}(factory, s.GetRequiredService<{implName}>(), s.GetRequiredService<ILogger<{call.Namespace}.Memoized.{call.ClassName}>>());");
                 sb.AppendLine("\t\t\t\t});");
                 sb.AppendLine("\t\t\t\treturn services;");
                 sb.AppendLine("\t\t\t}");

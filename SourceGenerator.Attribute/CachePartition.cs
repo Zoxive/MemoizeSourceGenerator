@@ -18,13 +18,11 @@ namespace SourceGenerator.Attribute
         private int _misses = 0;
         private int _totalSize = 0;
 
-        public CachePartition(string name, ILogger<CachePartition> logger)
+        public CachePartition(string name, ILogger<CachePartition> logger, MemoryCache memoryCache)
         {
             _logger = logger;
             Name = name;
-
-            // TODO add a way for users to customize this
-            Cache = new MemoryCache(new MemoryCacheOptions());
+            Cache = memoryCache;
             _tokenSourceSync = new object();
             ClearCacheTokenSource = new CancellationTokenSource();
         }

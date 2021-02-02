@@ -22,10 +22,38 @@ namespace SourceGenerator.Models
             var interfaceAttributes = interfaceType.GetAttributes();
             var errorLocation = expressionSyntax.Name.GetLocation();
 
-            if (!TryGetClassName(context, interfaceType, interfaceAttributes, errorLocation, out var className))
+            var memoizeAttribute = interfaceAttributes.FirstOrDefault(x => SymbolEqualityComparer.Default.Equals(x.AttributeClass, context.CreateMemoizedAttribute));
+            if (memoizeAttribute == null)
+            {
+                var label = DiagError.CreateError("Missing Memoized Attribute", "Interface must have the [CreateMemoizedImplementation] attribute attached");
+                context.ReportDiagnostic(Diagnostic.Create(label, errorLocation));
+                call = null;
+                return false;
+            }
+
+            if (!TryGetClassName(memoizeAttribute, interfaceType, out var className))
             {
                 call = null;
                 return false;
+            }
+
+            var memoizerFactory = memoizeAttribute.NamedArguments.FirstOrDefault(x => x.Key == nameof(CreateMemoizedImplementationAttribute.MemoizerFactory)).Value;
+            INamedTypeSymbol? memoizerFactoryTypeSymbol = null;
+            if (!memoizerFactory.IsNull)
+            {
+                memoizerFactoryTypeSymbol = memoizerFactory.Value as INamedTypeSymbol;
+            }
+
+            if (memoizerFactoryTypeSymbol != null)
+            {
+                if (!memoizerFactoryTypeSymbol.AllInterfaces.Any(i => SymbolEqualityComparer.Default.Equals(i, context.MemoizerFactoryInterface)))
+                {
+                    var label = DiagError.CreateError($"Wrong {nameof(CreateMemoizedImplementationAttribute.MemoizerFactory)} type",
+                        $"MemoizerFactory type must implement {nameof(IMemoizerFactory)}");
+                    context.ReportDiagnostic(Diagnostic.Create(label, errorLocation));
+                    call = null;
+                    return false;
+                }
             }
 
             var slidingCache = SlidingCache.MaybeCreate(context, interfaceAttributes);
@@ -51,32 +79,14 @@ namespace SourceGenerator.Models
                 }
             }
 
-            call = new ScopedMemoizerCall(interfaceType, implementationType, className, methods, slidingCache);
+            call = new ScopedMemoizerCall(interfaceType, implementationType, className, methods, slidingCache, memoizerFactoryTypeSymbol);
 
             return true;
         }
 
-        private static bool TryGetClassName
-        (
-            GeneratorContext context,
-            ITypeSymbol interfaceType,
-            ImmutableArray<AttributeData> interfaceAttributes,
-            Location errorLocation,
-            [NotNullWhen(true)] out string? className
-        )
+        private static bool TryGetClassName(AttributeData memoizeAttribute, ITypeSymbol interfaceType, out string className)
         {
-            var memoizeAttribute = interfaceAttributes.FirstOrDefault(x => SymbolEqualityComparer.Default.Equals(x.AttributeClass, context.CreateMemoizedAttribute));
-
-            if (memoizeAttribute == null)
-            {
-                var label = DiagError.CreateError("Missing Memoized Attribute", "Interface must have the [CreateMemoizedImplementation] attribute attached");
-                context.ReportDiagnostic(Diagnostic.Create(label, errorLocation));
-                className = null;
-                return false;
-            }
-
             var name = memoizeAttribute.NamedArguments.FirstOrDefault(x => x.Key == nameof(CreateMemoizedImplementationAttribute.Name)).Value;
-
             string? classNameFromAttribute = null;
             if (!name.IsNull)
             {
@@ -89,12 +99,12 @@ namespace SourceGenerator.Models
         }
 
         private ScopedMemoizerCall
-        (
-            ITypeSymbol interfaceType,
+        (ITypeSymbol interfaceType,
             ITypeSymbol implementationType,
             string className,
             IReadOnlyList<MemoizedMethodMember> methods,
-            SlidingCache? slidingCache
+            SlidingCache? slidingCache,
+            INamedTypeSymbol? memoizerFactoryType
         )
         {
             InterfaceType = interfaceType;
@@ -102,6 +112,7 @@ namespace SourceGenerator.Models
             ClassName = className;
             Methods = methods;
             SlidingCache = slidingCache;
+            MemoizerFactoryType = memoizerFactoryType;
         }
 
         public ITypeSymbol ImplementationsType { get; }
@@ -110,5 +121,6 @@ namespace SourceGenerator.Models
         public string Namespace => InterfaceType.ContainingNamespace.ToDisplayString();
         public IReadOnlyList<MemoizedMethodMember> Methods { get; }
         public SlidingCache? SlidingCache { get; }
+        public INamedTypeSymbol? MemoizerFactoryType { get; }
     }
 }

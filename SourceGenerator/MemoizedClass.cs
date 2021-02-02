@@ -67,7 +67,7 @@ namespace {scopedCall.Namespace}.Memoized
                 sb.AppendLine($"\t\t\tif (cache.TryGetValue<{returnType}>(key, out var value))");
                 sb.AppendLine("\t\t\t{");
                 sb.Append("\t\t\t\tif (_logger.IsEnabled(LogLevel.Debug))");
-                sb.AppendLine(" _logger.LogDebug(\"Cache hit. {key} {value}\", key, value);");
+                sb.AppendLine(" _logger.LogDebug(\"Cache hit. {CacheName} {key} {value}\", _cacheFactory.Name, key, value);");
                 sb.AppendLine();
                 sb.AppendLine("\t\t\t\treturn value;");
                 sb.AppendLine("\t\t\t}");
@@ -85,7 +85,7 @@ namespace {scopedCall.Namespace}.Memoized
                 sb.AppendLine();
 
                 sb.Append("\t\t\tif (_logger.IsEnabled(LogLevel.Debug))");
-                sb.AppendLine(" _logger.LogDebug(\"Cache Miss. {key} {value}\", key, result);");
+                sb.AppendLine(" _logger.LogDebug(\"Cache Miss. {CacheName} {key} {value}\", _cacheFactory.Name, key, result);");
                 sb.AppendLine();
 
                 var slidingDuration = method.SlidingCache?.InMinutes ?? scopedCall.SlidingCache?.InMinutes ?? 10; // TODO fallback in global options
@@ -99,13 +99,14 @@ namespace {scopedCall.Namespace}.Memoized
                 sb.AppendLine("\t\t\treturn result;");
 
                 sb.AppendLine("\t\t}");
+                sb.AppendLine();
             }
-
-            sb.AppendLine();
 
             foreach (var method in methods.Where(x => !x.ReturnsVoid))
             {
                 GenerateArgStruct(method, sb);
+
+                sb.AppendLine();
             }
 
             sb.AppendLine("\t}");
@@ -181,6 +182,19 @@ namespace {scopedCall.Namespace}.Memoized
 
             sb.AppendLine(");");
             sb.AppendLine("\t\t\t}");
+
+            sb.AppendLine($"\t\t\tpublic override string ToString()");
+            sb.AppendLine("\t\t\t{");
+            sb.Append($"\t\t\t\treturn $\"{methodClassName}(");
+            foreach (var arg in method.Parameters)
+            {
+                sb.Append($"{{_{arg.Name}}}");
+                if (!ReferenceEquals(arg, lastArg))
+                    sb.Append(", ");
+            }
+            sb.AppendLine(")\";");
+            sb.AppendLine("\t\t\t}");
+
 
             sb.AppendLine("\t\t}");
         }

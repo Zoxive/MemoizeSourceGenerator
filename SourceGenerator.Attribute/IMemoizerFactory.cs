@@ -4,6 +4,8 @@ namespace SourceGenerator.Attribute
 {
     public interface IMemoizerFactory
     {
+        string Name { get; }
+
         CachePartition GetGlobal();
         CachePartition GetOrCreatePartition(string name);
 

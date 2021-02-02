@@ -26,21 +26,54 @@ namespace ConsoleApp
             s.AddLogging(o =>
             {
                 o.AddConsole();
-            });
-            s.AddMemoizedScoped<IDoMaths, DoMaths>();
+                o.SetMinimumLevel(LogLevel.Debug);
+            })
+                .AddScoped<RequestScope>()
+                .AddScoped<ScopedMemoizer>()
+                .AddMemoizedScoped<IDoMaths, DoMaths>()
+                .AddMemoizedScoped<ICustomMemoizerTest, CustomMemoizerTest>();
 
             var services = s.BuildServiceProvider();
 
             var log = services.GetRequiredService<ILogger<Program>>();
             try
             {
-                await WorkAsync(services);
+                //await WorkAsync(services);
+                await WorkScopedTestAsync(services);
             }
             catch (Exception e)
             {
                 log.LogError(e, "Err");
                 throw;
             }
+        }
+
+        private static async Task WorkScopedTestAsync(ServiceProvider services)
+        {
+            using (var scope = services.CreateScope())
+            {
+                scope.SetTenant("123");
+
+                var log = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
+                var myClass = scope.ServiceProvider.GetRequiredService<ICustomMemoizerTest>();
+
+                log.LogInformation("Result: {result}", myClass.Result("Hello"));
+                log.LogInformation("Result: {result}", myClass.Result("Hello"));
+            }
+
+            using (var scope = services.CreateScope())
+            {
+                scope.SetTenant("567");
+
+                var log = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
+                var myClass = scope.ServiceProvider.GetRequiredService<ICustomMemoizerTest>();
+
+                log.LogInformation("Result: {result}", myClass.Result("Hello"));
+                log.LogInformation("Result: {result}", myClass.Result("Hello"));
+            }
+
+            // Writing to the console isnt instant do delay slightly to see all logs
+            await Task.Delay(100);
         }
 
         private static async Task WorkAsync(ServiceProvider services)
@@ -108,6 +141,9 @@ namespace ConsoleApp
         [SlidingCache(1.25)]
         int GetValue(ValueType2 valueType);
 
+        ValueType2 FindValueTypeByName(string name);
+
+        [SlidingCache(5)]
         int SpecialMath([PartitionCache]string name, int arg1, int arg2);
     }
 
@@ -136,6 +172,11 @@ namespace ConsoleApp
         {
             _logger.LogInformation("Calculating Value2 {value}", valueType.Value);
             return valueType.Value;
+        }
+
+        public ValueType2 FindValueTypeByName(string name)
+        {
+            return new ValueType2(name.Length);
         }
 
         public int SpecialMath(string name, int arg1, int arg2)

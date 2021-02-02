@@ -1,10 +1,11 @@
 ﻿using System.Collections.Concurrent;
 using System.Collections.Generic;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 
 namespace SourceGenerator.Attribute
 {
-    public class MemoizerFactory : IMemoizerFactory
+    public sealed class MemoizerFactory : IMemoizerFactory
     {
         private static readonly ConcurrentDictionary<string, CachePartition> CachePartitions = new();
         private static CachePartition? _globalPartition;
@@ -17,6 +18,8 @@ namespace SourceGenerator.Attribute
 
         public IEnumerable<CachePartition> Partitions => CachePartitions.Values;
 
+        public string Name { get; } = "____GLOBAL____";
+
         public CachePartition GetGlobal()
         {
             if (_globalPartition != null)
@@ -24,7 +27,7 @@ namespace SourceGenerator.Attribute
                 return _globalPartition;
             }
 
-            _globalPartition = new CachePartition("____GLOBAL____", _loggerFactory.CreateLogger<CachePartition>());
+            _globalPartition = new CachePartition(Name, _loggerFactory.CreateLogger<CachePartition>(), new MemoryCache(new MemoryCacheOptions()));
             CachePartitions[_globalPartition.Name] = _globalPartition;
             return _globalPartition;
         }
@@ -36,7 +39,7 @@ namespace SourceGenerator.Attribute
 
         private CachePartition ValueFactory(string arg)
         {
-            return new(arg, _loggerFactory.CreateLogger<CachePartition>());
+            return new(arg, _loggerFactory.CreateLogger<CachePartition>(), new MemoryCache(new MemoryCacheOptions()));
         }
     }
 }

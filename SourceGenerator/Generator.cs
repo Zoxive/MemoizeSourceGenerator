@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using SourceGenerator.Attribute;
 using SourceGenerator.Models;
 
 namespace SourceGenerator
@@ -47,24 +49,12 @@ namespace SourceGenerator
             {
                 var compilation = context.Compilation;
 
-                var createMemoizedAttribute = compilation.GetAttribute("CreateMemoizedImplementationAttribute");
-                var partitionAttribute = compilation.GetAttribute("PartitionCacheAttribute");
-                var slidingCacheAttribute = compilation.GetAttribute("SlidingCacheAttribute");
+                var createMemoizedAttribute = compilation.GetAttribute(nameof(CreateMemoizedImplementationAttribute));
+                var partitionAttribute = compilation.GetAttribute(nameof(PartitionCacheAttribute));
+                var slidingCacheAttribute = compilation.GetAttribute(nameof(SlidingCacheAttribute));
+                var memoizerFactoryInterface = compilation.GetAttribute(nameof(IMemoizerFactory));
 
-                var myContext = new GeneratorContext(context, createMemoizedAttribute, partitionAttribute, slidingCacheAttribute);
-
-                /*
-                foreach (var possibleAttribute in receiver.CandidateAttributes)
-                {
-                    var model = compilation.GetSemanticModel(possibleAttribute.SyntaxTree);
-                    var symbol = model.GetSymbolInfo(possibleAttribute).Symbol;
-
-                    if (SymbolEqualityComparer.Default.Equals(symbol, createMemoizedAttribute))
-                    {
-
-                    }
-                }
-                */
+                var myContext = new GeneratorContext(context, createMemoizedAttribute, partitionAttribute, slidingCacheAttribute, memoizerFactoryInterface);
 
                 foreach (var addMemoizedScopeCall in receiver.Candidate)
                 {
@@ -97,8 +87,6 @@ namespace SourceGenerator
 
             context.AddSource("Memoized_ServiceCollectionExtensions", AddMemoizedExtensionCall.Generate(calls));
         }
-
-
     }
 
     public static class CompilationExtensions
@@ -118,19 +106,21 @@ namespace SourceGenerator
         public INamedTypeSymbol CreateMemoizedAttribute { get; }
         public INamedTypeSymbol PartitionCacheAttribute { get; }
         public INamedTypeSymbol SlidingCacheAttribute { get; }
+        public INamedTypeSymbol MemoizerFactoryInterface { get; }
 
         public GeneratorContext
-        (
-            GeneratorExecutionContext context,
+        (GeneratorExecutionContext context,
             INamedTypeSymbol createMemoizedAttribute,
             INamedTypeSymbol partitionCacheAttribute,
-            INamedTypeSymbol slidingCacheAttribute
+            INamedTypeSymbol slidingCacheAttribute,
+            INamedTypeSymbol memoizerFactoryInterface
         )
         {
             Context = context;
             CreateMemoizedAttribute = createMemoizedAttribute;
             PartitionCacheAttribute = partitionCacheAttribute;
             SlidingCacheAttribute = slidingCacheAttribute;
+            MemoizerFactoryInterface = memoizerFactoryInterface;
         }
 
         public void ReportDiagnostic(Diagnostic diag)

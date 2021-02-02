@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ContentModelStore">
+    <e p="C:\Github\CachedInterfaceSourceGenerator" t="IncludeFlat">
+      <e p="ConsoleApp" t="IncludeRecursive">
+        <e p="bin" t="ExcludeRecursive" />
+        <e p="ConsoleApp.csproj" t="IncludeRecursive" />
+        <e p="obj" t="ExcludeRecursive">
+          <e p="Debug" t="Include">
+            <e p="netcoreapp3.1" t="Include">
+              <e p="ConsoleApp.AssemblyInfo.cs" t="Include" />
+            </e>
+          </e>
+        </e>
+        <e p="Program.cs" t="Include" />
+        <e p="ScopedMemoizer.cs" t="Include" />
+      </e>
+      <e p="MemoizeSourceGenerator" t="IncludeRecursive">
+        <e p="AddMemoizedExtensionCall.cs" t="Include" />
+        <e p="bin" t="ExcludeRecursive" />
+        <e p="DiagError.cs" t="Include" />
+        <e p="Generator.cs" t="Include" />
+        <e p="MemoizedClass.cs" t="Include" />
+        <e p="MemoizeSourceGenerator.csproj" t="IncludeRecursive" />
+        <e p="Models" t="Include">
+          <e p="MemoizedMethodMember.cs" t="Include" />
+          <e p="MemoizedMethodMemberArgument.cs" t="Include" />
+          <e p="MemoizerCall.cs" t="Include" />
+          <e p="SlidingCache.cs" t="Include" />
+        </e>
+        <e p="obj" t="ExcludeRecursive">
+          <e p="Debug" t="Include">
+            <e p="netstandard2.1" t="Include">
+              <e p="MemoizeSourceGenerator.AssemblyInfo.cs" t="Include" />
+            </e>
+          </e>
+        </e>
+        <e p="SymbolExtensions.cs" t="Include" />
+      </e>
+      <e p="MemoizeSourceGenerator.Attribute" t="IncludeRecursive">
+        <e p="Attributes.cs" t="Include" />
+        <e p="bin" t="ExcludeRecursive" />
+        <e p="CachePartition.cs" t="Include" />
+        <e p="CacheStatistics.cs" t="Include" />
+        <e p="IMemoizerFactory.cs" t="Include" />
+        <e p="MemoizerFactory.cs" t="Include" />
+        <e p="MemoizeSourceGenerator.Attribute.csproj" t="IncludeRecursive" />
+        <e p="obj" t="ExcludeRecursive">
+          <e p="Debug" t="Include">
+            <e p="netstandard2.1" t="Include">
+              <e p="MemoizeSourceGenerator.Attribute.AssemblyInfo.cs" t="Include" />
+            </e>
+          </e>
+        </e>
+      </e>
+      <e p="MemoizeSourceGenerator.sln" t="IncludeFlat" />
+      <e p="packages" t="ExcludeRecursive" />
+      <e p="SourceGeneratorTests" t="IncludeRecursive">
+        <e p="bin" t="ExcludeRecursive" />
+        <e p="obj" t="ExcludeRecursive">
+          <e p="Debug" t="Include">
+            <e p="netcoreapp3.1" t="Include">
+              <e p="SourceGeneratorTests.AssemblyInfo.cs" t="Include" />
+            </e>
+          </e>
+        </e>
+        <e p="SourceGeneratorTests.csproj" t="IncludeRecursive" />
+        <e p="Tests.cs" t="Include" />
+      </e>
+    </e>
+    <e p="C:\Users\Kyle\.nuget\packages\microsoft.net.test.sdk\16.8.0-preview-20200921-01\build\netcoreapp2.1" t="Include">
+      <e p="Microsoft.NET.Test.Sdk.Program.cs" t="Include" />
+    </e>
+    <e p="C:\Users\Kyle\.nuget\packages\microsoft.testplatform.testhost\16.8.0-preview-20200921-01\build\netcoreapp2.1\x64\testhost.dll" t="Include" />
+    <e p="C:\Users\Kyle\.nuget\packages\microsoft.testplatform.testhost\16.8.0-preview-20200921-01\build\netcoreapp2.1\x64\testhost.exe" t="Include" />
+    <e p="C:\Users\Kyle\.nuget\packages\xunit.runner.visualstudio\2.4.3\build\netcoreapp2.1\xunit.runner.reporters.netcoreapp10.dll" t="Include" />
+    <e p="C:\Users\Kyle\.nuget\packages\xunit.runner.visualstudio\2.4.3\build\netcoreapp2.1\xunit.runner.utility.netcoreapp10.dll" t="Include" />
+    <e p="C:\Users\Kyle\.nuget\packages\xunit.runner.visualstudio\2.4.3\build\netcoreapp2.1\xunit.runner.visualstudio.dotnetcore.testadapter.dll" t="Include" />
+    <e p="C:\Users\Kyle\AppData\Local\JetBrains\Rider2020.3\extResources" t="IncludeRecursive" />
+    <e p="C:\Users\Kyle\AppData\Local\JetBrains\Rider2020.3\resharper-host\Local\Transient\Rider\v203\SolutionCaches\_MemoizeSourceGenerator.714856825.00" t="ExcludeRecursive" />
+    <e p="C:\Users\Kyle\AppData\Roaming\JetBrains\Rider2020.3\consoles\db" t="IncludeRecursive" />
+    <e p="C:\Users\Kyle\AppData\Roaming\JetBrains\Rider2020.3\extensions" t="IncludeRecursive" />
+    <e p="C:\Users\Kyle\AppData\Roaming\JetBrains\Rider2020.3\scratches" t="IncludeRecursive" />
+  </component>
+</project>

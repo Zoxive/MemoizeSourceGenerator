@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using MemoizeSourceGenerator.Attribute;
+using MemoizeSourceGenerator.Models;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using SourceGenerator.Attribute;
-using SourceGenerator.Models;
 
-namespace SourceGenerator
+namespace MemoizeSourceGenerator
 {
     [Generator]
     public class Generator : ISourceGenerator
@@ -43,16 +43,16 @@ namespace SourceGenerator
 
         private void Generate(GeneratorExecutionContext context)
         {
-            var calls = new List<ScopedMemoizerCall>();
+            var calls = new List<MemoizerCall>();
 
             if (context.SyntaxReceiver is RecieveExtensionCalls receiver)
             {
                 var compilation = context.Compilation;
 
-                var createMemoizedAttribute = compilation.GetAttribute(nameof(CreateMemoizedImplementationAttribute));
-                var partitionAttribute = compilation.GetAttribute(nameof(PartitionCacheAttribute));
-                var slidingCacheAttribute = compilation.GetAttribute(nameof(SlidingCacheAttribute));
-                var memoizerFactoryInterface = compilation.GetAttribute(nameof(IMemoizerFactory));
+                var createMemoizedAttribute = compilation.GetSymbol(nameof(CreateMemoizedImplementationAttribute));
+                var partitionAttribute = compilation.GetSymbol(nameof(PartitionCacheAttribute));
+                var slidingCacheAttribute = compilation.GetSymbol(nameof(SlidingCacheAttribute));
+                var memoizerFactoryInterface = compilation.GetSymbol(nameof(IMemoizerFactory));
 
                 var myContext = new GeneratorContext(context, createMemoizedAttribute, partitionAttribute, slidingCacheAttribute, memoizerFactoryInterface);
 
@@ -73,7 +73,7 @@ namespace SourceGenerator
                             continue;
                         }
 
-                        if (!ScopedMemoizerCall.TryCreate(myContext, addMemoizedScopeCall, interfaceArg, implArg, out var scopedCall))
+                        if (!MemoizerCall.TryCreate(myContext, addMemoizedScopeCall, interfaceArg, implArg, out var scopedCall))
                             continue;
 
                         calls.Add(scopedCall);
@@ -91,9 +91,9 @@ namespace SourceGenerator
 
     public static class CompilationExtensions
     {
-        public static INamedTypeSymbol GetAttribute(this Compilation compilation, string name)
+        public static INamedTypeSymbol GetSymbol(this Compilation compilation, string name)
         {
-            var createMemoizedAttribute = compilation.GetTypeByMetadataName($"SourceGenerator.Attribute.{name}");
+            var createMemoizedAttribute = compilation.GetTypeByMetadataName($"MemoizeSourceGenerator.Attribute.{name}");
             if (createMemoizedAttribute == null)
                 throw new Exception($"Could not locate {name}");
             return createMemoizedAttribute;
@@ -136,14 +136,20 @@ namespace SourceGenerator
 
         public void OnVisitSyntaxNode(SyntaxNode syntaxNode)
         {
-            if (syntaxNode is MemberAccessExpressionSyntax memberAccessExpressionSyntax && memberAccessExpressionSyntax.Name.Identifier.ValueText == "AddMemoizedScoped")
+            switch (syntaxNode)
             {
-                Candidate.Add(memberAccessExpressionSyntax);
-            }
-
-            if (syntaxNode is InterfaceDeclarationSyntax interfaceDeclarationSyntax && interfaceDeclarationSyntax.AttributeLists.Count > 0)
-            {
-                CandidateAttributes.Add(interfaceDeclarationSyntax);
+                case MemberAccessExpressionSyntax memberAccessExpressionSyntax:
+                {
+                    var methodName = memberAccessExpressionSyntax.Name.Identifier.ValueText;
+                    if (methodName == "AddMemoizedScoped" || methodName == "AddMemoizedSingleton")
+                    {
+                        Candidate.Add(memberAccessExpressionSyntax);
+                    }
+                    break;
+                }
+                case InterfaceDeclarationSyntax interfaceDeclarationSyntax when interfaceDeclarationSyntax.AttributeLists.Count > 0:
+                    CandidateAttributes.Add(interfaceDeclarationSyntax);
+                    break;
             }
         }
     }

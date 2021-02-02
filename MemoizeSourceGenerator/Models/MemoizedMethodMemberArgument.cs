@@ -2,7 +2,7 @@
 using System.Linq;
 using Microsoft.CodeAnalysis;
 
-namespace SourceGenerator.Models
+namespace MemoizeSourceGenerator.Models
 {
     public class MemoizedMethodMemberArgument
     {

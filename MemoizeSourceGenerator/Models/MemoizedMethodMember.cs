@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using Microsoft.CodeAnalysis;
 
-namespace SourceGenerator.Models
+namespace MemoizeSourceGenerator.Models
 {
     public class MemoizedMethodMember
     {

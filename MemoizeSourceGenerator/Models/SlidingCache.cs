@@ -1,10 +1,8 @@
-﻿using System;
-using System.Collections.Immutable;
-using System.Diagnostics.CodeAnalysis;
+﻿using System.Collections.Immutable;
 using System.Linq;
 using Microsoft.CodeAnalysis;
 
-namespace SourceGenerator.Models
+namespace MemoizeSourceGenerator.Models
 {
     public class SlidingCache
     {

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace SourceGenerator.Attribute
+namespace MemoizeSourceGenerator.Attribute
 {
     [AttributeUsage(AttributeTargets.Interface, Inherited = false)]
     public class CreateMemoizedImplementationAttribute : System.Attribute

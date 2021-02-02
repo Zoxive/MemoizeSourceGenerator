@@ -4,7 +4,7 @@ using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Primitives;
 
-namespace SourceGenerator.Attribute
+namespace MemoizeSourceGenerator.Attribute
 {
     public sealed class CachePartition : IMemoryCache
     {

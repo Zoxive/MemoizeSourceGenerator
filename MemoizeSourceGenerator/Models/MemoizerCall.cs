@@ -1,15 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using MemoizeSourceGenerator.Attribute;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using SourceGenerator.Attribute;
 
-namespace SourceGenerator.Models
+namespace MemoizeSourceGenerator.Models
 {
-    public class ScopedMemoizerCall
+    public class MemoizerCall
     {
         public static bool TryCreate
         (
@@ -17,7 +16,7 @@ namespace SourceGenerator.Models
             MemberAccessExpressionSyntax expressionSyntax,
             ITypeSymbol interfaceType,
             ITypeSymbol implementationType,
-            [NotNullWhen(true)] out ScopedMemoizerCall? call)
+            [NotNullWhen(true)] out MemoizerCall? call)
         {
             var interfaceAttributes = interfaceType.GetAttributes();
             var errorLocation = expressionSyntax.Name.GetLocation();
@@ -79,7 +78,7 @@ namespace SourceGenerator.Models
                 }
             }
 
-            call = new ScopedMemoizerCall(interfaceType, implementationType, className, methods, slidingCache, memoizerFactoryTypeSymbol);
+            call = new MemoizerCall(interfaceType, implementationType, className, methods, slidingCache, memoizerFactoryTypeSymbol);
 
             return true;
         }
@@ -98,7 +97,7 @@ namespace SourceGenerator.Models
             return true;
         }
 
-        private ScopedMemoizerCall
+        private MemoizerCall
         (ITypeSymbol interfaceType,
             ITypeSymbol implementationType,
             string className,

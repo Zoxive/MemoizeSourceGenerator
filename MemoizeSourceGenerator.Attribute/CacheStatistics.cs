@@ -1,4 +1,4 @@
-﻿namespace SourceGenerator.Attribute
+﻿namespace MemoizeSourceGenerator.Attribute
 {
     public sealed class CacheStatistics
     {

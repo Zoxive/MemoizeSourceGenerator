@@ -3,7 +3,7 @@ using System.Collections.Immutable;
 using System.Linq;
 using Microsoft.CodeAnalysis;
 
-namespace SourceGenerator
+namespace MemoizeSourceGenerator
 {
     public static class SymbolExtensions
     {

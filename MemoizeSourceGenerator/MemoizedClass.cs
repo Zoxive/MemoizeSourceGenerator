@@ -1,29 +1,29 @@
 ﻿using System.Linq;
 using System.Text;
-using SourceGenerator.Models;
+using MemoizeSourceGenerator.Models;
 
-namespace SourceGenerator
+namespace MemoizeSourceGenerator
 {
     internal static class MemoizedClass
     {
-        public static string Generate(ScopedMemoizerCall scopedCall)
+        public static string Generate(MemoizerCall call)
         {
-            var fullInterfaceName = scopedCall.InterfaceType.ToDisplayString();
+            var fullInterfaceName = call.InterfaceType.ToDisplayString();
 
             var sb = new StringBuilder(@$"using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using System;
-using SourceGenerator.Attribute;
+using MemoizeSourceGenerator.Attribute;
 
-namespace {scopedCall.Namespace}.Memoized
+namespace {call.Namespace}.Memoized
 {{
-    public class {scopedCall.ClassName} : {fullInterfaceName}
+    public class {call.ClassName} : {fullInterfaceName}
     {{
 ");
             sb.AppendLine($"\t\tprivate readonly {fullInterfaceName} _impl;");
-            sb.AppendLine($"\t\tprivate readonly ILogger<{scopedCall.ClassName}> _logger;");
+            sb.AppendLine($"\t\tprivate readonly ILogger<{call.ClassName}> _logger;");
             sb.AppendLine($"\t\tprivate readonly IMemoizerFactory _cacheFactory;");
-            sb.AppendLine($"\t\tpublic {scopedCall.ClassName}(IMemoizerFactory cacheFactory, {fullInterfaceName} impl, ILogger<{scopedCall.ClassName}> logger)");
+            sb.AppendLine($"\t\tpublic {call.ClassName}(IMemoizerFactory cacheFactory, {fullInterfaceName} impl, ILogger<{call.ClassName}> logger)");
             sb.AppendLine("\t\t{");
             sb.AppendLine("\t\t\t_cacheFactory = cacheFactory;");
             sb.AppendLine("\t\t\t_impl = impl;");
@@ -32,7 +32,7 @@ namespace {scopedCall.Namespace}.Memoized
 
             sb.AppendLine();
 
-            var methods= scopedCall.Methods;
+            var methods= call.Methods;
             foreach (var method in methods)
             {
                 if (method.ReturnsVoid)
@@ -88,7 +88,7 @@ namespace {scopedCall.Namespace}.Memoized
                 sb.AppendLine(" _logger.LogDebug(\"Cache Miss. {CacheName} {key} {value}\", cache.Name, key, result);");
                 sb.AppendLine();
 
-                var slidingDuration = method.SlidingCache?.InMinutes ?? scopedCall.SlidingCache?.InMinutes ?? 10; // TODO fallback in global options
+                var slidingDuration = method.SlidingCache?.InMinutes ?? call.SlidingCache?.InMinutes ?? 10; // TODO fallback in global options
 
                 sb.AppendLine($"\t\t\tcache.SetExpiration(entry, clearCacheTokenSource, {slidingDuration});");
                 sb.AppendLine("");

@@ -1,9 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Text;
-using SourceGenerator.Models;
+using MemoizeSourceGenerator.Models;
 
-namespace SourceGenerator
+namespace MemoizeSourceGenerator
 {
     public static class AddMemoizedExtensionCall
     {
@@ -15,20 +14,20 @@ namespace Microsoft.Extensions.DependencyInjection
     {
         public static IServiceCollection AddMemoizedScoped<TInterface, TImplementation>(this IServiceCollection services) where TInterface : class where TImplementation : class, TInterface
         {
-            throw new NotSupportedException(""This will be replaced with a SourceGenerator call"");
+            throw new NotSupportedException(""This will be replaced with a MemoizeSourceGenerator call"");
         }
     }
 }";
 
 
-        public static string Generate(IReadOnlyList<ScopedMemoizerCall> calls)
+        public static string Generate(IReadOnlyList<MemoizerCall> calls)
         {
             var sb = new StringBuilder(
 @"using System;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using SourceGenerator.Attribute;
+using MemoizeSourceGenerator.Attribute;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
@@ -44,7 +43,7 @@ namespace Microsoft.Extensions.DependencyInjection
             return sb.ToString();
         }
 
-        private static void GenerateExtensionMethod(IReadOnlyList<ScopedMemoizerCall> calls, StringBuilder sb, string mode)
+        private static void GenerateExtensionMethod(IReadOnlyList<MemoizerCall> calls, StringBuilder sb, string mode)
         {
             sb.AppendLine($"\t\tpublic static IServiceCollection AddMemoized{mode}<TInterface, TImplementation>(this IServiceCollection services) where TInterface : class where TImplementation : class, TInterface");
             sb.AppendLine("\t\t{");
@@ -58,7 +57,7 @@ namespace Microsoft.Extensions.DependencyInjection
             sb.AppendLine("\t\t}");
         }
 
-        private static void GenerateCall(ScopedMemoizerCall call, StringBuilder sb, string mode)
+        private static void GenerateCall(MemoizerCall call, StringBuilder sb, string mode)
         {
             var interfaceName = call.InterfaceType.ToDisplayString();
             var implName = call.ImplementationsType.ToDisplayString();

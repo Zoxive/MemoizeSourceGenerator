@@ -1,6 +1,6 @@
 ﻿using Microsoft.CodeAnalysis;
 
-namespace SourceGenerator
+namespace MemoizeSourceGenerator
 {
     public static class DiagError
     {

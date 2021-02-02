@@ -28,7 +28,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\SourceGenerator\SourceGenerator.csproj" />
+    <ProjectReference Include="..\MemoizeSourceGenerator\MemoizeSourceGenerator.csproj" />
   </ItemGroup>
 
 </Project>

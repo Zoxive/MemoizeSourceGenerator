@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace SourceGenerator.Attribute
+namespace MemoizeSourceGenerator.Attribute
 {
     public interface IMemoizerFactory
     {

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 
-namespace SourceGenerator.Attribute
+namespace MemoizeSourceGenerator.Attribute
 {
     public sealed class MemoizerFactory : IMemoizerFactory
     {

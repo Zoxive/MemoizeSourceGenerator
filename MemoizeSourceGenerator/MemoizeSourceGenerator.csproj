@@ -17,7 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\SourceGenerator.Attribute\SourceGenerator.Attribute.csproj" Exclude="Build,Analyzers" PrivateAssets="contentfiles;analyzers;build;runtime" />
+    <ProjectReference Include="..\MemoizeSourceGenerator.Attribute\MemoizeSourceGenerator.Attribute.csproj" Exclude="Build,Analyzers" PrivateAssets="contentfiles;analyzers;build;runtime" />
   </ItemGroup>
 
   <!--

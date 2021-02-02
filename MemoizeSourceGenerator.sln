@@ -2,11 +2,11 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleApp", "ConsoleApp\ConsoleApp.csproj", "{F3E9AFED-B8DA-4439-9E0B-A46598254972}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SourceGenerator", "SourceGenerator\SourceGenerator.csproj", "{58D0C3DC-90EA-4360-B570-FC445BD311B4}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MemoizeSourceGenerator", "MemoizeSourceGenerator\MemoizeSourceGenerator.csproj", "{58D0C3DC-90EA-4360-B570-FC445BD311B4}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SourceGeneratorTests", "SourceGeneratorTests\SourceGeneratorTests.csproj", "{61136EB3-54D2-4D67-A476-AB0500949876}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SourceGenerator.Attribute", "SourceGenerator.Attribute\SourceGenerator.Attribute.csproj", "{2E7C3B03-F534-47EC-B20C-273475180E8A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MemoizeSourceGenerator.Attribute", "MemoizeSourceGenerator.Attribute\MemoizeSourceGenerator.Attribute.csproj", "{2E7C3B03-F534-47EC-B20C-273475180E8A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

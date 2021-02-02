@@ -8,8 +8,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\SourceGenerator.Attribute\SourceGenerator.Attribute.csproj" />
-    <ProjectReference Include="..\SourceGenerator\SourceGenerator.csproj" ReferenceOutputAssembly="false" OutputItemType="Analyzer" />
+    <ProjectReference Include="..\MemoizeSourceGenerator.Attribute\MemoizeSourceGenerator.Attribute.csproj" />
+    <ProjectReference Include="..\MemoizeSourceGenerator\MemoizeSourceGenerator.csproj" ReferenceOutputAssembly="false" OutputItemType="Analyzer" />
   </ItemGroup>
 
   <ItemGroup>

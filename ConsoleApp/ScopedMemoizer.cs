@@ -1,8 +1,8 @@
 #nullable enable
 using System.Collections.Generic;
+using MemoizeSourceGenerator.Attribute;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using SourceGenerator.Attribute;
 
 namespace ConsoleApp
 {

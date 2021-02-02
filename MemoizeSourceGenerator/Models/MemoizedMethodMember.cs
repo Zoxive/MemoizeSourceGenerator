@@ -45,7 +45,14 @@ namespace MemoizeSourceGenerator.Models
             PartitionedParameter = parameters.FirstOrDefault(x => x.PartitionsCache);
 
             var argNames = parameters.Select(x => x.ArgType.Replace('.', '_')).ToArray();
-            ClassName = $"ArgKey_{ReturnType.Replace('.', '_')}_{Name}_{(string.Join("_", argNames))}";
+
+            // TODO better way to generate a class name.s
+            var simpleReturnName = ReturnType
+                .Replace('.', '_')
+                .Replace('<', '_')
+                .Replace('>', '_')
+                .Replace('?', '_');
+            ClassName = $"ArgKey_{simpleReturnName}_{Name}_{(string.Join("_", argNames))}";
 
             ReturnsVoid = methodSymbol.ReturnsVoid;
 

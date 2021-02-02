@@ -46,10 +46,11 @@ namespace MemoizeSourceGenerator.Attribute
             }
         }
 
-        public void SetExpiration(ICacheEntry entry, CancellationTokenSource clearCacheTokenSource, double inMinutes, long? size = null)
+        public void SetExpiration(ICacheEntry entry, CancellationTokenSource clearCacheTokenSource, double inMinutes, long? size = null, Action<ICacheEntry>? configureEntry = null)
         {
             lock (_tokenSourceSync)
             {
+                configureEntry?.Invoke(entry);
                 if (clearCacheTokenSource != ClearCacheTokenSource)
                 {
                     entry.SetAbsoluteExpiration(TimeSpan.FromTicks(1));

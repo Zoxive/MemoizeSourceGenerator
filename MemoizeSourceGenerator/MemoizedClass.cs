@@ -15,6 +15,7 @@ using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using System;
 using MemoizeSourceGenerator.Attribute;
+#nullable enable
 
 namespace {call.Namespace}
 {{
@@ -24,11 +25,13 @@ namespace {call.Namespace}
             sb.AppendLine($"\t\tprivate readonly {fullInterfaceName} _impl;");
             sb.AppendLine($"\t\tprivate readonly ILogger<{call.ClassName}> _logger;");
             sb.AppendLine($"\t\tprivate readonly IMemoizerFactory _cacheFactory;");
-            sb.AppendLine($"\t\tpublic {call.ClassName}(IMemoizerFactory cacheFactory, {fullInterfaceName} impl, ILogger<{call.ClassName}> logger)");
+            sb.AppendLine($"\t\tprivate readonly Action<ICacheEntry>? _configureEntry;");
+            sb.AppendLine($"\t\tpublic {call.ClassName}(IMemoizerFactory cacheFactory, {fullInterfaceName} impl, ILogger<{call.ClassName}> logger, Action<ICacheEntry>? configureEntry = null)");
             sb.AppendLine("\t\t{");
             sb.AppendLine("\t\t\t_cacheFactory = cacheFactory;");
             sb.AppendLine("\t\t\t_impl = impl;");
             sb.AppendLine("\t\t\t_logger = logger;");
+            sb.AppendLine("\t\t\t_configureEntry = configureEntry;");
             sb.AppendLine("\t\t}");
 
             sb.AppendLine();
@@ -91,7 +94,7 @@ namespace {call.Namespace}
 
                 var slidingDuration = method.SlidingCache?.InMinutes ?? call.SlidingCache?.InMinutes ?? 10; // TODO fallback in global options
 
-                sb.AppendLine($"\t\t\tcache.SetExpiration(entry, clearCacheTokenSource, {slidingDuration});");
+                sb.AppendLine($"\t\t\tcache.SetExpiration(entry, clearCacheTokenSource, {slidingDuration}, null, _configureEntry);");
                 sb.AppendLine("");
                 sb.AppendLine("\t\t\t// need to manually call dispose instead of having a using");
                 sb.AppendLine("\t\t\t// in case the factory passed in throws, in which case we");

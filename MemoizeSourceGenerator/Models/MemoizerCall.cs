@@ -11,8 +11,7 @@ namespace MemoizeSourceGenerator.Models
     public class MemoizerCall
     {
         public static bool TryCreate
-        (
-            GeneratorContext context,
+        (GeneratorContext context,
             MemberAccessExpressionSyntax expressionSyntax,
             ITypeSymbol interfaceType,
             ITypeSymbol implementationType,
@@ -103,8 +102,7 @@ namespace MemoizeSourceGenerator.Models
             string className,
             IReadOnlyList<MemoizedMethodMember> methods,
             SlidingCache? slidingCache,
-            INamedTypeSymbol? memoizerFactoryType
-        )
+            INamedTypeSymbol? memoizerFactoryType)
         {
             InterfaceType = interfaceType;
             ImplementationsType = implementationType;

@@ -15,6 +15,7 @@ namespace MemoizeSourceGenerator
             var firstCall = calls.FirstOrDefault();
             if (firstCall != null)
             {
+                // TODO get the first namespace of the AddMemoized<>() call... not the interface..
                 @namespace = firstCall.Namespace;
             }
 

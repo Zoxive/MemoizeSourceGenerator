@@ -42,16 +42,24 @@ namespace MemoizeSourceGenerator.Models
 
             Name = methodSymbol.Name;
 
+            IsAsync = methodSymbol.IsAsync;
+
             PartitionedParameter = parameters.FirstOrDefault(x => x.PartitionsCache);
 
-            var argNames = parameters.Select(x => x.ArgType.Replace('.', '_')).ToArray();
-
             // TODO better way to generate a class name.s
-            var simpleReturnName = ReturnType
-                .Replace('.', '_')
-                .Replace('<', '_')
-                .Replace('>', '_')
-                .Replace('?', '_');
+            static string Fix(string sr)
+            {
+                return sr.Replace('.', '_')
+                .Replace("<", "")
+                .Replace(">", "")
+                .Replace("?", "")
+                .Replace(",", "")
+                .Replace(" ", "");
+            }
+
+            var argNames = parameters.Select(x => Fix(x.ArgType)).ToArray();
+
+            var simpleReturnName = Fix(ReturnType);
             ClassName = $"ArgKey_{simpleReturnName}_{Name}_{(string.Join("_", argNames))}";
 
             ReturnsVoid = methodSymbol.ReturnsVoid;
@@ -70,6 +78,7 @@ namespace MemoizeSourceGenerator.Models
         public SlidingCache? SlidingCache { get; }
         public string Name { get; }
         public bool ReturnsVoid { get; }
+        public bool IsAsync { get; }
         public string ReturnType { get; }
 
         public void WriteParameters(StringBuilder sb, bool writeType = false, string? prefix = null)

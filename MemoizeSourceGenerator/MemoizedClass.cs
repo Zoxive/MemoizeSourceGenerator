@@ -49,7 +49,12 @@ namespace {call.Namespace}
                 var returnType = method.ReturnType;
                 var methodName = method.Name;
 
-                sb.Append($"\t\tpublic {returnType} {methodName}(");
+                sb.Append($"\t\tpublic ");
+                if (method.IsAsync)
+                {
+                    sb.Append("async ");
+                }
+                sb.Append($"{returnType} {methodName}(");
                 method.WriteParameters(sb, writeType: true, prefix: "__");
                 sb.AppendLine(")");
                 sb.AppendLine("\t\t{");
@@ -81,7 +86,12 @@ namespace {call.Namespace}
                 sb.AppendLine("\t\t\tcache.RecordMiss();");
                 sb.AppendLine();
                 sb.AppendLine("\t\t\tvar entry = cache.CreateEntry(key);");
-                sb.Append($"\t\t\tvar result = _impl.{methodName}(");
+                sb.Append($"\t\t\tvar result = ");
+                if (method.IsAsync)
+                {
+                    sb.Append("await ");
+                }
+                sb.Append($"_impl.{methodName}(");
                 method.WriteParameters(sb, prefix: "__");
                 sb.AppendLine(");");
                 sb.AppendLine("\t\t\tentry.SetValue(result);");
@@ -156,7 +166,14 @@ namespace {call.Namespace}
             sb.Append($"\t\t\t\treturn ");
             foreach (var arg in method.Parameters)
             {
-                sb.Append($"_{arg.Name}.Equals(other._{arg.Name})");
+                if (arg.IsNullable)
+                {
+                    sb.Append($"(_{arg.Name} == null? other._{arg.Name} == null : _{arg.Name}.Equals(other._{arg.Name}))");
+                }
+                else
+                {
+                    sb.Append($"_{arg.Name}.Equals(other._{arg.Name})");
+                }
                 if (!ReferenceEquals(arg, lastArg))
                     sb.Append(" && ");
             }

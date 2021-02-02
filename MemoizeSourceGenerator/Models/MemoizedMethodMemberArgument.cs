@@ -59,8 +59,10 @@ namespace MemoizeSourceGenerator.Models
             PartitionsCache = partitionsCache;
             Name = parameterSymbol.Name;
             ArgType = parameterSymbol.ToDisplayString();
+            IsNullable = parameterSymbol.NullableAnnotation == NullableAnnotation.Annotated;
         }
 
+        public bool IsNullable { get; }
         public bool PartitionsCache { get; }
         public string Name { get; }
         public string ArgType { get; }

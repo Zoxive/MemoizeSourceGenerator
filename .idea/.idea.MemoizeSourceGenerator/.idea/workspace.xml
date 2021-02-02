@@ -6,10 +6,10 @@
   <component name="ChangeListManager">
     <list default="true" id="25fb4445-a3ad-4d6f-a730-0fe87988fee8" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.MemoizeSourceGenerator/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.MemoizeSourceGenerator/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ConsoleApp/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ConsoleApp/Program.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/MemoizeSourceGenerator.Attribute/MemoizeSourceGenerator.Attribute.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/MemoizeSourceGenerator.Attribute/MemoizeSourceGenerator.Attribute.csproj" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/MemoizeSourceGenerator/AddMemoizedExtensionCall.cs" beforeDir="false" afterPath="$PROJECT_DIR$/MemoizeSourceGenerator/AddMemoizedExtensionCall.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/MemoizeSourceGenerator/MemoizedClass.cs" beforeDir="false" afterPath="$PROJECT_DIR$/MemoizeSourceGenerator/MemoizedClass.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/MemoizeSourceGenerator/Models/MemoizerCall.cs" beforeDir="false" afterPath="$PROJECT_DIR$/MemoizeSourceGenerator/Models/MemoizerCall.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/MemoizeSourceGenerator/Models/MemoizedMethodMember.cs" beforeDir="false" afterPath="$PROJECT_DIR$/MemoizeSourceGenerator/Models/MemoizedMethodMember.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -23,13 +23,13 @@
     <changedPaths>
       <option value="$PROJECT_DIR$/SourceGeneratorTests/Tests.cs" />
       <option value="$PROJECT_DIR$/MemoizeSourceGenerator/MemoizeSourceGenerator.csproj" />
-      <option value="$PROJECT_DIR$/MemoizeSourceGenerator.Attribute/MemoizeSourceGenerator.Attribute.csproj" />
       <option value="$PROJECT_DIR$/MemoizeSourceGenerator/Generator.cs" />
       <option value="$PROJECT_DIR$/ConsoleApp/ConsoleApp.csproj" />
       <option value="$PROJECT_DIR$/MemoizeSourceGenerator/MemoizedClass.cs" />
       <option value="$PROJECT_DIR$/MemoizeSourceGenerator/AddMemoizedExtensionCall.cs" />
       <option value="$PROJECT_DIR$/MemoizeSourceGenerator/Models/MemoizerCall.cs" />
       <option value="$PROJECT_DIR$/ConsoleApp/Program.cs" />
+      <option value="$PROJECT_DIR$/MemoizeSourceGenerator.Attribute/MemoizeSourceGenerator.Attribute.csproj" />
     </changedPaths>
   </component>
   <component name="ProjectId" id="1nw8guKGktxjmh4W1nyvSwPHyOs" />
@@ -72,14 +72,16 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1612289906894</updated>
-      <workItem from="1612289915411" duration="1284000" />
+      <workItem from="1612289915411" duration="1480000" />
+      <workItem from="1612291780474" duration="687000" />
+      <workItem from="1612292774901" duration="325000" />
     </task>
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
   </component>
-  <component name="UnityProjectConfiguration" hasMinimizedUI="null" />
+  <component name="UnityProjectConfiguration" hasMinimizedUI="false" />
   <component name="UnityUnitTestConfiguration" currentTestLauncher="NUnit" />
   <component name="Vcs.Log.Tabs.Properties">
     <option name="TAB_STATES">
@@ -91,6 +93,7 @@
         </entry>
       </map>
     </option>
+    <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="VcsManagerConfiguration">
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />

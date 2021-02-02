@@ -67,7 +67,7 @@ namespace {scopedCall.Namespace}.Memoized
                 sb.AppendLine($"\t\t\tif (cache.TryGetValue<{returnType}>(key, out var value))");
                 sb.AppendLine("\t\t\t{");
                 sb.Append("\t\t\t\tif (_logger.IsEnabled(LogLevel.Debug))");
-                sb.AppendLine(" _logger.LogDebug(\"Cache hit. {CacheName} {key} {value}\", _cacheFactory.Name, key, value);");
+                sb.AppendLine(" _logger.LogDebug(\"Cache hit. {CacheName} {key} {value}\", cache.Name, key, value);");
                 sb.AppendLine();
                 sb.AppendLine("\t\t\t\treturn value;");
                 sb.AppendLine("\t\t\t}");
@@ -85,7 +85,7 @@ namespace {scopedCall.Namespace}.Memoized
                 sb.AppendLine();
 
                 sb.Append("\t\t\tif (_logger.IsEnabled(LogLevel.Debug))");
-                sb.AppendLine(" _logger.LogDebug(\"Cache Miss. {CacheName} {key} {value}\", _cacheFactory.Name, key, result);");
+                sb.AppendLine(" _logger.LogDebug(\"Cache Miss. {CacheName} {key} {value}\", cache.Name, key, result);");
                 sb.AppendLine();
 
                 var slidingDuration = method.SlidingCache?.InMinutes ?? scopedCall.SlidingCache?.InMinutes ?? 10; // TODO fallback in global options

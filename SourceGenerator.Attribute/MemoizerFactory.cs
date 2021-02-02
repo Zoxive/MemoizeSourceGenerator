@@ -18,7 +18,7 @@ namespace SourceGenerator.Attribute
 
         public IEnumerable<CachePartition> Partitions => CachePartitions.Values;
 
-        public string Name { get; } = "____GLOBAL____";
+        public string Name { get; } = "|GLOBAL|";
 
         public CachePartition GetGlobal()
         {
@@ -28,7 +28,7 @@ namespace SourceGenerator.Attribute
             }
 
             _globalPartition = new CachePartition(Name, _loggerFactory.CreateLogger<CachePartition>(), new MemoryCache(new MemoryCacheOptions()));
-            CachePartitions[_globalPartition.Name] = _globalPartition;
+            CachePartitions[Name] = _globalPartition;
             return _globalPartition;
         }
 

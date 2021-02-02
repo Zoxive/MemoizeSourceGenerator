@@ -59,6 +59,10 @@ namespace ConsoleApp
 
                 log.LogInformation("Result: {result}", myClass.Result("Hello"));
                 log.LogInformation("Result: {result}", myClass.Result("Hello"));
+
+                log.LogInformation("Result: {result}", myClass.Partition("auf wiedersehn", 1));
+                log.LogInformation("Result: {result}", myClass.Partition("auf wiedersehn", 1));
+                log.LogInformation("Result: {result}", myClass.Partition("auf wiedersehn", 2));
             }
 
             using (var scope = services.CreateScope())
@@ -70,6 +74,23 @@ namespace ConsoleApp
 
                 log.LogInformation("Result: {result}", myClass.Result("Hello"));
                 log.LogInformation("Result: {result}", myClass.Result("Hello"));
+                log.LogInformation("Result: {result}", myClass.Result("Hello2"));
+
+                log.LogInformation("Result: {result}", myClass.Partition("auf wiedersehn", 1));
+                log.LogInformation("Result: {result}", myClass.Partition("auf wiedersehn", 1));
+                log.LogInformation("Result: {result}", myClass.Partition("auf wiedersehn", 2));
+            }
+
+            using (var scope = services.CreateScope())
+            {
+                var log = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
+                var cacheFactory = scope.ServiceProvider.GetRequiredService<IMemoizerFactory>();
+                var stats = cacheFactory.Partitions.Select(x => x.GetStatistics());
+
+                foreach (var stat in stats)
+                {
+                    log.LogInformation("Cache {@Statistics} for {Id}", stat.ToLogArg, stat.Id);
+                }
             }
 
             // Writing to the console isnt instant do delay slightly to see all logs

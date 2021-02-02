@@ -1,8 +1,5 @@
 #nullable enable
-using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using SourceGenerator.Attribute;
@@ -22,7 +19,7 @@ namespace ConsoleApp
 
         private string Key(string? partition = null)
         {
-            return $"{_requestScope.Tenant}-{partition ?? "____GLOBAL____"}";
+            return $"{_requestScope.Tenant}-{partition ?? _memoizerFactory.Name}";
         }
 
         public IEnumerable<CachePartition> Partitions => _memoizerFactory.Partitions;
@@ -44,6 +41,8 @@ namespace ConsoleApp
     public interface ICustomMemoizerTest
     {
         string Result(string name);
+
+        string Partition([PartitionCache] string name, int arg);
     }
 
     public sealed class CustomMemoizerTest : ICustomMemoizerTest
@@ -51,6 +50,11 @@ namespace ConsoleApp
         public string Result(string name)
         {
             return name + "Test!@#";
+        }
+
+        public string Partition(string name, int arg)
+        {
+            return $"{name}.{arg}";
         }
     }
 

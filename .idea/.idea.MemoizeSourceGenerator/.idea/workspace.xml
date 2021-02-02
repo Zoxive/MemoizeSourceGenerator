@@ -5,38 +5,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="25fb4445-a3ad-4d6f-a730-0fe87988fee8" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/.idea.MemoizeSourceGenerator/.idea/.name" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/.idea.MemoizeSourceGenerator/.idea/contentModel.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/.idea.MemoizeSourceGenerator/.idea/encodings.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/.idea.MemoizeSourceGenerator/.idea/indexLayout.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/.idea.MemoizeSourceGenerator/.idea/modules.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/.idea.MemoizeSourceGenerator/.idea/projectSettingsUpdater.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/.idea.MemoizeSourceGenerator/.idea/vcs.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/.idea.MemoizeSourceGenerator/.idea/workspace.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/global.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/CachedInterfaceSourceGenerator.sln" beforeDir="false" afterPath="$PROJECT_DIR$/MemoizeSourceGenerator.sln" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/CachedInterfaceSourceGenerator.sln.DotSettings" beforeDir="false" afterPath="$PROJECT_DIR$/MemoizeSourceGenerator.DotSettings" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ConsoleApp/ConsoleApp.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/ConsoleApp/ConsoleApp.csproj" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.MemoizeSourceGenerator/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.MemoizeSourceGenerator/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ConsoleApp/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ConsoleApp/Program.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ConsoleApp/ScopedMemoizer.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ConsoleApp/ScopedMemoizer.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/SourceGenerator.Attribute/Attributes.cs" beforeDir="false" afterPath="$PROJECT_DIR$/MemoizeSourceGenerator.Attribute/Attributes.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/SourceGenerator.Attribute/CachePartition.cs" beforeDir="false" afterPath="$PROJECT_DIR$/MemoizeSourceGenerator.Attribute/CachePartition.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/SourceGenerator.Attribute/CacheStatistics.cs" beforeDir="false" afterPath="$PROJECT_DIR$/MemoizeSourceGenerator.Attribute/CacheStatistics.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/SourceGenerator.Attribute/IMemoizerFactory.cs" beforeDir="false" afterPath="$PROJECT_DIR$/MemoizeSourceGenerator.Attribute/IMemoizerFactory.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/SourceGenerator.Attribute/MemoizerFactory.cs" beforeDir="false" afterPath="$PROJECT_DIR$/MemoizeSourceGenerator.Attribute/MemoizerFactory.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/SourceGenerator.Attribute/SourceGenerator.Attribute.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/MemoizeSourceGenerator.Attribute/MemoizeSourceGenerator.Attribute.csproj" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/SourceGenerator/AddMemoizedExtensionCall.cs" beforeDir="false" afterPath="$PROJECT_DIR$/MemoizeSourceGenerator/AddMemoizedExtensionCall.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/SourceGenerator/DiagError.cs" beforeDir="false" afterPath="$PROJECT_DIR$/MemoizeSourceGenerator/DiagError.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/SourceGenerator/Generator.cs" beforeDir="false" afterPath="$PROJECT_DIR$/MemoizeSourceGenerator/Generator.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/SourceGenerator/MemoizedClass.cs" beforeDir="false" afterPath="$PROJECT_DIR$/MemoizeSourceGenerator/MemoizedClass.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/SourceGenerator/Models/MemoizedMethodMember.cs" beforeDir="false" afterPath="$PROJECT_DIR$/MemoizeSourceGenerator/Models/MemoizedMethodMember.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/SourceGenerator/Models/MemoizedMethodMemberArgument.cs" beforeDir="false" afterPath="$PROJECT_DIR$/MemoizeSourceGenerator/Models/MemoizedMethodMemberArgument.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/SourceGenerator/Models/ScopedMemoizerCall.cs" beforeDir="false" afterPath="$PROJECT_DIR$/MemoizeSourceGenerator/Models/MemoizerCall.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/SourceGenerator/Models/SlidingCache.cs" beforeDir="false" afterPath="$PROJECT_DIR$/MemoizeSourceGenerator/Models/SlidingCache.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/SourceGenerator/SourceGenerator.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/MemoizeSourceGenerator/MemoizeSourceGenerator.csproj" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/SourceGenerator/SymbolExtensions.cs" beforeDir="false" afterPath="$PROJECT_DIR$/MemoizeSourceGenerator/SymbolExtensions.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/SourceGeneratorTests/SourceGeneratorTests.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/SourceGeneratorTests/SourceGeneratorTests.csproj" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/SourceGeneratorTests/Tests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/SourceGeneratorTests/Tests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/MemoizeSourceGenerator/AddMemoizedExtensionCall.cs" beforeDir="false" afterPath="$PROJECT_DIR$/MemoizeSourceGenerator/AddMemoizedExtensionCall.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/MemoizeSourceGenerator/MemoizedClass.cs" beforeDir="false" afterPath="$PROJECT_DIR$/MemoizeSourceGenerator/MemoizedClass.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/MemoizeSourceGenerator/Models/MemoizerCall.cs" beforeDir="false" afterPath="$PROJECT_DIR$/MemoizeSourceGenerator/Models/MemoizerCall.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -53,6 +26,10 @@
       <option value="$PROJECT_DIR$/MemoizeSourceGenerator.Attribute/MemoizeSourceGenerator.Attribute.csproj" />
       <option value="$PROJECT_DIR$/MemoizeSourceGenerator/Generator.cs" />
       <option value="$PROJECT_DIR$/ConsoleApp/ConsoleApp.csproj" />
+      <option value="$PROJECT_DIR$/MemoizeSourceGenerator/MemoizedClass.cs" />
+      <option value="$PROJECT_DIR$/MemoizeSourceGenerator/AddMemoizedExtensionCall.cs" />
+      <option value="$PROJECT_DIR$/MemoizeSourceGenerator/Models/MemoizerCall.cs" />
+      <option value="$PROJECT_DIR$/ConsoleApp/Program.cs" />
     </changedPaths>
   </component>
   <component name="ProjectId" id="1nw8guKGktxjmh4W1nyvSwPHyOs" />
@@ -64,6 +41,7 @@
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="nodejs_package_manager_path" value="npm" />
     <property name="vue.rearranger.settings.migration" value="true" />
   </component>
   <component name="RunManager">
@@ -94,7 +72,7 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1612289906894</updated>
-      <workItem from="1612289915411" duration="987000" />
+      <workItem from="1612289915411" duration="1284000" />
     </task>
     <servers />
   </component>

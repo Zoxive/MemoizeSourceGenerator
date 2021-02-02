@@ -77,7 +77,7 @@ namespace Microsoft.Extensions.DependencyInjection
             }
 
             sb.AppendLine(
-                $"\t\t\t\t\treturn new {call.Namespace}.Memoized.{call.ClassName}(factory, s.GetRequiredService<{implName}>(), s.GetRequiredService<ILogger<{call.Namespace}.Memoized.{call.ClassName}>>());");
+                $"\t\t\t\t\treturn new {call.Namespace}.{call.ClassName}(factory, s.GetRequiredService<{implName}>(), s.GetRequiredService<ILogger<{call.Namespace}.{call.ClassName}>>());");
             sb.AppendLine("\t\t\t\t});");
             sb.AppendLine("\t\t\t\treturn services;");
             sb.AppendLine("\t\t\t}");

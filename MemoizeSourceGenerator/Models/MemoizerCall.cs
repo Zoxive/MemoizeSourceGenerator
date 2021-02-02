@@ -93,7 +93,7 @@ namespace MemoizeSourceGenerator.Models
             }
 
             className = classNameFromAttribute ??
-                        (interfaceType.Name.StartsWith("I", StringComparison.OrdinalIgnoreCase) ? interfaceType.Name.Substring(1) : interfaceType.Name);
+                        "Memoized_" + (interfaceType.Name.StartsWith("I", StringComparison.OrdinalIgnoreCase) ? interfaceType.Name.Substring(1) : interfaceType.Name);
             return true;
         }
 
@@ -117,7 +117,7 @@ namespace MemoizeSourceGenerator.Models
         public ITypeSymbol ImplementationsType { get; }
         public ITypeSymbol InterfaceType { get; }
         public string ClassName { get; }
-        public string Namespace => InterfaceType.ContainingNamespace.ToDisplayString();
+        public string Namespace => $"{InterfaceType.ContainingNamespace.ToDisplayString()}.Memoized";
         public IReadOnlyList<MemoizedMethodMember> Methods { get; }
         public SlidingCache? SlidingCache { get; }
         public INamedTypeSymbol? MemoizerFactoryType { get; }

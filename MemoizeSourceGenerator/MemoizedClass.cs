@@ -15,7 +15,7 @@ using Microsoft.Extensions.Logging;
 using System;
 using MemoizeSourceGenerator.Attribute;
 
-namespace {call.Namespace}.Memoized
+namespace {call.Namespace}
 {{
     public class {call.ClassName} : {fullInterfaceName}
     {{

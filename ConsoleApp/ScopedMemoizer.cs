@@ -1,4 +1,5 @@
 #nullable enable
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using MemoizeSourceGenerator.Attribute;
 using Microsoft.Extensions.DependencyInjection;
@@ -8,33 +9,29 @@ namespace ConsoleApp
 {
     public sealed class ScopedMemoizer : IMemoizerFactory
     {
+        private static readonly ConcurrentDictionary<string, MemoizerFactory> TenantMemoizerFactories = new ();
         private readonly RequestScope _requestScope;
-        private readonly MemoizerFactory _memoizerFactory;
+        private readonly ILoggerFactory _loggerFactory;
 
         public ScopedMemoizer(RequestScope requestScope, ILoggerFactory loggerFactory)
         {
             _requestScope = requestScope;
-            _memoizerFactory = new MemoizerFactory(loggerFactory);
+            _loggerFactory = loggerFactory;
         }
 
-        private string Key(string? partition = null)
+        private string Application => _requestScope.Tenant;
+        private MemoizerFactory Factory => TenantMemoizerFactories.GetOrAdd(Application, CreateFactory);
+        private MemoizerFactory CreateFactory(string _)
         {
-            return $"{_requestScope.Tenant}-{partition ?? _memoizerFactory.Name}";
+            var factory = new MemoizerFactory(_loggerFactory);
+            return factory;
         }
 
-        public IEnumerable<CachePartition> Partitions => _memoizerFactory.Partitions;
-
-        public string Name => _requestScope.Tenant;
-
-        public CachePartition GetGlobal()
-        {
-            return _memoizerFactory.GetOrCreatePartition(Key());
-        }
-
-        public CachePartition GetOrCreatePartition(string name)
-        {
-            return _memoizerFactory.GetOrCreatePartition(Key(name));
-        }
+        public CachePartition GetGlobal() => Factory.GetGlobal();
+        public CachePartition GetOrCreatePartition(IPartitionKey partitionKey, out bool wasCreated) => Factory.GetOrCreatePartition(partitionKey, out wasCreated);
+        public void InvalidateAll() => Factory.InvalidateAll();
+        public void InvalidatePartition(IPartitionKey partitionKey) => Factory.InvalidatePartition(partitionKey);
+        public IEnumerable<CachePartition> Partitions => Factory.Partitions;
     }
 
     [CreateMemoizedImplementation(MemoizerFactory = typeof(ScopedMemoizer))]

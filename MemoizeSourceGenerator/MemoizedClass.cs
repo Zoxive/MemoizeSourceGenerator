@@ -61,11 +61,11 @@ namespace {call.Namespace}
 
                 if (method.PartitionedParameter != null)
                 {
-                    sb.AppendLine($"\t\t\tvar cache = _cacheFactory.GetOrCreatePartition(__{method.PartitionedParameter.Name});");
+                    sb.AppendLine($"\t\t\tvar cache = _cacheFactory.GetOrCreatePartition(\"{call.HumanId}\", __{method.PartitionedParameter.Name}, out var __);");
                 }
                 else
                 {
-                    sb.AppendLine($"\t\t\tvar cache = _cacheFactory.GetGlobal();");
+                    sb.AppendLine($"\t\t\tvar cache = _cacheFactory.Get(\"{call.HumanId}\");");
                 }
 
                 sb.AppendLine($"\t\t\tcache.RecordAccessCount();");
@@ -76,7 +76,7 @@ namespace {call.Namespace}
                 sb.AppendLine($"\t\t\tif (cache.TryGetValue<{returnType}>(key, out var value))");
                 sb.AppendLine("\t\t\t{");
                 sb.Append("\t\t\t\tif (_logger.IsEnabled(LogLevel.Debug))");
-                sb.AppendLine(" _logger.LogDebug(\"Cache hit. {CacheName} {key} {value}\", cache.Name, key, value);");
+                sb.AppendLine(" _logger.LogDebug(\"Cache hit. {CacheName} {key} {value}\", cache.DisplayName, key, value);");
                 sb.AppendLine();
                 sb.AppendLine("\t\t\t\treturn value;");
                 sb.AppendLine("\t\t\t}");
@@ -99,7 +99,7 @@ namespace {call.Namespace}
                 sb.AppendLine();
 
                 sb.Append("\t\t\tif (_logger.IsEnabled(LogLevel.Debug))");
-                sb.AppendLine(" _logger.LogDebug(\"Cache Miss. {CacheName} {key} {value}\", cache.Name, key, result);");
+                sb.AppendLine(" _logger.LogDebug(\"Cache Miss. {CacheName} {key} {value}\", cache.DisplayName, key, result);");
                 sb.AppendLine();
 
                 var slidingDuration = method.SlidingCache?.InMinutes ?? call.SlidingCache?.InMinutes ?? 10; // TODO fallback in global options
@@ -143,18 +143,21 @@ namespace {call.Namespace}
                 sb.AppendLine($"\t\t\tprivate readonly {arg.ArgType} _{arg.Name};");
             }
 
-            sb.AppendLine();
-            sb.Append($"\t\t\tpublic {methodClassName}(");
-            method.WriteParameters(sb, writeType: true);
-
-            sb.AppendLine(")");
-            sb.AppendLine("\t\t\t{");
-            foreach (var arg in method.Parameters)
+            if (method.Parameters.Count > 0)
             {
-                sb.AppendLine($"\t\t\t\t_{arg.Name} = {arg.Name};");
-            }
+                sb.AppendLine();
+                sb.Append($"\t\t\tpublic {methodClassName}(");
+                method.WriteParameters(sb, writeType: true);
 
-            sb.AppendLine("\t\t\t}");
+                sb.AppendLine(")");
+                sb.AppendLine("\t\t\t{");
+                foreach (var arg in method.Parameters)
+                {
+                    sb.AppendLine($"\t\t\t\t_{arg.Name} = {arg.Name};");
+                }
+
+                sb.AppendLine("\t\t\t}");
+            }
 
             sb.AppendLine();
 
@@ -177,13 +180,17 @@ namespace {call.Namespace}
                 if (!ReferenceEquals(arg, lastArg))
                     sb.Append(" && ");
             }
+            if (method.Parameters.Count == 0)
+            {
+                sb.Append("true");
+            }
 
             sb.AppendLine(";");
 
             sb.AppendLine("\t\t\t}");
             sb.AppendLine();
 
-            sb.AppendLine($"\t\t\tpublic override bool Equals(object obj)");
+            sb.AppendLine($"\t\t\tpublic override bool Equals(object? obj)");
             sb.AppendLine("\t\t\t{");
             sb.AppendLine("\t\t\t\tif (ReferenceEquals(null, obj)) return false;");
             sb.AppendLine("\t\t\t\tif (ReferenceEquals(this, obj)) return true;");
@@ -193,15 +200,21 @@ namespace {call.Namespace}
 
             sb.AppendLine($"\t\t\tpublic override int GetHashCode()");
             sb.AppendLine("\t\t\t{");
-            sb.Append("\t\t\t\treturn HashCode.Combine(");
-            foreach (var arg in method.Parameters)
+            if (method.Parameters.Count == 0)
             {
-                sb.Append($"_{arg.Name}");
-                if (!ReferenceEquals(arg, lastArg))
-                    sb.Append(", ");
+                sb.AppendLine("\t\t\t\treturn 0;");
             }
-
-            sb.AppendLine(");");
+            else
+            {
+                sb.Append("\t\t\t\treturn HashCode.Combine(");
+                foreach (var arg in method.Parameters)
+                {
+                    sb.Append($"_{arg.Name}");
+                    if (!ReferenceEquals(arg, lastArg))
+                        sb.Append(", ");
+                }
+                sb.AppendLine(");");
+            }
             sb.AppendLine("\t\t\t}");
 
             sb.AppendLine($"\t\t\tpublic override string ToString()");

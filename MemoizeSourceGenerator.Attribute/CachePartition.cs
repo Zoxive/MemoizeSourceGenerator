@@ -6,11 +6,19 @@ using Microsoft.Extensions.Primitives;
 
 namespace MemoizeSourceGenerator.Attribute
 {
+    public interface IPartitionKey : IEquatable<IPartitionKey>
+    {
+        string DisplayName { get; }
+        string PartitionName { get; }
+    }
+
     public sealed class CachePartition : IMemoryCache
     {
+        private readonly string _callerId;
         private readonly ILogger<CachePartition> _logger;
+        public string DisplayName { get; }
+        public IPartitionKey PartitionKey { get; }
         private MemoryCache Cache { get; }
-        public string Name { get; }
 
         public CancellationTokenSource ClearCacheTokenSource { get; private set; }
         private readonly object _tokenSourceSync;
@@ -18,12 +26,14 @@ namespace MemoizeSourceGenerator.Attribute
         private int _misses = 0;
         private int _totalSize = 0;
 
-        public CachePartition(string name, ILogger<CachePartition> logger, MemoryCache memoryCache)
+        public CachePartition(string callerId, IPartitionKey partitionKey, ILogger<CachePartition> logger, MemoryCache memoryCache)
         {
+            _callerId = callerId;
             _logger = logger;
-            Name = name;
+            PartitionKey = partitionKey;
             Cache = memoryCache;
             _tokenSourceSync = new object();
+            DisplayName = $"{callerId}>{partitionKey.DisplayName}";
             ClearCacheTokenSource = new CancellationTokenSource();
         }
 
@@ -94,7 +104,7 @@ namespace MemoizeSourceGenerator.Attribute
             // force expired items scan
             Cache.Remove(this);
 
-            return new CacheStatistics(Name, accessCount, misses, Cache.Count, _totalSize);
+            return new CacheStatistics(DisplayName, accessCount, misses, Cache.Count, _totalSize);
         }
 
         /*

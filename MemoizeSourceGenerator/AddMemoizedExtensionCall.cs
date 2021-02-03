@@ -10,14 +10,15 @@ namespace MemoizeSourceGenerator
     {
         public static string Generate(IReadOnlyList<MemoizerCall> calls)
         {
+            /*
             var @namespace = "Microsoft.Extensions.DependencyInjection";
-
             var firstCall = calls.FirstOrDefault();
             if (firstCall != null)
             {
                 // TODO get the first namespace of the AddMemoized<>() call... not the interface..
                 @namespace = firstCall.Namespace;
             }
+            */
 
             var sb = new StringBuilder(
 @$"
@@ -30,7 +31,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using MemoizeSourceGenerator.Attribute;
 
-namespace {@namespace} 
+namespace Memoized
 {{
     internal static class ServiceCollectionExtensions
     {{

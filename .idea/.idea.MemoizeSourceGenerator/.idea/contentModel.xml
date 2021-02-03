@@ -42,6 +42,7 @@
         <e p="bin" t="ExcludeRecursive" />
         <e p="CachePartition.cs" t="Include" />
         <e p="CacheStatistics.cs" t="Include" />
+        <e p="GlobalKey.cs" t="Include" />
         <e p="IMemoizerFactory.cs" t="Include" />
         <e p="MemoizerFactory.cs" t="Include" />
         <e p="MemoizeSourceGenerator.Attribute.csproj" t="IncludeRecursive" />
@@ -52,6 +53,7 @@
             </e>
           </e>
         </e>
+        <e p="StringPartitionKey.cs" t="Include" />
       </e>
       <e p="MemoizeSourceGenerator.sln" t="IncludeFlat" />
       <e p="packages" t="ExcludeRecursive" />

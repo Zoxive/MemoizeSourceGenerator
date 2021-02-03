@@ -29,7 +29,7 @@ namespace MemoizeSourceGenerator.Models
                 return false;
             }
 
-            if (!TryGetClassName(memoizeAttribute, interfaceType, out var className))
+            if (!TryGetClassName(memoizeAttribute, interfaceType, out var className, out var humanId))
             {
                 call = null;
                 return false;
@@ -77,12 +77,12 @@ namespace MemoizeSourceGenerator.Models
                 }
             }
 
-            call = new MemoizerCall(interfaceType, implementationType, className, methods, slidingCache, memoizerFactoryTypeSymbol);
+            call = new MemoizerCall(interfaceType, implementationType, className, methods, slidingCache, memoizerFactoryTypeSymbol, humanId);
 
             return true;
         }
 
-        private static bool TryGetClassName(AttributeData memoizeAttribute, ITypeSymbol interfaceType, out string className)
+        private static bool TryGetClassName(AttributeData memoizeAttribute, ITypeSymbol interfaceType, out string className, out string humanId)
         {
             var name = memoizeAttribute.NamedArguments.FirstOrDefault(x => x.Key == nameof(CreateMemoizedImplementationAttribute.Name)).Value;
             string? classNameFromAttribute = null;
@@ -91,8 +91,11 @@ namespace MemoizeSourceGenerator.Models
                 classNameFromAttribute = name.Value as string;
             }
 
-            className = classNameFromAttribute ??
-                        "Memoized_" + (interfaceType.Name.StartsWith("I", StringComparison.OrdinalIgnoreCase) ? interfaceType.Name.Substring(1) : interfaceType.Name);
+            var interfaceNameWithoutI = interfaceType.Name.StartsWith("I", StringComparison.OrdinalIgnoreCase) ? interfaceType.Name.Substring(1) : interfaceType.Name;
+
+            className = classNameFromAttribute ?? "Memoized_" + interfaceNameWithoutI;
+            humanId = classNameFromAttribute ?? interfaceNameWithoutI;
+
             return true;
         }
 
@@ -102,7 +105,8 @@ namespace MemoizeSourceGenerator.Models
             string className,
             IReadOnlyList<MemoizedMethodMember> methods,
             SlidingCache? slidingCache,
-            INamedTypeSymbol? memoizerFactoryType)
+            INamedTypeSymbol? memoizerFactoryType,
+            string humanId)
         {
             InterfaceType = interfaceType;
             ImplementationsType = implementationType;
@@ -110,12 +114,15 @@ namespace MemoizeSourceGenerator.Models
             Methods = methods;
             SlidingCache = slidingCache;
             MemoizerFactoryType = memoizerFactoryType;
+            HumanId = humanId;
         }
 
         public ITypeSymbol ImplementationsType { get; }
         public ITypeSymbol InterfaceType { get; }
+        public string HumanId { get; }
         public string ClassName { get; }
-        public string Namespace => $"{InterfaceType.ContainingNamespace.ToDisplayString()}.Memoized";
+        //public string Namespace => $"{InterfaceType.ContainingNamespace.ToDisplayString()}.Memoized";
+        public string Namespace => "Memoized";
         public IReadOnlyList<MemoizedMethodMember> Methods { get; }
         public SlidingCache? SlidingCache { get; }
         public INamedTypeSymbol? MemoizerFactoryType { get; }

@@ -1,4 +1,6 @@
-﻿namespace MemoizeSourceGenerator.Attribute
+﻿using System;
+
+namespace MemoizeSourceGenerator.Attribute
 {
     public sealed class CacheStatistics
     {
@@ -16,6 +18,8 @@
         public int Misses { get; }
         public int EntryCount { get; }
         public int TotalSize { get; }
+
+        public double HitRatio => Math.Round((double)(AccessCount - Misses) / AccessCount, 3);
 
         public object ToLogArg => new { AccessCount, Misses, EntryCount, TotalSize };
     }

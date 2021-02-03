@@ -59,8 +59,10 @@ namespace MemoizeSourceGenerator.Models
 
             var argNames = parameters.Select(x => Fix(x.ArgType)).ToArray();
 
+            var methodsClassName = Fix(methodSymbol.ContainingType.Name);
+
             var simpleReturnName = Fix(ReturnType);
-            ClassName = $"ArgKey_{simpleReturnName}_{Name}_{(string.Join("_", argNames))}";
+            ClassName = $"ArgKey_{methodsClassName}_{simpleReturnName}_{Name}_{(string.Join("_", argNames))}";
 
             ReturnsVoid = methodSymbol.ReturnsVoid;
 

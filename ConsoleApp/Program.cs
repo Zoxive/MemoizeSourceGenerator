@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using MemoizeSourceGenerator.Attribute;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Memoized;
 
 namespace ConsoleApp
 {

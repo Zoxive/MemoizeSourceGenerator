@@ -6,15 +6,8 @@ using Microsoft.Extensions.Primitives;
 
 namespace MemoizeSourceGenerator.Attribute
 {
-    public interface IPartitionKey : IEquatable<IPartitionKey>
-    {
-        string DisplayName { get; }
-        string PartitionName { get; }
-    }
-
     public sealed class CachePartition : IMemoryCache
     {
-        private readonly string _callerId;
         private readonly ILogger<CachePartition> _logger;
         public string DisplayName { get; }
         public IPartitionKey PartitionKey { get; }
@@ -26,14 +19,13 @@ namespace MemoizeSourceGenerator.Attribute
         private int _misses = 0;
         private int _totalSize = 0;
 
-        public CachePartition(string callerId, IPartitionKey partitionKey, ILogger<CachePartition> logger, MemoryCache memoryCache)
+        public CachePartition(IPartitionKey partitionKey, ILogger<CachePartition> logger, MemoryCache memoryCache)
         {
-            _callerId = callerId;
             _logger = logger;
             PartitionKey = partitionKey;
             Cache = memoryCache;
             _tokenSourceSync = new object();
-            DisplayName = $"{callerId}>{partitionKey.DisplayName}";
+            DisplayName = partitionKey.DisplayName;
             ClearCacheTokenSource = new CancellationTokenSource();
         }
 

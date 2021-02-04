@@ -61,11 +61,11 @@ namespace {call.Namespace}
 
                 if (method.PartitionedParameter != null)
                 {
-                    sb.AppendLine($"\t\t\tvar cache = _cacheFactory.GetOrCreatePartition(\"{call.HumanId}\", __{method.PartitionedParameter.Name}, out var __);");
+                    sb.AppendLine($"\t\t\tvar cache = _cacheFactory.GetOrCreatePartition(__{method.PartitionedParameter.Name});");
                 }
                 else
                 {
-                    sb.AppendLine($"\t\t\tvar cache = _cacheFactory.Get(\"{call.HumanId}\");");
+                    sb.AppendLine($"\t\t\tvar cache = _cacheFactory.GetGlobal();");
                 }
 
                 sb.AppendLine($"\t\t\tcache.RecordAccessCount();");

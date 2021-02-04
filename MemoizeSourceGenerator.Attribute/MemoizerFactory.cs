@@ -1,4 +1,5 @@
-﻿using System.Collections.Concurrent;
+﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
@@ -9,7 +10,6 @@ namespace MemoizeSourceGenerator.Attribute
     {
         private readonly ILoggerFactory _loggerFactory;
         private readonly ConcurrentDictionary<IPartitionKey, CachePartition> _cachePartitions = new();
-        private static CachePartition? _globalPartition;
 
         public MemoizerFactory(ILoggerFactory loggerFactory)
         {
@@ -18,31 +18,18 @@ namespace MemoizeSourceGenerator.Attribute
 
         public IEnumerable<CachePartition> Partitions => _cachePartitions.Values;
 
-        public CachePartition Get(string callerId)
+        public CachePartition GetGlobal()
         {
-            if (_globalPartition != null)
-            {
-                return _globalPartition;
-            }
-
-            var globalKey = GlobalKey.Instance;
-
-            _globalPartition = new CachePartition(callerId, globalKey, _loggerFactory.CreateLogger<CachePartition>(), new MemoryCache(new MemoryCacheOptions()));
-            _cachePartitions[globalKey] = _globalPartition;
-            return _globalPartition;
+            return GetOrCreatePartition( GlobalKey.Instance);
         }
 
-        public CachePartition GetOrCreatePartition(string callerId, IPartitionKey partitionKey, out bool created)
+        public CachePartition GetOrCreatePartition(IPartitionKey partitionKey)
         {
-            var wasCreated = false;
             CachePartition Create(IPartitionKey _)
             {
-                 wasCreated = true;
-                 return new CachePartition(callerId, partitionKey, _loggerFactory.CreateLogger<CachePartition>(), new MemoryCache(new MemoryCacheOptions()));
+                 return CreatePartition(partitionKey);
             }
-            var result = _cachePartitions.GetOrAdd(partitionKey, Create);
-            created = wasCreated;
-            return result;
+            return GetOrCreatePartition(partitionKey, Create);
         }
 
         public void InvalidateAll()
@@ -60,14 +47,23 @@ namespace MemoizeSourceGenerator.Attribute
                 cachePartition.Invalidate();
             }
         }
+
+        // Not on the interface, but exposed for composition purposes
+        public CachePartition GetOrCreatePartition(IPartitionKey partitionKey, Func<IPartitionKey, CachePartition> createPartition)
+        {
+            return _cachePartitions.GetOrAdd(partitionKey, createPartition);
+        }
+        public CachePartition CreatePartition(IPartitionKey partitionKey)
+        {
+             return new CachePartition(partitionKey, _loggerFactory.CreateLogger<CachePartition>(), new MemoryCache(new MemoryCacheOptions()));
+        }
     }
 
     public static class MemoizerFactoryExtensions
     {
-        public static CachePartition GetOrCreatePartition(this IMemoizerFactory factory, string callerId, string partition, out bool created)
+        public static CachePartition GetOrCreatePartition(this IMemoizerFactory factory, string partition)
         {
-            var partitionKey = new StringPartitionKey(partition);
-            return factory.GetOrCreatePartition(callerId, partitionKey, out created);
+            return factory.GetOrCreatePartition(new StringPartitionKey(partition));
         }
     }
 }

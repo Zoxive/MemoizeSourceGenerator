@@ -4,8 +4,8 @@ namespace MemoizeSourceGenerator.Attribute
 {
     public interface IMemoizerFactory
     {
-        CachePartition Get(string callerId);
-        CachePartition GetOrCreatePartition(string callerId, IPartitionKey partitionKey, out bool wasCreated);
+        CachePartition GetGlobal();
+        CachePartition GetOrCreatePartition(IPartitionKey partitionKey);
 
         void InvalidateAll();
         void InvalidatePartition(IPartitionKey partitionKey);

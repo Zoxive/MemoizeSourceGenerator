@@ -44,6 +44,7 @@
         <e p="CacheStatistics.cs" t="Include" />
         <e p="GlobalKey.cs" t="Include" />
         <e p="IMemoizerFactory.cs" t="Include" />
+        <e p="IPartitionKey.cs" t="Include" />
         <e p="MemoizerFactory.cs" t="Include" />
         <e p="MemoizeSourceGenerator.Attribute.csproj" t="IncludeRecursive" />
         <e p="obj" t="ExcludeRecursive">

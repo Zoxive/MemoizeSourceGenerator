@@ -7,19 +7,18 @@ namespace MemoizeSourceGenerator.Attribute
         public static readonly GlobalKey Instance = new GlobalKey();
 
         public string DisplayName { get; }
-        public string PartitionName { get; }
 
         private GlobalKey()
         {
-            PartitionName = DisplayName = "|GLOBAL|";
+            DisplayName = "|GLOBAL|";
         }
 
         private bool Equals(GlobalKey other)
         {
-            return DisplayName == other.DisplayName && PartitionName == other.PartitionName;
+            return DisplayName == other.DisplayName;
         }
 
-        public bool Equals(IPartitionKey obj)
+        public bool Equals(IPartitionKey? obj)
         {
             return ReferenceEquals(this, obj) || obj is GlobalKey other && Equals(other);
         }
@@ -31,7 +30,7 @@ namespace MemoizeSourceGenerator.Attribute
 
         public override int GetHashCode()
         {
-            return HashCode.Combine(DisplayName, PartitionName);
+            return HashCode.Combine(DisplayName);
         }
     }
 }

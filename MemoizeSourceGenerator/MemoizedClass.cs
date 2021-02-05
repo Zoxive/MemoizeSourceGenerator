@@ -70,22 +70,21 @@ namespace {call.Namespace}
 
                 sb.AppendLine($"\t\t\tcache.RecordAccessCount();");
                 sb.AppendLine();
-                sb.Append($"\t\t\tvar key = new {method.ClassName}(");
+                sb.Append($"\t\t\tvar key = new {method.ClassName}(cache.PartitionKey,");
                 method.WriteParameters(sb, prefix: "__");
                 sb.AppendLine(");");
-                sb.AppendLine($"\t\t\tif (cache.TryGetValue<{returnType}>(key, out var value))");
+                sb.AppendLine($"\t\t\tif (cache.TryGetValue<{method.TypeInCache}>(key, out var returnValue))");
                 sb.AppendLine("\t\t\t{");
                 sb.Append("\t\t\t\tif (_logger.IsEnabled(LogLevel.Debug))");
-                sb.AppendLine(" _logger.LogDebug(\"Cache hit. {CacheName} {key} {value}\", cache.DisplayName, key, value);");
+                sb.AppendLine(" _logger.LogDebug(\"Cache hit. {CacheName} {key} {value}\", cache.DisplayName, key, returnValue);");
                 sb.AppendLine();
-                sb.AppendLine("\t\t\t\treturn value;");
+                sb.AppendLine("\t\t\t\treturn returnValue;");
                 sb.AppendLine("\t\t\t}");
 
                 sb.AppendLine();
-                sb.AppendLine($"\t\t\tvar clearCacheTokenSource = cache.ClearCacheTokenSource;");
+                sb.AppendLine($"\t\t\tvar tokenSourceBeforeComputingEntry = cache.ClearCacheTokenSource;");
                 sb.AppendLine("\t\t\tcache.RecordMiss();");
                 sb.AppendLine();
-                sb.AppendLine("\t\t\tvar entry = cache.CreateEntry(key);");
                 sb.Append($"\t\t\tvar result = ");
                 if (method.IsAsync)
                 {
@@ -94,7 +93,6 @@ namespace {call.Namespace}
                 sb.Append($"_impl.{methodName}(");
                 method.WriteParameters(sb, prefix: "__");
                 sb.AppendLine(");");
-                sb.AppendLine("\t\t\tentry.SetValue(result);");
 
                 sb.AppendLine();
 
@@ -103,13 +101,8 @@ namespace {call.Namespace}
                 sb.AppendLine();
 
                 var slidingDuration = method.SlidingCache?.InMinutes ?? call.SlidingCache?.InMinutes ?? 10; // TODO fallback in global options
+                sb.AppendLine($"\t\t\tcache.CreateEntry(key, result, tokenSourceBeforeComputingEntry, {slidingDuration}, null, _configureEntry);");
 
-                sb.AppendLine($"\t\t\tcache.SetExpiration(entry, clearCacheTokenSource, {slidingDuration}, null, _configureEntry);");
-                sb.AppendLine("");
-                sb.AppendLine("\t\t\t// need to manually call dispose instead of having a using");
-                sb.AppendLine("\t\t\t// in case the factory passed in throws, in which case we");
-                sb.AppendLine("\t\t\t// do not want to add the entry to the cache");
-                sb.AppendLine("\t\t\tentry.Dispose();");
                 sb.AppendLine("\t\t\treturn result;");
 
                 sb.AppendLine("\t\t}");
@@ -138,6 +131,7 @@ namespace {call.Namespace}
             sb.AppendLine($"\t\tpublic readonly struct {methodClassName} : IEquatable<{methodClassName}>");
             sb.AppendLine("\t\t{");
 
+            sb.AppendLine($"\t\t\tprivate readonly IPartitionKey PartitionKey;");
             foreach (var arg in method.Parameters)
             {
                 sb.AppendLine($"\t\t\tprivate readonly {arg.ArgType} _{arg.Name};");
@@ -146,14 +140,15 @@ namespace {call.Namespace}
             if (method.Parameters.Count > 0)
             {
                 sb.AppendLine();
-                sb.Append($"\t\t\tpublic {methodClassName}(");
-                method.WriteParameters(sb, writeType: true);
+                sb.Append($"\t\t\tpublic {methodClassName}(IPartitionKey partitionKey,");
+                method.WriteParameters(sb, writeType: true, prefix: "__");
 
                 sb.AppendLine(")");
                 sb.AppendLine("\t\t\t{");
+                sb.AppendLine($"\t\t\t\tPartitionKey = partitionKey;");
                 foreach (var arg in method.Parameters)
                 {
-                    sb.AppendLine($"\t\t\t\t_{arg.Name} = {arg.Name};");
+                    sb.AppendLine($"\t\t\t\t_{arg.Name} = __{arg.Name};");
                 }
 
                 sb.AppendLine("\t\t\t}");

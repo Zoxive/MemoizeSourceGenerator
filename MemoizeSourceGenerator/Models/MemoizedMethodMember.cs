@@ -1,15 +1,16 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace MemoizeSourceGenerator.Models
 {
     public class MemoizedMethodMember
     {
-        public static bool TryCreate(GeneratorContext context, Location errorLocation, IMethodSymbol methodSymbol,
-            [NotNullWhen(true)] out MemoizedMethodMember? method)
+        public static bool TryCreate(GeneratorContext context, CreateMemoizeInterfaceContext interfaceContext, IMethodSymbol methodSymbol, [NotNullWhen(true)] out MemoizedMethodMember? method)
         {
             var @params = methodSymbol.Parameters;
             var args = new List<MemoizedMethodMemberArgument>(@params.Length);
@@ -20,7 +21,7 @@ namespace MemoizeSourceGenerator.Models
 
             foreach (var param in @params)
             {
-                if (MemoizedMethodMemberArgument.TryCreate(context, errorLocation, param, out var arg))
+                if (MemoizedMethodMemberArgument.TryCreate(context, interfaceContext.ErrorLocation, param, out var arg))
                 {
                     args.Add(arg);
                 }
@@ -31,18 +32,51 @@ namespace MemoizeSourceGenerator.Models
                 }
             }
 
-            method = new MemoizedMethodMember(methodSymbol, args, slidingCache);
+            var returnType = methodSymbol.ReturnType.ToDisplayString();
+            var isAsync = methodSymbol.IsTaskOfTOrValueTaskOfT();
+
+            string typeInCache;
+
+            if (isAsync)
+            {
+                if (methodSymbol.ReturnType is not INamedTypeSymbol {IsGenericType: true} namedTypeSymbol || namedTypeSymbol.TypeArguments.Length != 1)
+                {
+                    context.CreateError("Async return types must return something", $"Expected 1 generic type argument for {methodSymbol.Name}", interfaceContext.ErrorLocation);
+                    method = null;
+                    return false;
+                }
+
+                var taskReturnObj = namedTypeSymbol.TypeArguments[0];
+
+                // TODO check it has SizeOf()
+                // we dont care if they are IEquatable, but we do care they implement .SizeOf() at somepoint
+                /*
+                if (!taskReturnObj.AllInterfaces.Any(x => x.MetadataName == "IEquatable`1"))
+                {
+                    context.CreateError("Return types must implement IEquatable", $"Async return type Task<{taskReturnObj.Name}> does not implement IEquatable", interfaceContext.ErrorLocation);
+                    method = null;
+                    return false;
+                }
+                */
+
+                typeInCache = taskReturnObj.ToDisplayString();
+            }
+            else
+            {
+                typeInCache = returnType;
+            }
+
+            method = new MemoizedMethodMember(methodSymbol, args, slidingCache, isAsync, returnType, typeInCache);
 
             return true;
         }
 
-        private MemoizedMethodMember(IMethodSymbol methodSymbol, IReadOnlyList<MemoizedMethodMemberArgument> parameters, SlidingCache? slidingCache)
+        private MemoizedMethodMember(IMethodSymbol methodSymbol, IReadOnlyList<MemoizedMethodMemberArgument> parameters, SlidingCache? slidingCache, bool isAsync, string returnType, string typeInCache)
         {
-            ReturnType = methodSymbol.ReturnType.ToDisplayString();
-
             Name = methodSymbol.Name;
-
-            IsAsync = methodSymbol.IsAsync;
+            IsAsync = isAsync;
+            ReturnType = returnType;
+            TypeInCache = typeInCache;
 
             PartitionedParameter = parameters.FirstOrDefault(x => x.PartitionsCache);
 
@@ -76,12 +110,18 @@ namespace MemoizeSourceGenerator.Models
         public string ClassName { get; }
 
         private readonly MemoizedMethodMemberArgument? _lastArg;
+
         public IReadOnlyList<MemoizedMethodMemberArgument> Parameters { get; }
         public SlidingCache? SlidingCache { get; }
         public string Name { get; }
         public bool ReturnsVoid { get; }
         public bool IsAsync { get; }
         public string ReturnType { get; }
+
+        /// <summary>
+        /// This will be the same as ReturnType, unless its a Task<> method then its the value inside the Task.
+        /// </summary>
+        public string TypeInCache { get; }
 
         public void WriteParameters(StringBuilder sb, bool writeType = false, string? prefix = null)
         {

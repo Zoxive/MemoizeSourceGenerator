@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using MemoizeSourceGenerator.Attribute;
 using MemoizeSourceGenerator.Models;
 using Microsoft.CodeAnalysis;
@@ -45,43 +46,62 @@ namespace MemoizeSourceGenerator
         {
             var calls = new List<MemoizerCall>();
 
-            if (context.SyntaxReceiver is RecieveExtensionCalls receiver)
+            if (context.SyntaxReceiver is not RecieveExtensionCalls receiver)
             {
-                var compilation = context.Compilation;
+                context.AddSource("Memoized_ServiceCollectionExtensions", AddMemoizedExtensionCall.Generate(calls));
+                return;
+            }
 
-                var createMemoizedAttribute = compilation.GetSymbol(nameof(CreateMemoizedImplementationAttribute));
-                var partitionAttribute = compilation.GetSymbol(nameof(PartitionCacheAttribute));
-                var slidingCacheAttribute = compilation.GetSymbol(nameof(SlidingCacheAttribute));
-                var memoizerFactoryInterface = compilation.GetSymbol(nameof(IMemoizerFactory));
+            var compilation = context.Compilation;
 
-                var myContext = new GeneratorContext(context, createMemoizedAttribute, partitionAttribute, slidingCacheAttribute, memoizerFactoryInterface);
+            var createMemoizedAttribute = compilation.GetSymbol(nameof(CreateMemoizedImplementationAttribute));
+            var partitionAttribute = compilation.GetSymbol(nameof(PartitionCacheAttribute));
+            var slidingCacheAttribute = compilation.GetSymbol(nameof(SlidingCacheAttribute));
+            var memoizerFactoryInterface = compilation.GetSymbol(nameof(IMemoizerFactory));
 
-                foreach (var addMemoizedScopeCall in receiver.Candidate)
+            #pragma warning disable RS1024
+            var createAttributes = new Dictionary<ITypeSymbol, CreateMemoizeInterfaceContext>();
+            #pragma warning restore RS1024
+
+            foreach (var interfaceWithAttribute in receiver.CandidateAttributes)
+            {
+                var interfaceModel = compilation.GetSemanticModel(interfaceWithAttribute.SyntaxTree);
+                var interfaceType = interfaceModel.GetDeclaredSymbol(interfaceWithAttribute);
+                if (interfaceType == null) continue;
+                var interfaceAttributes = interfaceType.GetAttributes();
+                var createMemoizedAttributeData = interfaceAttributes.FirstOrDefault(x => SymbolEqualityComparer.Default.Equals(x.AttributeClass, createMemoizedAttribute));
+                if (createMemoizedAttributeData == null) continue;
+
+                var create = CreateMemoizeInterfaceContext.CreateFromSyntax(interfaceWithAttribute, interfaceType, interfaceModel, createMemoizedAttributeData);
+                createAttributes.Add(interfaceType, create);
+            }
+
+            var myContext = new GeneratorContext(context, partitionAttribute, slidingCacheAttribute, memoizerFactoryInterface, createMemoizedAttribute, createAttributes);
+
+            foreach (var addMemoizedScopeCall in receiver.Candidate)
+            {
+                var model = compilation.GetSemanticModel(addMemoizedScopeCall.SyntaxTree);
+
+                var name = addMemoizedScopeCall.Name as GenericNameSyntax;
+                if (name != null && name.TypeArgumentList.Arguments.Count == 2)
                 {
-                    var model = compilation.GetSemanticModel(addMemoizedScopeCall.SyntaxTree);
+                    var interfaceArg = model.GetSymbolInfo(name.TypeArgumentList.Arguments[0]).Symbol as ITypeSymbol;
+                    var implArg = model.GetSymbolInfo(name.TypeArgumentList.Arguments[1]).Symbol as ITypeSymbol;
 
-                    var name = addMemoizedScopeCall.Name as GenericNameSyntax;
-                    if (name != null && name.TypeArgumentList.Arguments.Count == 2)
+                    if (interfaceArg == null || implArg == null)
                     {
-                        var interfaceArg = model.GetSymbolInfo(name.TypeArgumentList.Arguments[0]).Symbol as ITypeSymbol;
-                        var implArg = model.GetSymbolInfo(name.TypeArgumentList.Arguments[1]).Symbol as ITypeSymbol;
-
-                        if (interfaceArg == null || implArg == null)
-                        {
-                            var label = DiagError.CreateError("Wrong Type", "Generic Arguments not found");
-                            context.ReportDiagnostic(Diagnostic.Create(label, name.GetLocation()));
-                            continue;
-                        }
-
-                        if (!MemoizerCall.TryCreate(myContext, addMemoizedScopeCall, interfaceArg, implArg, out var scopedCall))
-                            continue;
-
-                        calls.Add(scopedCall);
-
-                        var source = MemoizedClass.Generate(scopedCall);
-
-                        context.AddSource(scopedCall.ClassName, source);
+                        myContext.CreateError("Wrong Type", "Generic Arguments not found", name.GetLocation());
+                        continue;
                     }
+
+                    if (!MemoizerCall.TryCreate(myContext, addMemoizedScopeCall, interfaceArg, implArg, out var scopedCall))
+                        continue;
+
+                    calls.Add(scopedCall);
+
+                    var source = MemoizedClass.Generate(scopedCall);
+
+                    context.AddSource(scopedCall.ClassName, source);
                 }
             }
 
@@ -102,30 +122,39 @@ namespace MemoizeSourceGenerator
 
     public class GeneratorContext
     {
+        private readonly IReadOnlyDictionary<ITypeSymbol, CreateMemoizeInterfaceContext> _createMemoizeAttributeContexts;
         public GeneratorExecutionContext Context { get; }
-        public INamedTypeSymbol CreateMemoizedAttribute { get; }
         public INamedTypeSymbol PartitionCacheAttribute { get; }
         public INamedTypeSymbol SlidingCacheAttribute { get; }
         public INamedTypeSymbol MemoizerFactoryInterface { get; }
+        public INamedTypeSymbol CreateMemoizedAttribute { get; }
 
         public GeneratorContext
-        (GeneratorExecutionContext context,
-            INamedTypeSymbol createMemoizedAttribute,
+        (
+            GeneratorExecutionContext context,
             INamedTypeSymbol partitionCacheAttribute,
             INamedTypeSymbol slidingCacheAttribute,
-            INamedTypeSymbol memoizerFactoryInterface
+            INamedTypeSymbol memoizerFactoryInterface,
+            INamedTypeSymbol createMemoizedAttribute,
+            IReadOnlyDictionary<ITypeSymbol, CreateMemoizeInterfaceContext> createMemoizeAttributeContexts
         )
         {
+            _createMemoizeAttributeContexts = createMemoizeAttributeContexts;
             Context = context;
-            CreateMemoizedAttribute = createMemoizedAttribute;
             PartitionCacheAttribute = partitionCacheAttribute;
             SlidingCacheAttribute = slidingCacheAttribute;
             MemoizerFactoryInterface = memoizerFactoryInterface;
+            CreateMemoizedAttribute = createMemoizedAttribute;
         }
 
         public void ReportDiagnostic(Diagnostic diag)
         {
             Context.ReportDiagnostic(diag);
+        }
+
+        public bool TryGetInterfaceContext(ITypeSymbol interfaceType, out CreateMemoizeInterfaceContext o)
+        {
+            return _createMemoizeAttributeContexts.TryGetValue(interfaceType, out o);
         }
     }
 

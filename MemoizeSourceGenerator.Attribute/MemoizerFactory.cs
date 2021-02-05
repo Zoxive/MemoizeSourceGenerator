@@ -8,6 +8,10 @@ namespace MemoizeSourceGenerator.Attribute
 {
     public sealed class MemoizerFactory : IMemoizerFactory
     {
+        // TODO how to customize Cache options?
+        // One global cache with partitions inside that
+        private static readonly MemoryCache MemoryCache = new MemoryCache(new MemoryCacheOptions());
+
         private readonly ILoggerFactory _loggerFactory;
         private readonly ConcurrentDictionary<IPartitionKey, CachePartition> _cachePartitions = new();
 
@@ -18,18 +22,16 @@ namespace MemoizeSourceGenerator.Attribute
 
         public IEnumerable<CachePartition> Partitions => _cachePartitions.Values;
 
+        public IPartitionKey FactoryKey => GlobalKey.Instance;
+
         public CachePartition GetGlobal()
         {
-            return GetOrCreatePartition( GlobalKey.Instance);
+            return GetOrCreatePartition(FactoryKey, rootKey: true);
         }
 
         public CachePartition GetOrCreatePartition(IPartitionKey partitionKey)
         {
-            CachePartition Create(IPartitionKey _)
-            {
-                 return CreatePartition(partitionKey);
-            }
-            return GetOrCreatePartition(partitionKey, Create);
+            return GetOrCreatePartition(partitionKey, false);
         }
 
         public void InvalidateAll()
@@ -48,14 +50,27 @@ namespace MemoizeSourceGenerator.Attribute
             }
         }
 
+        // Not on interface, but exposed for composition purposes
+        public CachePartition GetOrCreatePartition(IPartitionKey partitionKey, bool rootKey)
+        {
+            var key = rootKey? partitionKey : new CompositeKey(FactoryKey, partitionKey);
+
+            CachePartition Create(IPartitionKey _)
+            {
+                 return CreatePartition(key);
+            }
+            return GetOrCreatePartition(key, Create);
+        }
+
         // Not on the interface, but exposed for composition purposes
         public CachePartition GetOrCreatePartition(IPartitionKey partitionKey, Func<IPartitionKey, CachePartition> createPartition)
         {
             return _cachePartitions.GetOrAdd(partitionKey, createPartition);
         }
+
         public CachePartition CreatePartition(IPartitionKey partitionKey)
         {
-             return new CachePartition(partitionKey, _loggerFactory.CreateLogger<CachePartition>(), new MemoryCache(new MemoryCacheOptions()));
+             return new CachePartition(partitionKey, _loggerFactory.CreateLogger<CachePartition>(), MemoryCache);
         }
     }
 

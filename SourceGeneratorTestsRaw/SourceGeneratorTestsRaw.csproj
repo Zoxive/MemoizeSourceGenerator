@@ -4,6 +4,8 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
 
     <IsPackable>false</IsPackable>
+
+    <RootNamespace>SourceGeneratorTests</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
@@ -28,8 +30,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\MemoizeSourceGenerator\MemoizeSourceGenerator.csproj" />
     <ProjectReference Include="..\MemoizeSourceGenerator.Attribute\MemoizeSourceGenerator.Attribute.csproj" />
-    <ProjectReference Include="..\MemoizeSourceGenerator\MemoizeSourceGenerator.csproj" ReferenceOutputAssembly="false" OutputItemType="Analyzer" />
   </ItemGroup>
 
 </Project>

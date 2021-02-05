@@ -30,8 +30,7 @@ namespace MemoizeSourceGenerator.Models
             {
                 if (!type.AllInterfaces.Any(x => x.MetadataName == "IEquatable`1"))
                 {
-                    var label = DiagError.CreateError("Must implement IEquatable<>", $"Type {parameterSymbol.ToDisplayString()} must implement IEquatable<>");
-                    context.ReportDiagnostic(Diagnostic.Create(label, errorLocation));
+                    context.CreateError("Must implement IEquatable<>", $"Type {parameterSymbol.ToDisplayString()} must implement IEquatable<>", errorLocation);
                     arg = null;
                     return false;
                 }

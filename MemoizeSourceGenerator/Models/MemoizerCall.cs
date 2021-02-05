@@ -11,23 +11,31 @@ namespace MemoizeSourceGenerator.Models
     public class MemoizerCall
     {
         public static bool TryCreate
-        (GeneratorContext context,
+        (
+            GeneratorContext context,
             MemberAccessExpressionSyntax expressionSyntax,
             ITypeSymbol interfaceType,
             ITypeSymbol implementationType,
             [NotNullWhen(true)] out MemoizerCall? call)
         {
             var interfaceAttributes = interfaceType.GetAttributes();
-            var errorLocation = expressionSyntax.Name.GetLocation();
 
-            var memoizeAttribute = interfaceAttributes.FirstOrDefault(x => SymbolEqualityComparer.Default.Equals(x.AttributeClass, context.CreateMemoizedAttribute));
-            if (memoizeAttribute == null)
+            if (!context.TryGetInterfaceContext(interfaceType, out var interfaceContext))
             {
-                var label = DiagError.CreateError("Missing Memoized Attribute", "Interface must have the [CreateMemoizedImplementation] attribute attached");
-                context.ReportDiagnostic(Diagnostic.Create(label, errorLocation));
-                call = null;
-                return false;
+                // The Interface could exist in a referenced project which we dont have the interfacesyntax for.. lets check that
+                var memoizeAttribute2 = interfaceAttributes.FirstOrDefault(x => SymbolEqualityComparer.Default.Equals(x.AttributeClass, context.CreateMemoizedAttribute));
+
+                if (memoizeAttribute2 == null)
+                {
+                    context.CreateError("Missing Memoized Attribute", "Interface must have the [CreateMemoizedImplementation] attribute attached", expressionSyntax.Name.GetLocation());
+                    call = null;
+                    return false;
+                }
+
+                interfaceContext = CreateMemoizeInterfaceContext.CreateFromType(interfaceType, memoizeAttribute2, expressionSyntax.GetLocation());
             }
+
+            var memoizeAttribute = interfaceContext.CreateMemoizedAttributeData;
 
             if (!TryGetClassName(memoizeAttribute, interfaceType, out var className, out var humanId))
             {
@@ -46,9 +54,7 @@ namespace MemoizeSourceGenerator.Models
             {
                 if (!memoizerFactoryTypeSymbol.AllInterfaces.Any(i => SymbolEqualityComparer.Default.Equals(i, context.MemoizerFactoryInterface)))
                 {
-                    var label = DiagError.CreateError($"Wrong {nameof(CreateMemoizedImplementationAttribute.MemoizerFactory)} type",
-                        $"MemoizerFactory type must implement {nameof(IMemoizerFactory)}");
-                    context.ReportDiagnostic(Diagnostic.Create(label, errorLocation));
+                    context.CreateError($"Wrong {nameof(CreateMemoizedImplementationAttribute.MemoizerFactory)} type", $"MemoizerFactory type must implement {nameof(IMemoizerFactory)}", interfaceContext.InterfaceWithAttribute?.GetLocation() ?? expressionSyntax.Name.GetLocation());
                     call = null;
                     return false;
                 }
@@ -58,15 +64,14 @@ namespace MemoizeSourceGenerator.Models
 
             var members = interfaceType.GetMembers();
             var methods = new List<MemoizedMethodMember>(members.Length);
-
             var methodSymbols = members.OfType<IMethodSymbol>().ToList();
 
             // TODO Create different ArgKey class name implementations
             // then Check names to see what ArgKey_ class name algo we can use
 
-            foreach (var member in methodSymbols)
+            foreach (var interfaceMethod in methodSymbols)
             {
-                if (MemoizedMethodMember.TryCreate(context, errorLocation, member, out var methodMember))
+                if (MemoizedMethodMember.TryCreate(context, interfaceContext, interfaceMethod, out var methodMember))
                 {
                     methods.Add(methodMember);
                 }

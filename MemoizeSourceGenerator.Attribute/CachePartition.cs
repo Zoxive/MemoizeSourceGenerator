@@ -6,20 +6,21 @@ using Microsoft.Extensions.Primitives;
 
 namespace MemoizeSourceGenerator.Attribute
 {
-    public sealed class CachePartition : IMemoryCache
+    public sealed class CachePartition
     {
         private readonly ILogger<CachePartition> _logger;
         public string DisplayName { get; }
         public IPartitionKey PartitionKey { get; }
-        private MemoryCache Cache { get; }
+        private IMemoryCache Cache { get; }
 
         public CancellationTokenSource ClearCacheTokenSource { get; private set; }
         private readonly object _tokenSourceSync;
         private int _accessCount = 0;
         private int _misses = 0;
         private int _totalSize = 0;
+        private int _partitionCount = 0;
 
-        public CachePartition(IPartitionKey partitionKey, ILogger<CachePartition> logger, MemoryCache memoryCache)
+        public CachePartition(IPartitionKey partitionKey, ILogger<CachePartition> logger, IMemoryCache memoryCache)
         {
             _logger = logger;
             PartitionKey = partitionKey;
@@ -29,9 +30,47 @@ namespace MemoizeSourceGenerator.Attribute
             ClearCacheTokenSource = new CancellationTokenSource();
         }
 
-        public bool TryGetValue(object key, out object value) => Cache.TryGetValue(key, out value);
-        public ICacheEntry CreateEntry(object key) => Cache.CreateEntry(key);
+        public bool TryGetValue<TValue>(object key, out TValue value) => Cache.TryGetValue<TValue>(key, out value);
         public void Remove(object key) => Cache.Remove(key);
+
+        public void CreateEntry<TValue>(object key, TValue? value, CancellationTokenSource tokenSourceBeforeComputingValue, double slidingCacheInMinutes, long? size = null, Action<ICacheEntry>? configureEntry = null)
+        {
+            var entry = Cache.CreateEntry(key);
+
+            entry.SetValue(value);
+
+            // TODO size will not be optional
+            if (size.HasValue)
+            {
+                entry.Size = size;
+                Interlocked.Add(ref _totalSize, (int)size.Value);
+            }
+
+            Interlocked.Increment(ref _partitionCount);
+
+            SetExpiration(entry, tokenSourceBeforeComputingValue, slidingCacheInMinutes, configureEntry);
+
+            entry.RegisterPostEvictionCallback(EvictionCallback);
+            void EvictionCallback(object callbackObjKey, object callbackObjValue, EvictionReason reason, object ___)
+            {
+                if (size.HasValue)
+                {
+                    Interlocked.Add(ref _totalSize, -(int)size.Value);
+                }
+
+                Interlocked.Decrement(ref _partitionCount);
+
+                if (reason == EvictionReason.Capacity)
+                {
+                    _logger.LogWarning("Cache Item removed due to Capacity. {Key} {Value}", callbackObjKey, callbackObjValue);
+                }
+            }
+
+            // need to manually call dispose instead of having a using");
+            // in case the factory passed in throws, in which case we");
+            // do not want to add the entry to the cache");
+            entry.Dispose();
+        }
 
         public void Invalidate()
         {
@@ -48,12 +87,12 @@ namespace MemoizeSourceGenerator.Attribute
             }
         }
 
-        public void SetExpiration(ICacheEntry entry, CancellationTokenSource clearCacheTokenSource, double inMinutes, long? size = null, Action<ICacheEntry>? configureEntry = null)
+        private void SetExpiration(ICacheEntry entry, CancellationTokenSource tokenSourceBeforeComputingValue, double inMinutes, Action<ICacheEntry>? configureEntry = null)
         {
             lock (_tokenSourceSync)
             {
                 configureEntry?.Invoke(entry);
-                if (clearCacheTokenSource != ClearCacheTokenSource)
+                if (tokenSourceBeforeComputingValue != ClearCacheTokenSource)
                 {
                     entry.SetAbsoluteExpiration(TimeSpan.FromTicks(1));
                 }
@@ -61,26 +100,6 @@ namespace MemoizeSourceGenerator.Attribute
                 {
                     entry.SetSlidingExpiration(TimeSpan.FromMinutes(inMinutes))
                         .AddExpirationToken(new CancellationChangeToken(ClearCacheTokenSource.Token));
-                }
-            }
-
-            if (size.HasValue)
-            {
-                entry.Size = size;
-                Interlocked.Add(ref _totalSize, (int)size.Value);
-            }
-
-            entry.RegisterPostEvictionCallback(EvictionCallback);
-            void EvictionCallback(object key, object value, EvictionReason reason, object ___)
-            {
-                if (size.HasValue)
-                {
-                    Interlocked.Add(ref _totalSize, -(int)size.Value);
-                }
-
-                if (reason == EvictionReason.Capacity)
-                {
-                    _logger.LogWarning("Cache Item removed due to Capacity. {Key} {Value}", key, value);
                 }
             }
         }
@@ -96,7 +115,7 @@ namespace MemoizeSourceGenerator.Attribute
             // force expired items scan
             Cache.Remove(this);
 
-            return new CacheStatistics(DisplayName, accessCount, misses, Cache.Count, _totalSize);
+            return new CacheStatistics(DisplayName, accessCount, misses, _partitionCount, _totalSize);
         }
 
         /*

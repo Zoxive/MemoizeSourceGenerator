@@ -4,6 +4,8 @@ namespace MemoizeSourceGenerator.Attribute
 {
     public interface IMemoizerFactory
     {
+        IPartitionKey FactoryKey { get; }
+
         CachePartition GetGlobal();
         CachePartition GetOrCreatePartition(IPartitionKey partitionKey);
 

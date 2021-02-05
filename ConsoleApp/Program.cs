@@ -117,7 +117,7 @@ namespace ConsoleApp
                 log.LogInformation("New Result: {result}", maths.Add(10, 10));
 
                 // manual bust
-                cacheFactory.GetGlobal().Remove(new Memoized.Memoized_DoMaths.ArgKey_int_Add_int_int(5, 10));
+                cacheFactory.GetGlobal().Remove(new Memoized.Memoized_DoMaths.ArgKey_IDoMaths_int_Add_int_int(GlobalKey.Instance, 5, 10));
 
                 log.LogInformation("Result: {result}", maths.Add(5, 10));
 

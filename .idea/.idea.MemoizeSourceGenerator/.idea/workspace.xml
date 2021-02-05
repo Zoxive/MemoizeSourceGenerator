@@ -5,15 +5,25 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="25fb4445-a3ad-4d6f-a730-0fe87988fee8" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/MemoizeSourceGenerator.Attribute/IPartitionKey.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/MemoizeSourceGenerator/Models/CreateMemoizeInterfaceContext.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.MemoizeSourceGenerator/.idea/contentModel.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.MemoizeSourceGenerator/.idea/contentModel.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.MemoizeSourceGenerator/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.MemoizeSourceGenerator/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ConsoleApp/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ConsoleApp/Program.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ConsoleApp/ScopedMemoizer.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ConsoleApp/ScopedMemoizer.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/MemoizeSourceGenerator.Attribute/CachePartition.cs" beforeDir="false" afterPath="$PROJECT_DIR$/MemoizeSourceGenerator.Attribute/CachePartition.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/MemoizeSourceGenerator.Attribute/GlobalKey.cs" beforeDir="false" afterPath="$PROJECT_DIR$/MemoizeSourceGenerator.Attribute/GlobalKey.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/MemoizeSourceGenerator.Attribute/IMemoizerFactory.cs" beforeDir="false" afterPath="$PROJECT_DIR$/MemoizeSourceGenerator.Attribute/IMemoizerFactory.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/MemoizeSourceGenerator.Attribute/IPartitionKey.cs" beforeDir="false" afterPath="$PROJECT_DIR$/MemoizeSourceGenerator.Attribute/IPartitionKey.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/MemoizeSourceGenerator.Attribute/MemoizerFactory.cs" beforeDir="false" afterPath="$PROJECT_DIR$/MemoizeSourceGenerator.Attribute/MemoizerFactory.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/MemoizeSourceGenerator.Attribute/StringPartitionKey.cs" beforeDir="false" afterPath="$PROJECT_DIR$/MemoizeSourceGenerator.Attribute/StringPartitionKey.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/MemoizeSourceGenerator.sln" beforeDir="false" afterPath="$PROJECT_DIR$/MemoizeSourceGenerator.sln" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/MemoizeSourceGenerator/DiagError.cs" beforeDir="false" afterPath="$PROJECT_DIR$/MemoizeSourceGenerator/DiagError.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/MemoizeSourceGenerator/Generator.cs" beforeDir="false" afterPath="$PROJECT_DIR$/MemoizeSourceGenerator/Generator.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/MemoizeSourceGenerator/MemoizedClass.cs" beforeDir="false" afterPath="$PROJECT_DIR$/MemoizeSourceGenerator/MemoizedClass.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/MemoizeSourceGenerator/Models/MemoizedMethodMember.cs" beforeDir="false" afterPath="$PROJECT_DIR$/MemoizeSourceGenerator/Models/MemoizedMethodMember.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/MemoizeSourceGenerator/Models/MemoizedMethodMemberArgument.cs" beforeDir="false" afterPath="$PROJECT_DIR$/MemoizeSourceGenerator/Models/MemoizedMethodMemberArgument.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/MemoizeSourceGenerator/Models/MemoizerCall.cs" beforeDir="false" afterPath="$PROJECT_DIR$/MemoizeSourceGenerator/Models/MemoizerCall.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/MemoizeSourceGenerator/SymbolExtensions.cs" beforeDir="false" afterPath="$PROJECT_DIR$/MemoizeSourceGenerator/SymbolExtensions.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SourceGeneratorTests/SourceGeneratorTests.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/SourceGeneratorTestsRaw/SourceGeneratorTestsRaw.csproj" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SourceGeneratorTests/Tests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/SourceGeneratorTestsRaw/Tests.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -34,37 +44,57 @@
   <component name="HighlightingSettingsPerFile">
     <setting file="mock://C:/Github/CachedInterfaceSourceGenerator/MemoizeSourceGenerator/Models/MemoizedMethodMember.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock://C:/Github/CachedInterfaceSourceGenerator/MemoizeSourceGenerator/MemoizedClass.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock://C:/Github/CachedInterfaceSourceGenerator/MemoizeSourceGenerator.Attribute/MemoizerFactory.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock://C:/Github/CachedInterfaceSourceGenerator/MemoizeSourceGenerator/AddMemoizedExtensionCall.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/D9481C48-DEDE-406B-80E9-12FDF0C86235/1B2/CSharpSyntaxNode.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock://C:/Github/CachedInterfaceSourceGenerator/MemoizeSourceGenerator/MemoizedClass.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock://C:/Github/CachedInterfaceSourceGenerator/MemoizeSourceGenerator.Attribute/CachePartition.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock://C:/Github/CachedInterfaceSourceGenerator/MemoizeSourceGenerator/Models/MemoizedMethodMember.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock://C:/Github/CachedInterfaceSourceGenerator/MemoizeSourceGenerator/Models/MemoizedMethodMember.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock://C:/Github/CachedInterfaceSourceGenerator/MemoizeSourceGenerator/AddMemoizedExtensionCall.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock://C:/Github/CachedInterfaceSourceGenerator/MemoizeSourceGenerator/AddMemoizedExtensionCall.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock://C:/Github/CachedInterfaceSourceGenerator/MemoizeSourceGenerator/MemoizedClass.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock://C:/Github/CachedInterfaceSourceGenerator/MemoizeSourceGenerator/Models/MemoizedMethodMemberArgument.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock://C:/Github/CachedInterfaceSourceGenerator/MemoizeSourceGenerator/AddMemoizedExtensionCall.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock://C:/Github/CachedInterfaceSourceGenerator/MemoizeSourceGenerator/MemoizedClass.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/1003AE41-C1C6-41B1-8889-7EDA041418F7/F/CSharpSemanticFactsService.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock://C:/Github/CachedInterfaceSourceGenerator/MemoizeSourceGenerator.Attribute/CachePartition.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock://C:/Github/CachedInterfaceSourceGenerator/MemoizeSourceGenerator/Models/MemoizerCall.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock://C:/Github/CachedInterfaceSourceGenerator/MemoizeSourceGenerator/AddMemoizedExtensionCall.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/2CDB5A9D-896E-4B73-8149-97583E450999/D7/DocumentationCommentId.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/2CDB5A9D-896E-4B73-8149-97583E450999/1C1/TextSpan.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/2CDB5A9D-896E-4B73-8149-97583E450999/171/SyntaxTree.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock://C:/Github/CachedInterfaceSourceGenerator/MemoizeSourceGenerator/AddMemoizedExtensionCall.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock://C:/Github/CachedInterfaceSourceGenerator/MemoizeSourceGenerator/MemoizedClass.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock://C:/Github/CachedInterfaceSourceGenerator/MemoizeSourceGenerator.Attribute/MemoizerFactory.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock://C:/Github/CachedInterfaceSourceGenerator/MemoizeSourceGenerator.Attribute/CachePartition.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/2CDB5A9D-896E-4B73-8149-97583E450999/36/dbdff9c1/ITypeSymbol.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock://C:/Github/CachedInterfaceSourceGenerator/MemoizeSourceGenerator/AddMemoizedExtensionCall.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock://C:/Github/CachedInterfaceSourceGenerator/MemoizeSourceGenerator.Attribute/CachePartition.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/6E1C5770-EF3D-4D36-802B-3829D5207228/6/MemoryCache.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock://C:/Github/CachedInterfaceSourceGenerator/MemoizeSourceGenerator/Models/MemoizedMethodMember.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock://C:/Github/CachedInterfaceSourceGenerator/MemoizeSourceGenerator/Models/MemoizedMethodMember.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock://C:/Github/CachedInterfaceSourceGenerator/MemoizeSourceGenerator/AddMemoizedExtensionCall.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock://C:/Github/CachedInterfaceSourceGenerator/MemoizeSourceGenerator/AddMemoizedExtensionCall.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/2CDB5A9D-896E-4B73-8149-97583E450999/B2/SemanticModel.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock://C:/Github/CachedInterfaceSourceGenerator/MemoizeSourceGenerator/Models/MemoizerCall.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock://C:/Github/CachedInterfaceSourceGenerator/MemoizeSourceGenerator/Models/MemoizedMethodMemberArgument.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock://C:/Github/CachedInterfaceSourceGenerator/MemoizeSourceGenerator/AddMemoizedExtensionCall.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock://C:/Github/CachedInterfaceSourceGenerator/MemoizeSourceGenerator/MemoizedClass.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock://C:/Github/CachedInterfaceSourceGenerator/MemoizeSourceGenerator/AddMemoizedExtensionCall.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/2CDB5A9D-896E-4B73-8149-97583E450999/ef/7b5fcf6a/INamedTypeSymbol.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/2CDB5A9D-896E-4B73-8149-97583E450999/119/GeneratorContexts.cs" root0="SKIP_HIGHLIGHTING" />
   </component>
   <component name="IdeDocumentHistory">
     <changedPaths>
-      <option value="$PROJECT_DIR$/SourceGeneratorTests/Tests.cs" />
       <option value="$PROJECT_DIR$/MemoizeSourceGenerator/MemoizeSourceGenerator.csproj" />
-      <option value="$PROJECT_DIR$/MemoizeSourceGenerator/Generator.cs" />
-      <option value="$PROJECT_DIR$/ConsoleApp/ConsoleApp.csproj" />
       <option value="$PROJECT_DIR$/MemoizeSourceGenerator/AddMemoizedExtensionCall.cs" />
-      <option value="$PROJECT_DIR$/MemoizeSourceGenerator/Models/MemoizerCall.cs" />
       <option value="$PROJECT_DIR$/MemoizeSourceGenerator.Attribute/MemoizeSourceGenerator.Attribute.csproj" />
-      <option value="$PROJECT_DIR$/ConsoleApp/ScopedMemoizer.cs" />
-      <option value="$PROJECT_DIR$/ConsoleApp/Program.cs" />
-      <option value="$PROJECT_DIR$/MemoizeSourceGenerator/MemoizedClass.cs" />
       <option value="$PROJECT_DIR$/MemoizeSourceGenerator.Attribute/StringPartitionKey.cs" />
+      <option value="$PROJECT_DIR$/MemoizeSourceGenerator/Models/CreateMemoizeAttributeContext.cs" />
+      <option value="$PROJECT_DIR$/MemoizeSourceGenerator/DiagError.cs" />
+      <option value="$PROJECT_DIR$/MemoizeSourceGenerator/Models/MemoizedMethodMemberArgument.cs" />
+      <option value="$PROJECT_DIR$/ConsoleApp/Program.cs" />
+      <option value="$PROJECT_DIR$/MemoizeSourceGenerator.Attribute/CachePartition.cs" />
+      <option value="$PROJECT_DIR$/MemoizeSourceGenerator/MemoizedClass.cs" />
+      <option value="$PROJECT_DIR$/MemoizeSourceGenerator/Models/CreateMemoizeInterfaceContext.cs" />
+      <option value="$PROJECT_DIR$/MemoizeSourceGenerator/Models/MemoizerCall.cs" />
+      <option value="$PROJECT_DIR$/MemoizeSourceGenerator/Models/MemoizedMethodMember.cs" />
+      <option value="$PROJECT_DIR$/MemoizeSourceGenerator/SymbolExtensions.cs" />
+      <option value="$PROJECT_DIR$/MemoizeSourceGenerator/Generator.cs" />
+      <option value="$PROJECT_DIR$/ConsoleApp/ScopedMemoizer.cs" />
+      <option value="$PROJECT_DIR$/ConsoleApp/ConsoleApp.csproj" />
+      <option value="$PROJECT_DIR$/SourceGeneratorTests/SourceGeneratorTests.csproj" />
+      <option value="$PROJECT_DIR$/SourceGeneratorTests/Tests.cs" />
     </changedPaths>
   </component>
   <component name="ProjectId" id="1nw8guKGktxjmh4W1nyvSwPHyOs" />
@@ -73,13 +103,15 @@
     <option name="showLibraryContents" value="true" />
   </component>
   <component name="PropertiesComponent">
+    <property name="DebuggerViewTab_PTCS_FirstProportionKey" value="0.34997028" />
+    <property name="DebuggerViewTab_PTCS_LastProportionKey" value="0.0" />
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="nodejs_package_manager_path" value="npm" />
     <property name="vue.rearranger.settings.migration" value="true" />
   </component>
-  <component name="RunManager">
+  <component name="RunManager" selected=".NET Project.ConsoleApp">
     <configuration name="ConsoleApp" type="DotNetProject" factoryName=".NET Project">
       <option name="EXE_PATH" value="" />
       <option name="PROGRAM_PARAMETERS" value="" />
@@ -98,6 +130,16 @@
         <option name="Build" />
       </method>
     </configuration>
+    <configuration name="Debugger.Launch: dotnet.exe" type="RunNativeExe" factoryName="Native Executable">
+      <option name="EXE_PATH" value="C:\Program Files\dotnet\dotnet.exe" />
+      <option name="PROGRAM_PARAMETERS" value=" exec &quot;C:\Program Files\dotnet\sdk\5.0.102\Roslyn\bincore\csc.dll&quot; /noconfig @&quot;C:\Users\Kyle\AppData\Local\Temp\tmp30f6a6f1b8304041a058c6687505ceaa.rsp&quot;" />
+      <option name="WORKING_DIRECTORY" value="C:\Program Files\dotnet" />
+      <option name="PASS_PARENT_ENVS" value="1" />
+      <option name="USE_EXTERNAL_CONSOLE" value="0" />
+      <method v="2">
+        <option name="Build Solution" enabled="true" />
+      </method>
+    </configuration>
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
@@ -109,7 +151,7 @@
       <updated>1612289906894</updated>
       <workItem from="1612289915411" duration="1480000" />
       <workItem from="1612291780474" duration="687000" />
-      <workItem from="1612292774901" duration="13274000" />
+      <workItem from="1612292774901" duration="29580000" />
     </task>
     <task id="LOCAL-00001" summary="add autogenerated comment to generated files">
       <created>1612293141085</created>
@@ -132,7 +174,14 @@
       <option name="project" value="LOCAL" />
       <updated>1612300807188</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="remove caller">
+      <created>1612448791949</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1612448791949</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -157,6 +206,26 @@
     <MESSAGE value="add autogenerated comment to generated files" />
     <MESSAGE value="fixes while trying to use it in a real object" />
     <MESSAGE value="add async method support, nullable args" />
-    <option name="LAST_COMMIT_MESSAGE" value="add async method support, nullable args" />
+    <MESSAGE value="remove caller" />
+    <option name="LAST_COMMIT_MESSAGE" value="remove caller" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/MemoizeSourceGenerator/Models/MemoizedMethodMember.cs</url>
+          <line>37</line>
+          <properties documentPath="C:\Github\CachedInterfaceSourceGenerator\MemoizeSourceGenerator\Models\MemoizedMethodMember.cs" initialLine="37" containingFunctionPresentation="method 'TryCreate'">
+            <startOffsets>
+              <option value="1300" />
+            </startOffsets>
+            <endOffsets>
+              <option value="1319" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="12" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
   </component>
 </project>

@@ -8,16 +8,20 @@ namespace MemoizeSourceGenerator.Attribute
 {
     public sealed class MemoizerFactory : IMemoizerFactory
     {
-        // TODO how to customize Cache options?
         // One global cache with partitions inside that
-        private static readonly MemoryCache MemoryCache = new MemoryCache(new MemoryCacheOptions());
+        private static MemoryCache? _memoryCache;
 
         private readonly ILoggerFactory _loggerFactory;
         private readonly ConcurrentDictionary<IPartitionKey, CachePartition> _cachePartitions = new();
 
-        public MemoizerFactory(ILoggerFactory loggerFactory)
+        public MemoizerFactory(ILoggerFactory loggerFactory, MemoryCacheOptions? options = null)
         {
             _loggerFactory = loggerFactory;
+
+            if (_memoryCache == null)
+            {
+                _memoryCache = new MemoryCache(options ?? new MemoryCacheOptions());
+            }
         }
 
         public IEnumerable<CachePartition> Partitions => _cachePartitions.Values;
@@ -70,7 +74,7 @@ namespace MemoizeSourceGenerator.Attribute
 
         public CachePartition CreatePartition(IPartitionKey partitionKey)
         {
-             return new CachePartition(partitionKey, _loggerFactory.CreateLogger<CachePartition>(), MemoryCache);
+             return new CachePartition(partitionKey, _loggerFactory.CreateLogger<CachePartition>(), _memoryCache!);
         }
     }
 

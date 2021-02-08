@@ -68,8 +68,6 @@ namespace {call.Namespace}
                     sb.AppendLine($"\t\t\tvar cache = _cacheFactory.GetGlobal();");
                 }
 
-                sb.AppendLine($"\t\t\tcache.RecordAccessCount();");
-                sb.AppendLine();
                 sb.Append($"\t\t\tvar key = new {method.ClassName}(cache.PartitionKey,");
                 method.WriteParameters(sb, prefix: "__");
                 sb.AppendLine(");");
@@ -83,7 +81,6 @@ namespace {call.Namespace}
 
                 sb.AppendLine();
                 sb.AppendLine($"\t\t\tvar tokenSourceBeforeComputingEntry = cache.ClearCacheTokenSource;");
-                sb.AppendLine("\t\t\tcache.RecordMiss();");
                 sb.AppendLine();
                 sb.Append($"\t\t\tvar result = ");
                 if (method.IsAsync)
@@ -128,10 +125,10 @@ namespace {call.Namespace}
             var lastArg = method.Parameters.LastOrDefault();
 
 
-            sb.AppendLine($"\t\tpublic readonly struct {methodClassName} : IEquatable<{methodClassName}>");
+            sb.AppendLine($"\t\tpublic readonly struct {methodClassName} : IEquatable<{methodClassName}>, IPartitionObjectKey");
             sb.AppendLine("\t\t{");
 
-            sb.AppendLine($"\t\t\tprivate readonly IPartitionKey PartitionKey;");
+            sb.AppendLine("\t\t\tpublic IPartitionKey PartitionKey { get; }");
             foreach (var arg in method.Parameters)
             {
                 sb.AppendLine($"\t\t\tprivate readonly {arg.ArgType} _{arg.Name};");
@@ -189,6 +186,13 @@ namespace {call.Namespace}
             sb.AppendLine("\t\t\t{");
             sb.AppendLine("\t\t\t\tif (ReferenceEquals(null, obj)) return false;");
             sb.AppendLine("\t\t\t\tif (ReferenceEquals(this, obj)) return true;");
+            sb.AppendLine($"\t\t\t\treturn obj is {methodClassName} castedObj && Equals(castedObj);");
+            sb.AppendLine("\t\t\t}");
+            sb.AppendLine();
+
+            sb.AppendLine($"\t\t\tpublic bool Equals(IPartitionObjectKey? obj)");
+            sb.AppendLine("\t\t\t{");
+            sb.AppendLine("\t\t\t\tif (ReferenceEquals(null, obj)) return false;");
             sb.AppendLine($"\t\t\t\treturn obj is {methodClassName} castedObj && Equals(castedObj);");
             sb.AppendLine("\t\t\t}");
             sb.AppendLine();

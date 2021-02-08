@@ -42,10 +42,12 @@
         <e p="Attributes.cs" t="Include" />
         <e p="bin" t="ExcludeRecursive" />
         <e p="CachePartition.cs" t="Include" />
+        <e p="CachePartitionExtensions.cs" t="Include" />
         <e p="CacheStatistics.cs" t="Include" />
         <e p="GlobalKey.cs" t="Include" />
         <e p="IMemoizerFactory.cs" t="Include" />
         <e p="IPartitionKey.cs" t="Include" />
+        <e p="IPartitionValueKey.cs" t="Include" />
         <e p="MemoizerFactory.cs" t="Include" />
         <e p="MemoizeSourceGenerator.Attribute.csproj" t="IncludeRecursive" />
         <e p="obj" t="ExcludeRecursive">
@@ -61,6 +63,11 @@
       <e p="packages" t="ExcludeRecursive" />
       <e p="SourceGeneratorTests" t="IncludeRecursive">
         <e p="bin" t="ExcludeRecursive" />
+        <e p="CachePartitionTests.cs" t="Include" />
+        <e p="CacheStatsTests.cs" t="Include" />
+        <e p="extensions" t="Include">
+          <e p="AssertExtensions.cs" t="Include" />
+        </e>
         <e p="obj" t="ExcludeRecursive">
           <e p="Debug" t="Include">
             <e p="netcoreapp3.1" t="Include">
@@ -69,7 +76,6 @@
           </e>
         </e>
         <e p="SourceGeneratorTests.csproj" t="IncludeRecursive" />
-        <e p="Tests.cs" t="Include" />
       </e>
       <e p="SourceGeneratorTestsRaw" t="IncludeRecursive">
         <e p="bin" t="ExcludeRecursive" />

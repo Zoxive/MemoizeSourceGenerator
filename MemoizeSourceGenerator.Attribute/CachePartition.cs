@@ -9,7 +9,7 @@ namespace MemoizeSourceGenerator.Attribute
     public sealed class CachePartition
     {
         private readonly ILogger<CachePartition> _logger;
-        public string DisplayName { get; }
+        public string DisplayName => PartitionKey.DisplayName;
         public IPartitionKey PartitionKey { get; }
         private IMemoryCache Cache { get; }
 
@@ -26,15 +26,48 @@ namespace MemoizeSourceGenerator.Attribute
             PartitionKey = partitionKey;
             Cache = memoryCache;
             _tokenSourceSync = new object();
-            DisplayName = partitionKey.DisplayName;
             ClearCacheTokenSource = new CancellationTokenSource();
         }
 
-        public bool TryGetValue<TValue>(object key, out TValue value) => Cache.TryGetValue<TValue>(key, out value);
-        public void Remove(object key) => Cache.Remove(key);
-
-        public void CreateEntry<TValue>(object key, TValue? value, CancellationTokenSource tokenSourceBeforeComputingValue, double slidingCacheInMinutes, long? size = null, Action<ICacheEntry>? configureEntry = null)
+        public bool TryGetValue<TValue>(IPartitionObjectKey key, out TValue? value)
         {
+            // Prevent keys from other partitions
+            if (!key.PartitionKey.Equals(PartitionKey))
+            {
+                value = default;
+                return false;
+            }
+
+            Interlocked.Increment(ref _accessCount);
+
+            if (Cache.TryGetValue(key, out value))
+            {
+                return true;
+            }
+
+            Interlocked.Increment(ref _misses);
+            return false;
+
+        }
+
+        public void Remove(IPartitionObjectKey key)
+        {
+            // Prevent keys from other partitions
+            if (!key.PartitionKey.Equals(PartitionKey))
+            {
+                return;
+            }
+            Cache.Remove(key);
+        }
+
+        public bool CreateEntry<TValue>(IPartitionObjectKey key, TValue? value, CancellationTokenSource tokenSourceBeforeComputingValue, double slidingCacheInMinutes, long? size = null, Action<ICacheEntry>? configureEntry = null)
+        {
+            // Prevent keys from other partitions
+            if (!key.PartitionKey.Equals(PartitionKey))
+            {
+                return false;
+            }
+
             var entry = Cache.CreateEntry(key);
 
             entry.SetValue(value);
@@ -49,27 +82,14 @@ namespace MemoizeSourceGenerator.Attribute
             Interlocked.Increment(ref _partitionCount);
 
             SetExpiration(entry, tokenSourceBeforeComputingValue, slidingCacheInMinutes, configureEntry);
-
-            entry.RegisterPostEvictionCallback(EvictionCallback);
-            void EvictionCallback(object callbackObjKey, object callbackObjValue, EvictionReason reason, object ___)
-            {
-                if (size.HasValue)
-                {
-                    Interlocked.Add(ref _totalSize, -(int)size.Value);
-                }
-
-                Interlocked.Decrement(ref _partitionCount);
-
-                if (reason == EvictionReason.Capacity)
-                {
-                    _logger.LogWarning("Cache Item removed due to Capacity. {Key} {Value}", callbackObjKey, callbackObjValue);
-                }
-            }
+            RegisterEvictionCallback(size, entry);
 
             // need to manually call dispose instead of having a using");
             // in case the factory passed in throws, in which case we");
             // do not want to add the entry to the cache");
             entry.Dispose();
+
+            return true;
         }
 
         public void Invalidate()
@@ -84,6 +104,32 @@ namespace MemoizeSourceGenerator.Attribute
                     tokenSource.Dispose();
                 }
                 ClearCacheTokenSource = new CancellationTokenSource();
+            }
+
+            Interlocked.Exchange(ref _totalSize, 0);
+            Interlocked.Exchange(ref _partitionCount, 0);
+
+            // force expired items scan
+            Cache.Remove(this);
+        }
+
+        private void RegisterEvictionCallback(long? size, ICacheEntry entry)
+        {
+            entry.RegisterPostEvictionCallback(EvictionCallback);
+
+            void EvictionCallback(object callbackObjKey, object callbackObjValue, EvictionReason reason, object ___)
+            {
+                if (size.HasValue)
+                {
+                    Interlocked.Add(ref _totalSize, -(int) size.Value);
+                }
+
+                Interlocked.Decrement(ref _partitionCount);
+
+                if (reason == EvictionReason.Capacity)
+                {
+                    _logger.LogWarning("Cache Item removed due to Capacity. {Key} {Value}", callbackObjKey, callbackObjValue);
+                }
             }
         }
 
@@ -104,16 +150,21 @@ namespace MemoizeSourceGenerator.Attribute
             }
         }
 
-        public void RecordAccessCount() => Interlocked.Increment(ref _accessCount);
-        public void RecordMiss() => Interlocked.Increment(ref _misses);
 
         public CacheStatistics GetStatistics()
         {
+            // force expired items scan
+            Cache.Remove(this);
+
             var accessCount = Interlocked.Exchange(ref _accessCount, 0);
             var misses = Interlocked.Exchange(ref _misses, 0);
 
-            // force expired items scan
-            Cache.Remove(this);
+            // Invalidate() directly sets these to 0, so if they appear below 0 its from EvictionCallback
+            if (_partitionCount < 0)
+                Interlocked.Exchange(ref  _partitionCount, 0);
+
+            if (_totalSize < 0)
+                Interlocked.Exchange(ref _totalSize, 0);
 
             return new CacheStatistics(DisplayName, accessCount, misses, _partitionCount, _totalSize);
         }

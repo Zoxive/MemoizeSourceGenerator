@@ -42,5 +42,10 @@ namespace SourceGeneratorTests.Extensions
         {
             return cache.CreateEntry(key, value, cache.ClearCacheTokenSource, 10, null, configureEntry);
         }
+
+        public static bool CreateEntry<T>(this CachePartition cache, IPartitionObjectKey key, T value, Action<ICacheEntry> configureEntry = null)
+        {
+            return cache.CreateEntry(key, value, cache.ClearCacheTokenSource, 10, null, configureEntry);
+        }
     }
 }

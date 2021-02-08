@@ -4,18 +4,16 @@ namespace MemoizeSourceGenerator.Attribute
 {
     public readonly struct StringPartitionKey : IPartitionKey
     {
-        private readonly string _partition;
-
         public StringPartitionKey(string partition)
         {
-            _partition = partition;
+            DisplayName = partition;
         }
 
-        public string DisplayName => _partition;
+        public string DisplayName { get; }
 
         public bool Equals(StringPartitionKey other)
         {
-            return _partition == other._partition;
+            return DisplayName == other.DisplayName;
         }
 
         public bool Equals(IPartitionKey? obj)
@@ -31,7 +29,7 @@ namespace MemoizeSourceGenerator.Attribute
 
         public override int GetHashCode()
         {
-            return HashCode.Combine(_partition);
+            return HashCode.Combine(DisplayName);
         }
     }
 }

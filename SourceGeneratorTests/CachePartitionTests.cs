@@ -8,7 +8,7 @@ namespace SourceGeneratorTests
 {
     public class CachePartitionTests
     {
-		private readonly IMemoizerFactory _factory = new MemoizerFactory(NullLoggerFactory.Instance);
+		private readonly IMemoizerFactory _factory = MemoizerFactory.Global;
 
         [Fact]
         public void GlobalPartitionName()
@@ -22,6 +22,17 @@ namespace SourceGeneratorTests
         {
             var p = _factory.GetOrCreatePartition("Part1");
             p.DisplayName.Is("|GLOBAL|>Part1");
+        }
+
+        [Fact]
+        public void ReturnsSamePartition()
+        {
+            var p = _factory.GetOrCreatePartition("Part3");
+
+            // Same as p
+            var p2 = _factory.GetOrCreatePartition("Part3");
+
+            ReferenceEquals(p, p2).Is(true);
         }
 
         [Fact]
@@ -66,6 +77,64 @@ namespace SourceGeneratorTests
             p.TryGetValue<string>("Green", out _).Is(true);
             p.Invalidate();
             p.TryGetValue<string>("Green", out _).Is(false);
+        }
+
+        [Fact]
+        public void Wrong_Key_TryGetValue()
+        {
+            // Setup
+            var g = _factory.GetGlobal();
+            var p = _factory.GetOrCreatePartition("Matrix5");
+            var globalKey = new PartitionObjectKeyString(g.PartitionKey, "Yellow");
+            var partitionObjectKey = new PartitionObjectKeyString(p.PartitionKey, "Purple");
+            g.CreateEntry(globalKey, "Value").Is(true);
+            p.CreateEntry(partitionObjectKey, "Value2").Is(true);
+
+            // Cant get global cache key from Partition
+            p.TryGetValue<string>(globalKey, out _).Is(false);
+            g.TryGetValue<string>(globalKey, out _).Is(true);
+
+            // Cant get partition key from global
+            g.TryGetValue<string>(partitionObjectKey, out _).Is(false);
+            p.TryGetValue<string>(partitionObjectKey, out _).Is(true);
+        }
+
+        [Fact]
+        public void Wrong_Key_Remove()
+        {
+            // Setup
+            var g = _factory.GetGlobal();
+            var p = _factory.GetOrCreatePartition("Matrix6");
+
+            var globalKey = new PartitionObjectKeyString(g.PartitionKey, "Yellow2");
+            var partitionObjectKey = new PartitionObjectKeyString(p.PartitionKey, "Purple2");
+
+            g.CreateEntry(globalKey, "Value").Is(true);
+            p.CreateEntry(partitionObjectKey, "Value2").Is(true);
+
+            // Cant remove global cache key from Partition
+            g.Remove(globalKey).Is(true);
+            p.Remove(globalKey).Is(false);
+
+            // Cant remove partition key from global
+            g.Remove(partitionObjectKey).Is(false);
+            p.Remove(partitionObjectKey).Is(true);
+        }
+
+        [Fact]
+        public void Wrong_Key_Add()
+        {
+            var g = _factory.GetGlobal();
+            var p = _factory.GetOrCreatePartition("Matrix7");
+
+            var globalKey = new PartitionObjectKeyString(g.PartitionKey, "Yellow3");
+            var partitionObjectKey = new PartitionObjectKeyString(p.PartitionKey, "Purple3");
+
+            g.CreateEntry(globalKey, "Value").Is(true);
+            p.CreateEntry(globalKey, "Value2").Is(false);
+
+            g.CreateEntry(partitionObjectKey, "Value").Is(false);
+            p.CreateEntry(partitionObjectKey, "Value2").Is(true);
         }
     }
 }

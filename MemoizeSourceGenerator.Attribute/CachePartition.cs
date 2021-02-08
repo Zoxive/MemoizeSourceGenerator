@@ -50,14 +50,16 @@ namespace MemoizeSourceGenerator.Attribute
 
         }
 
-        public void Remove(IPartitionObjectKey key)
+        public bool Remove(IPartitionObjectKey key)
         {
             // Prevent keys from other partitions
             if (!key.PartitionKey.Equals(PartitionKey))
             {
-                return;
+                return false;
             }
             Cache.Remove(key);
+
+            return true;
         }
 
         public bool CreateEntry<TValue>(IPartitionObjectKey key, TValue? value, CancellationTokenSource tokenSourceBeforeComputingValue, double slidingCacheInMinutes, long? size = null, Action<ICacheEntry>? configureEntry = null)
@@ -149,7 +151,6 @@ namespace MemoizeSourceGenerator.Attribute
                 }
             }
         }
-
 
         public CacheStatistics GetStatistics()
         {

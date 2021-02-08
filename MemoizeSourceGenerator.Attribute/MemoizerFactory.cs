@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 
 namespace MemoizeSourceGenerator.Attribute
 {
@@ -11,7 +12,31 @@ namespace MemoizeSourceGenerator.Attribute
         // One global cache with partitions inside that
         private static MemoryCache? _memoryCache;
 
+        private static MemoizerFactory? _global;
+        public static MemoizerFactory Global
+        {
+            get
+            {
+                if (_global != null)
+                {
+                    return _global;
+                }
+
+                return _global = new MemoizerFactory(NullLoggerFactory.Instance);
+            }
+
+            // This allows users to set MemoryCacheOptions and ILoggerFactory to their choosing
+            set
+            {
+                if (_global != null)
+                    throw new ArgumentOutOfRangeException(nameof(value), "Cant override global factory once it was originally set..");
+                _global = value;
+            }
+        }
+
         private readonly ILoggerFactory _loggerFactory;
+
+        // Instance specific CachePartitions
         private readonly ConcurrentDictionary<IPartitionKey, CachePartition> _cachePartitions = new();
 
         public MemoizerFactory(ILoggerFactory loggerFactory, MemoryCacheOptions? options = null)

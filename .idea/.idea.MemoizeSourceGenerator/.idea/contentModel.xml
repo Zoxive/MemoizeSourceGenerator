@@ -75,6 +75,7 @@
             </e>
           </e>
         </e>
+        <e p="ScopedMemoizerFactoryExampleTests.cs" t="Include" />
         <e p="SourceGeneratorTests.csproj" t="IncludeRecursive" />
       </e>
       <e p="SourceGeneratorTestsRaw" t="IncludeRecursive">

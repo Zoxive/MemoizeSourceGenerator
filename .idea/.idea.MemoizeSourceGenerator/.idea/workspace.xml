@@ -5,18 +5,16 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="25fb4445-a3ad-4d6f-a730-0fe87988fee8" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/MemoizeSourceGenerator.Attribute/CachePartitionExtensions.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/MemoizeSourceGenerator.Attribute/IPartitionValueKey.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/SourceGeneratorTests/CachePartitionTests.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/SourceGeneratorTests/CacheStatsTests.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/SourceGeneratorTests/Extensions/AssertExtensions.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SourceGeneratorTests/ScopedMemoizerFactoryExampleTests.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.MemoizeSourceGenerator/.idea/contentModel.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.MemoizeSourceGenerator/.idea/contentModel.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.MemoizeSourceGenerator/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.MemoizeSourceGenerator/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/MemoizeSourceGenerator.Attribute/CachePartition.cs" beforeDir="false" afterPath="$PROJECT_DIR$/MemoizeSourceGenerator.Attribute/CachePartition.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/MemoizeSourceGenerator.Attribute/CachePartitionExtensions.cs" beforeDir="false" afterPath="$PROJECT_DIR$/MemoizeSourceGenerator.Attribute/CachePartitionExtensions.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/MemoizeSourceGenerator.Attribute/MemoizerFactory.cs" beforeDir="false" afterPath="$PROJECT_DIR$/MemoizeSourceGenerator.Attribute/MemoizerFactory.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/MemoizeSourceGenerator/MemoizedClass.cs" beforeDir="false" afterPath="$PROJECT_DIR$/MemoizeSourceGenerator/MemoizedClass.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/MemoizeSourceGenerator.Attribute/StringPartitionKey.cs" beforeDir="false" afterPath="$PROJECT_DIR$/MemoizeSourceGenerator.Attribute/StringPartitionKey.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SourceGeneratorTests/CachePartitionTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/SourceGeneratorTests/CachePartitionTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SourceGeneratorTests/Extensions/AssertExtensions.cs" beforeDir="false" afterPath="$PROJECT_DIR$/SourceGeneratorTests/Extensions/AssertExtensions.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/SourceGeneratorTests/SourceGeneratorTests.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/SourceGeneratorTests/SourceGeneratorTests.csproj" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/SourceGeneratorTests/Tests.cs" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -42,6 +40,7 @@
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/42BD6997-9771-469F-96AD-3A9F7C20DA30/3/CacheEntry.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/BC542A5C-3AD0-4C34-A080-02E941B52719/14E/ExecutionContext.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/D9481C48-DEDE-406B-80E9-12FDF0C86235/1B2/CSharpSyntaxNode.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$USER_HOME$/AppData/Local/Temp/RiderSourceGeneratedDocuments/3CD276A0635359D3CC70D659/MemoizeSourceGenerator/MemoizeSourceGenerator.Generator/Memoized_CustomMemoizerTest.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/1003AE41-C1C6-41B1-8889-7EDA041418F7/F/CSharpSemanticFactsService.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/C8ED13E4-D063-4320-B29F-942B57A64198/197/Interlocked.CoreCLR.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/2CDB5A9D-896E-4B73-8149-97583E450999/D7/DocumentationCommentId.cs" root0="SKIP_HIGHLIGHTING" />
@@ -67,7 +66,6 @@
       <option value="$PROJECT_DIR$/MemoizeSourceGenerator/MemoizeSourceGenerator.csproj" />
       <option value="$PROJECT_DIR$/MemoizeSourceGenerator/AddMemoizedExtensionCall.cs" />
       <option value="$PROJECT_DIR$/MemoizeSourceGenerator.Attribute/MemoizeSourceGenerator.Attribute.csproj" />
-      <option value="$PROJECT_DIR$/MemoizeSourceGenerator.Attribute/StringPartitionKey.cs" />
       <option value="$PROJECT_DIR$/MemoizeSourceGenerator/Models/CreateMemoizeAttributeContext.cs" />
       <option value="$PROJECT_DIR$/MemoizeSourceGenerator/DiagError.cs" />
       <option value="$PROJECT_DIR$/MemoizeSourceGenerator/Models/MemoizedMethodMemberArgument.cs" />
@@ -83,12 +81,14 @@
       <option value="$PROJECT_DIR$/SourceGeneratorTests/SourceGeneratorTests.csproj" />
       <option value="$PROJECT_DIR$/MemoizeSourceGenerator/MemoizedClass.cs" />
       <option value="$PROJECT_DIR$/MemoizeSourceGenerator.Attribute/IPartitionValueKey.cs" />
-      <option value="$PROJECT_DIR$/SourceGeneratorTests/CachePartitionTests.cs" />
-      <option value="$PROJECT_DIR$/SourceGeneratorTests/Extensions/AssertExtensions.cs" />
-      <option value="$PROJECT_DIR$/MemoizeSourceGenerator.Attribute/CachePartitionExtensions.cs" />
-      <option value="$PROJECT_DIR$/MemoizeSourceGenerator.Attribute/MemoizerFactory.cs" />
-      <option value="$PROJECT_DIR$/MemoizeSourceGenerator.Attribute/CachePartition.cs" />
       <option value="$PROJECT_DIR$/SourceGeneratorTests/CacheStatsTests.cs" />
+      <option value="$PROJECT_DIR$/MemoizeSourceGenerator.Attribute/CachePartitionExtensions.cs" />
+      <option value="$PROJECT_DIR$/SourceGeneratorTests/Extensions/AssertExtensions.cs" />
+      <option value="$PROJECT_DIR$/MemoizeSourceGenerator.Attribute/CachePartition.cs" />
+      <option value="$PROJECT_DIR$/MemoizeSourceGenerator.Attribute/StringPartitionKey.cs" />
+      <option value="$PROJECT_DIR$/MemoizeSourceGenerator.Attribute/MemoizerFactory.cs" />
+      <option value="$PROJECT_DIR$/SourceGeneratorTests/CachePartitionTests.cs" />
+      <option value="$PROJECT_DIR$/SourceGeneratorTests/ScopedMemoizerFactoryExampleTests.cs" />
     </changedPaths>
   </component>
   <component name="ProjectId" id="1nw8guKGktxjmh4W1nyvSwPHyOs" />
@@ -146,7 +146,7 @@
       <workItem from="1612289915411" duration="1480000" />
       <workItem from="1612291780474" duration="687000" />
       <workItem from="1612292774901" duration="33315000" />
-      <workItem from="1612788189824" duration="8988000" />
+      <workItem from="1612788189824" duration="15688000" />
     </task>
     <task id="LOCAL-00001" summary="add autogenerated comment to generated files">
       <created>1612293141085</created>

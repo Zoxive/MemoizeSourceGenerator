@@ -19,10 +19,10 @@ namespace MemoizeSourceGenerator.Attribute
             return partition.CreateEntry(stringKey, value, tokenSourceBeforeComputingValue, slidingCacheInMinutes, size, configureEntry);
         }
 
-        public static void Remove(this CachePartition partition, string key)
+        public static bool Remove(this CachePartition partition, string key)
         {
             var stringKey = new PartitionObjectKeyString(partition.PartitionKey, key);
-            partition.Remove(stringKey);
+            return partition.Remove(stringKey);
         }
     }
 }

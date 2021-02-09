@@ -19,7 +19,7 @@ namespace SourceGeneratorTests
 		public CacheStatsTests(ITestOutputHelper output)
 		{
 			_output = output;
-			_factory = new MemoizerFactory(NullLoggerFactory.Instance, new MemoryCacheOptions
+			_factory = new MemoizerFactory(new StringPartitionKey("CacheStatsTest"), NullLoggerFactory.Instance, new MemoryCacheOptions
 			{
 				// Check every call for test purposes
 				ExpirationScanFrequency = TimeSpan.FromTicks(1)

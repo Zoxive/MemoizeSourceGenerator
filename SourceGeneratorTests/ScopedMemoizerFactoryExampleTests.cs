@@ -1,12 +1,10 @@
 ﻿#nullable enable
-using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.Linq;
 using System.Net.Mime;
 using FluentAssertions;
 using MemoizeSourceGenerator.Attribute;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
+using SourceGeneratorTests.Examples;
 using SourceGeneratorTests.Extensions;
 using Xunit;
 
@@ -14,9 +12,12 @@ namespace SourceGeneratorTests
 {
     public class ScopedMemoizerFactoryExampleTests
     {
+        private RequestScope _requestScope;
+
         public ScopedMemoizerFactoryExampleTests()
         {
             GlobalFactory = MemoizerFactory.Global;
+            _requestScope = RequestScope.Static("Tenant1");
         }
 
         public MemoizerFactory GlobalFactory { get; }
@@ -24,7 +25,7 @@ namespace SourceGeneratorTests
         [Fact]
         public void GlobalPartitionName()
         {
-            var factory = new TenantSpecificMemoizerFactory(NullLoggerFactory.Instance, "Tenant1");
+            var factory = new TenantSpecificMemoizerFactory(NullLoggerFactory.Instance, _requestScope);
             var p = factory.GetGlobal();
             p.DisplayName.Is("Tenant1");
         }
@@ -32,11 +33,11 @@ namespace SourceGeneratorTests
         [Fact]
         public void PartitionName()
         {
-            var factory = new TenantSpecificMemoizerFactory(NullLoggerFactory.Instance, "Tenant1");
+            var factory = new TenantSpecificMemoizerFactory(NullLoggerFactory.Instance, _requestScope);
             var p = factory.GetOrCreatePartition("Part1");
             p.DisplayName.Is("Tenant1>Part1");
 
-            var factory2 = new TenantSpecificMemoizerFactory(NullLoggerFactory.Instance, "Tenant2");
+            var factory2 = new TenantSpecificMemoizerFactory(NullLoggerFactory.Instance, RequestScope.Static("Tenant2"));
             var p2 = factory2.GetOrCreatePartition("Part2");
             p2.DisplayName.Is("Tenant2>Part2");
         }
@@ -44,11 +45,11 @@ namespace SourceGeneratorTests
         [Fact]
         public void ReturnsSamePartition()
         {
-            var factory = new TenantSpecificMemoizerFactory(NullLoggerFactory.Instance, "Tenant1");
+            var factory = new TenantSpecificMemoizerFactory(NullLoggerFactory.Instance, _requestScope);
             var p = factory.GetOrCreatePartition("Part3");
 
             // Same as factory1
-            var factory2 = new TenantSpecificMemoizerFactory(NullLoggerFactory.Instance, "Tenant1");
+            var factory2 = new TenantSpecificMemoizerFactory(NullLoggerFactory.Instance, _requestScope);
             var p2 = factory2.GetOrCreatePartition("Part3");
 
             ReferenceEquals(p, p2).Is(true);
@@ -57,7 +58,7 @@ namespace SourceGeneratorTests
         [Fact]
         public void TenantGlobal_andGlobalNotSame()
         {
-            var factory = new TenantSpecificMemoizerFactory(NullLoggerFactory.Instance, "Tenant1");
+            var factory = new TenantSpecificMemoizerFactory(NullLoggerFactory.Instance, _requestScope);
             var tg = factory.GetGlobal();
 
             var g = GlobalFactory.GetGlobal();
@@ -74,7 +75,7 @@ namespace SourceGeneratorTests
         [Fact]
         public void Partitions()
         {
-            var factory = new TenantSpecificMemoizerFactory(NullLoggerFactory.Instance, "Tenant3");
+            var factory = new TenantSpecificMemoizerFactory(NullLoggerFactory.Instance, RequestScope.Static("Tenant3"));
             factory.Partitions.Should().BeEmpty();
 
             var tenantPartition = factory.GetOrCreatePartition("TenantPartition");
@@ -90,7 +91,7 @@ namespace SourceGeneratorTests
         [Fact]
         public void CanGetItemFromCache()
         {
-            var factory = new TenantSpecificMemoizerFactory(NullLoggerFactory.Instance, "Tenant1");
+            var factory = new TenantSpecificMemoizerFactory(NullLoggerFactory.Instance, _requestScope);
             var p = factory.GetGlobal();
 
             p.CreateEntry("Test", "Value").Is(true);
@@ -102,7 +103,7 @@ namespace SourceGeneratorTests
         [Fact]
         public void Partition_Misses_GlobalCache()
         {
-            var factory = new TenantSpecificMemoizerFactory(NullLoggerFactory.Instance, "Tenant1");
+            var factory = new TenantSpecificMemoizerFactory(NullLoggerFactory.Instance, _requestScope);
             var global = factory.GetGlobal();
             global.CreateEntry("Test2", "Value").Is(true);
 
@@ -114,7 +115,7 @@ namespace SourceGeneratorTests
         [Fact]
         public void Global_Misses_Partition()
         {
-            var factory = new TenantSpecificMemoizerFactory(NullLoggerFactory.Instance, "Tenant1");
+            var factory = new TenantSpecificMemoizerFactory(NullLoggerFactory.Instance, _requestScope);
             var partition = factory.GetOrCreatePartition("Part1");
             partition.CreateEntry("Blue", "Value").Is(true);
 
@@ -126,7 +127,7 @@ namespace SourceGeneratorTests
         [Fact]
         public void Cache_Invalidate()
         {
-            var factory = new TenantSpecificMemoizerFactory(NullLoggerFactory.Instance, "Tenant1");
+            var factory = new TenantSpecificMemoizerFactory(NullLoggerFactory.Instance, _requestScope);
             var p = factory.GetGlobal();
             p.CreateEntry("Green", "Value").Is(true);
 
@@ -138,7 +139,7 @@ namespace SourceGeneratorTests
         [Fact]
         public void Wrong_Key_TryGetValue()
         {
-            var factory = new TenantSpecificMemoizerFactory(NullLoggerFactory.Instance, "Tenant1");
+            var factory = new TenantSpecificMemoizerFactory(NullLoggerFactory.Instance, _requestScope);
             // Setup
             var g = factory.GetGlobal();
             var p = factory.GetOrCreatePartition("Matrix5");
@@ -159,7 +160,7 @@ namespace SourceGeneratorTests
         [Fact]
         public void Wrong_Key_Remove()
         {
-            var factory = new TenantSpecificMemoizerFactory(NullLoggerFactory.Instance, "Tenant1");
+            var factory = new TenantSpecificMemoizerFactory(NullLoggerFactory.Instance, _requestScope);
 
             // Setup
             var g = factory.GetGlobal();
@@ -183,7 +184,7 @@ namespace SourceGeneratorTests
         [Fact]
         public void Wrong_Key_Add()
         {
-            var factory = new TenantSpecificMemoizerFactory(NullLoggerFactory.Instance, "Tenant1");
+            var factory = new TenantSpecificMemoizerFactory(NullLoggerFactory.Instance, _requestScope);
 
             var g = factory.GetGlobal();
             var p = factory.GetOrCreatePartition("Matrix7");
@@ -198,55 +199,5 @@ namespace SourceGeneratorTests
             p.CreateEntry(partitionObjectKey, "Value2").Is(true);
         }
         #endregion
-    }
-
-    // Not released but an intended example of the library for scoped service
-    public sealed class TenantSpecificMemoizerFactory : IMemoizerFactory
-    {
-        private static readonly ConcurrentDictionary<string, MemoizerFactory> TenantMemoizerFactories = new ();
-        private readonly ILoggerFactory _loggerFactory;
-        private readonly string _application;
-
-        public TenantSpecificMemoizerFactory(ILoggerFactory loggerFactory, string application)
-        {
-            _loggerFactory = loggerFactory;
-            _application = application;
-            FactoryKey = new StringPartitionKey(application);
-        }
-
-        private MemoizerFactory Factory => TenantMemoizerFactories.GetOrAdd(_application, CreateFactory);
-        public IPartitionKey FactoryKey { get; }
-
-        private MemoizerFactory CreateFactory(string _)
-        {
-            var factory = new MemoizerFactory(_loggerFactory);
-
-            //_invalidator.GetInvalidator().Add(factory);
-
-            return factory;
-        }
-
-        public CachePartition GetGlobal()
-        {
-            return Factory.GetOrCreatePartition(FactoryKey, rootKey: true);
-        }
-
-        public CachePartition GetOrCreatePartition(IPartitionKey partitionKey)
-        {
-            var f = Factory;
-
-            CachePartition Create(IPartitionKey _)
-            {
-                var tenantSpecificPartitionKey = new CompositeKey(FactoryKey, partitionKey);
-                return f.CreatePartition(tenantSpecificPartitionKey);
-            }
-
-            return f.GetOrCreatePartition(partitionKey, Create);
-        }
-
-        public void InvalidateAll() => Factory.InvalidateAll();
-        public void InvalidatePartition(IPartitionKey partitionKey) => Factory.InvalidatePartition(new CompositeKey(FactoryKey, partitionKey));
-
-        public IEnumerable<CachePartition> Partitions => Factory.Partitions;
     }
 }

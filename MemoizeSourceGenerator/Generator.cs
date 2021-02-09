@@ -97,6 +97,12 @@ namespace MemoizeSourceGenerator
                     if (!MemoizerCall.TryCreate(myContext, addMemoizedScopeCall, interfaceArg, implArg, out var scopedCall))
                         continue;
 
+                    // Same Proj with multiple AddMemoizer() calls for same types
+                    if (calls.Any(x => x.IsSameType(scopedCall)))
+                    {
+                        continue;
+                    }
+
                     calls.Add(scopedCall);
 
                     var source = MemoizedClass.Generate(scopedCall);

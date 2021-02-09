@@ -49,7 +49,7 @@ namespace Memoized
         {
             sb.AppendLine($"\t\tpublic static IServiceCollection AddMemoized{mode}<TInterface, TImplementation>(this IServiceCollection services, Action<ICacheEntry>? configureEntry = null) where TInterface : class where TImplementation : class, TInterface");
             sb.AppendLine("\t\t{");
-            sb.AppendLine("\t\t\tservices.TryAddSingleton<IMemoizerFactory, MemoizerFactory>();");
+            sb.AppendLine("\t\t\tservices.TryAddSingleton<IMemoizerFactory>(MemoizerFactory.Global);");
             foreach (var call in calls)
             {
                 GenerateCall(call, sb, mode);

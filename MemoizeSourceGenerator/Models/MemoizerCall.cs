@@ -131,5 +131,16 @@ namespace MemoizeSourceGenerator.Models
         public IReadOnlyList<MemoizedMethodMember> Methods { get; }
         public SlidingCache? SlidingCache { get; }
         public INamedTypeSymbol? MemoizerFactoryType { get; }
+
+        public bool IsSameType(MemoizerCall scopedCall)
+        {
+            if (!SymbolEqualityComparer.Default.Equals(InterfaceType, scopedCall.InterfaceType))
+                return false;
+
+            if (!SymbolEqualityComparer.Default.Equals(ImplementationsType, scopedCall.ImplementationsType))
+                return false;
+
+            return true;
+        }
     }
 }

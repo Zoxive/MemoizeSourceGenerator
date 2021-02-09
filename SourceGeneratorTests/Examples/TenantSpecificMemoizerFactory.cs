@@ -1,22 +1,38 @@
-#nullable enable
-using System;
+﻿#nullable enable
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using MemoizeSourceGenerator.Attribute;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
-namespace ConsoleApp
+namespace SourceGeneratorTests.Examples
 {
-    public sealed class ScopedMemoizer : IMemoizerFactory
+    public sealed class RequestScope
+    {
+        public string Application { get; private set; } = string.Empty;
+
+        public void SetApplication(string application)
+        {
+            Application = application;
+        }
+
+        public static RequestScope Static(string application)
+        {
+            return new RequestScope
+            {
+                Application = application
+            };
+        }
+    }
+
+    // Not released but an intended example of the library for scoped service
+    public sealed class TenantSpecificMemoizerFactory : IMemoizerFactory
     {
         private static readonly ConcurrentDictionary<IPartitionKey, MemoizerFactory> TenantMemoizerFactories = new ();
         private readonly ILoggerFactory _loggerFactory;
         private readonly RequestScope _requestScope;
-        private string Application => _requestScope.Tenant;
+        private string Application => _requestScope.Application;
 
-        public ScopedMemoizer(ILoggerFactory loggerFactory, RequestScope requestScope)
+        public TenantSpecificMemoizerFactory(ILoggerFactory loggerFactory, RequestScope requestScope)
         {
             _loggerFactory = loggerFactory;
             _requestScope = requestScope;
@@ -66,60 +82,5 @@ namespace ConsoleApp
         public void InvalidatePartition(IPartitionKey partitionKey) => Factory.InvalidatePartition(new CompositeKey(FactoryKey, partitionKey));
 
         public IEnumerable<CachePartition> Partitions => Factory.Partitions;
-    }
-
-    [CreateMemoizedImplementation(MemoizerFactory = typeof(ScopedMemoizer))]
-    public interface ICustomMemoizerTest
-    {
-        string Result(string name);
-
-        string Partition([PartitionCache] string name, int arg);
-
-        Task<string> GetAsync(string arg);
-
-        ValueTask<string> GetValueTaskAsync(string arg);
-    }
-
-    public sealed class CustomMemoizerTest : ICustomMemoizerTest
-    {
-        public string Result(string name)
-        {
-            return name + "Test!@#";
-        }
-
-        public string Partition(string name, int arg)
-        {
-            return $"{name}.{arg}";
-        }
-
-        public Task<string> GetAsync(string arg)
-        {
-            return Task.FromResult(arg);
-        }
-
-        public ValueTask<string> GetValueTaskAsync(string arg)
-        {
-            return new ValueTask<string>(arg);
-        }
-    }
-
-    public static class ScopeExtensions
-    {
-        public static void SetTenant(this IServiceScope scope, string name)
-        {
-            scope.ServiceProvider
-                .GetRequiredService<RequestScope>()
-                .SetTenant(name);
-        }
-    }
-
-    public sealed class RequestScope
-    {
-        public string Tenant { get; private set; } = string.Empty;
-
-        public void SetTenant(string name)
-        {
-            Tenant = name;
-        }
     }
 }

@@ -65,9 +65,21 @@
         <e p="bin" t="ExcludeRecursive" />
         <e p="CachePartitionTests.cs" t="Include" />
         <e p="CacheStatsTests.cs" t="Include" />
+        <e p="Examples" t="Include">
+          <e p="IScopedClassExample.cs" t="Include" />
+          <e p="SimpleValues.cs" t="Include" />
+          <e p="TenantSpecificMemoizerFactory.cs" t="Include" />
+          <e p="ValueType1.cs" t="Include" />
+        </e>
         <e p="extensions" t="Include">
           <e p="AssertExtensions.cs" t="Include" />
+          <e p="MockableLoggerFactory.cs" t="Include" />
         </e>
+        <e p="GenTests" t="Include">
+          <e p="ScopedClassWithTenantSpecificMemoizerTests.cs" t="Include" />
+          <e p="SimpleValuesCacheTests.cs" t="Include" />
+        </e>
+        <e p="MemoizerFactoryTests.cs" t="Include" />
         <e p="obj" t="ExcludeRecursive">
           <e p="Debug" t="Include">
             <e p="netcoreapp3.1" t="Include">

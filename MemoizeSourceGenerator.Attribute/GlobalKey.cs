@@ -10,7 +10,7 @@ namespace MemoizeSourceGenerator.Attribute
 
         private GlobalKey()
         {
-            DisplayName = "|GLOBAL|";
+            DisplayName = "GLOBAL";
         }
 
         private bool Equals(GlobalKey other)

@@ -98,12 +98,16 @@ namespace MemoizeSourceGenerator.Models
             var simpleReturnName = Fix(ReturnType);
             ClassName = $"ArgKey_{methodsClassName}_{simpleReturnName}_{Name}_{(string.Join("_", argNames))}";
 
+            SimpleName = $"{methodsClassName}.{Name}";
+
             ReturnsVoid = methodSymbol.ReturnsVoid;
 
             _lastArg = parameters.LastOrDefault();
             Parameters = parameters;
             SlidingCache = slidingCache;
         }
+
+        public string SimpleName { get; }
 
         public MemoizedMethodMemberArgument? PartitionedParameter { get; }
 

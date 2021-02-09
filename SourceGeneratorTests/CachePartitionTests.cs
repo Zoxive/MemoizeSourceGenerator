@@ -14,14 +14,14 @@ namespace SourceGeneratorTests
         public void GlobalPartitionName()
         {
             var p = _factory.GetGlobal();
-            p.DisplayName.Is("|GLOBAL|");
+            p.DisplayName.Is("GLOBAL");
         }
 
         [Fact]
         public void PartitionName()
         {
             var p = _factory.GetOrCreatePartition("Part1");
-            p.DisplayName.Is("|GLOBAL|>Part1");
+            p.DisplayName.Is("GLOBAL>Part1");
         }
 
         [Fact]
@@ -135,6 +135,30 @@ namespace SourceGeneratorTests
 
             g.CreateEntry(partitionObjectKey, "Value").Is(false);
             p.CreateEntry(partitionObjectKey, "Value2").Is(true);
+        }
+
+        [Fact]
+        public void InvalidatePartitionDoesntAffectGlobal()
+        {
+            var g = _factory.GetGlobal();
+            var p = _factory.GetOrCreatePartition("Matrix8");
+
+            var globalKey = new PartitionObjectKeyString(g.PartitionKey, "Yellow4");
+            var partitionObjectKey = new PartitionObjectKeyString(p.PartitionKey, "Purple4");
+
+            g.CreateEntry(globalKey, "Value").Is(true);
+            p.CreateEntry(partitionObjectKey, "Value").Is(true);
+
+            p.TryGetValue<string>(partitionObjectKey, out _).Is(true);
+            g.TryGetValue<string>(globalKey, out _).Is(true);
+
+            // Invalidate Partition only
+            p.Invalidate();
+
+            // Partition cache not found
+            p.TryGetValue<string>(partitionObjectKey, out _).Is(false);
+            // Global values still found
+            g.TryGetValue<string>(globalKey, out _).Is(true);
         }
     }
 }

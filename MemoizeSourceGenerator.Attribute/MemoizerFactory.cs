@@ -7,12 +7,16 @@ using Microsoft.Extensions.Logging.Abstractions;
 
 namespace MemoizeSourceGenerator.Attribute
 {
+    // TODO split this into a Global vs Instance? right now its both.. and little confusing
     public sealed class MemoizerFactory : IMemoizerFactory
     {
         // One global cache with partitions inside that
         private static MemoryCache? _memoryCache;
 
         private static MemoizerFactory? _global;
+
+        public static bool GlobalIsCreated => _global != null;
+
         public static MemoizerFactory Global
         {
             get
@@ -22,7 +26,7 @@ namespace MemoizeSourceGenerator.Attribute
                     return _global;
                 }
 
-                return _global = new MemoizerFactory(NullLoggerFactory.Instance);
+                return _global = new MemoizerFactory(GlobalKey.Instance, NullLoggerFactory.Instance);
             }
 
             // This allows users to set MemoryCacheOptions and ILoggerFactory to their choosing
@@ -39,8 +43,9 @@ namespace MemoizeSourceGenerator.Attribute
         // Instance specific CachePartitions
         private readonly ConcurrentDictionary<IPartitionKey, CachePartition> _cachePartitions = new();
 
-        public MemoizerFactory(ILoggerFactory loggerFactory, MemoryCacheOptions? options = null)
+        public MemoizerFactory(IPartitionKey factoryKey, ILoggerFactory loggerFactory, MemoryCacheOptions? options = null)
         {
+            FactoryKey = factoryKey;
             _loggerFactory = loggerFactory;
 
             if (_memoryCache == null)
@@ -51,7 +56,7 @@ namespace MemoizeSourceGenerator.Attribute
 
         public IEnumerable<CachePartition> Partitions => _cachePartitions.Values;
 
-        public IPartitionKey FactoryKey => GlobalKey.Instance;
+        public IPartitionKey FactoryKey { get; }
 
         public CachePartition GetGlobal()
         {

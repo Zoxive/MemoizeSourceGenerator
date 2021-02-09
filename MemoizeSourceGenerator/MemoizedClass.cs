@@ -74,7 +74,7 @@ namespace {call.Namespace}
                 sb.AppendLine($"\t\t\tif (cache.TryGetValue<{method.TypeInCache}>(key, out var returnValue))");
                 sb.AppendLine("\t\t\t{");
                 sb.Append("\t\t\t\tif (_logger.IsEnabled(LogLevel.Debug))");
-                sb.AppendLine(" _logger.LogDebug(\"Cache hit. {CacheName} {key} {value}\", cache.DisplayName, key, returnValue);");
+                sb.AppendLine(" _logger.LogDebug(\"Cache hit. {CacheName}~{key} => {value}\", cache.DisplayName, key, returnValue);");
                 sb.AppendLine();
                 sb.AppendLine("\t\t\t\treturn returnValue;");
                 sb.AppendLine("\t\t\t}");
@@ -94,7 +94,7 @@ namespace {call.Namespace}
                 sb.AppendLine();
 
                 sb.Append("\t\t\tif (_logger.IsEnabled(LogLevel.Debug))");
-                sb.AppendLine(" _logger.LogDebug(\"Cache Miss. {CacheName} {key} {value}\", cache.DisplayName, key, result);");
+                sb.AppendLine(" _logger.LogDebug(\"Cache miss. {CacheName}~{key} => {value}\", cache.DisplayName, key, result);");
                 sb.AppendLine();
 
                 var slidingDuration = method.SlidingCache?.InMinutes ?? call.SlidingCache?.InMinutes ?? 10; // TODO fallback in global options
@@ -218,7 +218,7 @@ namespace {call.Namespace}
 
             sb.AppendLine($"\t\t\tpublic override string ToString()");
             sb.AppendLine("\t\t\t{");
-            sb.Append($"\t\t\t\treturn $\"{methodClassName}(");
+            sb.Append($"\t\t\t\treturn $\"{method.SimpleName}(");
             foreach (var arg in method.Parameters)
             {
                 sb.Append($"{{_{arg.Name}}}");

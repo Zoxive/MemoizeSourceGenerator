@@ -12,6 +12,7 @@
             </e>
           </e>
         </e>
+        <e p="ObjectSize.cs" t="Include" />
         <e p="Program.cs" t="Include" />
         <e p="ScopedMemoizer.cs" t="Include" />
       </e>
@@ -87,6 +88,7 @@
             </e>
           </e>
         </e>
+        <e p="ObjectSize.cs" t="Include" />
         <e p="ScopedMemoizerFactoryExampleTests.cs" t="Include" />
         <e p="SourceGeneratorTests.csproj" t="IncludeRecursive" />
       </e>

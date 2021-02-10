@@ -40,9 +40,9 @@ namespace SourceGeneratorTests
         {
             var p = _factory.GetGlobal();
 
-            p.CreateEntry("Test", "Value").Is(true);
+            p.CreateEntry("Test123", "Value").Is(true);
 
-            p.TryGetValue<string>("Test", out var value).Is(true);
+            p.TryGetValue<string>("Test123", out var value).Is(true);
             value.Is("Value");
         }
 

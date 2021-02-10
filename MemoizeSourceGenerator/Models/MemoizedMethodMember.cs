@@ -1,13 +1,43 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
+using MemoizeSourceGenerator.Attribute;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace MemoizeSourceGenerator.Models
 {
+    public class MemoizedMethodSizeOfFunction
+    {
+        private readonly string? _selfMethodName;
+        private readonly string? _globalStaticMethodName;
+
+        public bool RequiresSizeOfMethod { get; }
+
+        public MemoizedMethodSizeOfFunction(bool requiresSizeOfMethod, string? selfMethodName, string? globalStaticMethodName)
+        {
+            _selfMethodName = selfMethodName;
+            _globalStaticMethodName = globalStaticMethodName;
+            RequiresSizeOfMethod = requiresSizeOfMethod;
+        }
+
+        public void Write(StringBuilder sb, string result)
+        {
+            if (_selfMethodName != null)
+            {
+                sb.AppendLine($"{result}.{_selfMethodName}();");
+            }
+            else if (_globalStaticMethodName != null)
+            {
+                sb.AppendLine($"{_globalStaticMethodName}({result});");
+            }
+        }
+    }
+
     public class MemoizedMethodMember
     {
         public static bool TryCreate(GeneratorContext context, CreateMemoizeInterfaceContext interfaceContext, IMethodSymbol methodSymbol, [NotNullWhen(true)] out MemoizedMethodMember? method)
@@ -32,14 +62,15 @@ namespace MemoizeSourceGenerator.Models
                 }
             }
 
-            var returnType = methodSymbol.ReturnType.ToDisplayString();
+            var returnType = methodSymbol.ReturnType;
             var isAsync = methodSymbol.IsTaskOfTOrValueTaskOfT();
 
-            string typeInCache;
+            bool typeIsNullable;
+            ITypeSymbol typeInCache;
 
             if (isAsync)
             {
-                if (methodSymbol.ReturnType is not INamedTypeSymbol {IsGenericType: true} namedTypeSymbol || namedTypeSymbol.TypeArguments.Length != 1)
+                if (returnType is not INamedTypeSymbol {IsGenericType: true} namedTypeSymbol || namedTypeSymbol.TypeArguments.Length != 1)
                 {
                     context.CreateError("Async return types must return something", $"Expected 1 generic type argument for {methodSymbol.Name}", interfaceContext.ErrorLocation);
                     method = null;
@@ -59,24 +90,86 @@ namespace MemoizeSourceGenerator.Models
                 }
                 */
 
-                typeInCache = taskReturnObj.ToDisplayString();
+                typeInCache = taskReturnObj;
+                typeIsNullable = taskReturnObj.NullableAnnotation == NullableAnnotation.Annotated;
+
+                if (!typeIsNullable)
+                {
+                    typeIsNullable = taskReturnObj.IsReferenceType;
+                }
             }
             else
             {
-                typeInCache = returnType;
+                typeInCache = methodSymbol.ReturnType;
+                typeIsNullable = methodSymbol.ReturnType.NullableAnnotation == NullableAnnotation.Annotated;
+
+                if (!typeIsNullable)
+                {
+                    typeIsNullable = methodSymbol.ReturnType.IsReferenceType;
+                }
             }
 
-            method = new MemoizedMethodMember(methodSymbol, args, slidingCache, isAsync, returnType, typeInCache);
+            var returnTypeAttributes = methodSymbol.GetReturnTypeAttributes();
+
+            string? globalSizeOfMethod = null;
+            string? selfSizeOfMethod = null;
+
+            // TODO [Attribute] set on the Interface that allows you to specify a class that can calculate this for you
+            // Check TypeInCache has .SizeOfInBytes() method
+            if (typeInCache.RequiresSizeOfMethod())
+            {
+                // Check for Attribute
+                var sizeOfAttributeData = returnTypeAttributes.FirstOrDefault(x => SymbolEqualityComparer.Default.Equals(x.AttributeClass, context.SizeOfResultAttribute));
+
+                if (sizeOfAttributeData == null)
+                {
+                    var sizeOfInBytesMethod = typeInCache.GetMembers().OfType<IMethodSymbol>().FirstOrDefault(x => x.Name == "SizeOfInBytes" && x.ReturnType.IsLong());
+                    if (sizeOfInBytesMethod == null)
+                    {
+                        context.CreateError("Missing SizeOfInBytes function", $"Return type '{typeInCache.ToDisplayString()}' must have a 'public long SizeOfInBytes()' function or use SizeOfResultAttribute.", interfaceContext.ErrorLocation);
+                        method = null;
+                        return false;
+                    }
+                    else
+                    {
+                        selfSizeOfMethod = "SizeOfInBytes";
+                    }
+                }
+                else
+                {
+                    var selfSizeOfMethodName = sizeOfAttributeData.NamedArguments.FirstOrDefault(x => x.Key == nameof(SizeOfResultAttribute.SizeOfMethodName)).Value;
+                    if (!selfSizeOfMethodName.IsNull)
+                    {
+                        selfSizeOfMethod = selfSizeOfMethodName.Value?.ToString();
+                    }
+                    var globalStaticMethodName = sizeOfAttributeData.NamedArguments.FirstOrDefault(x => x.Key == nameof(SizeOfResultAttribute.GlobalStaticMethod)).Value;
+                    if (!globalStaticMethodName.IsNull)
+                    {
+                        globalSizeOfMethod = globalStaticMethodName.Value?.ToString();
+                    }
+                }
+            }
+            else
+            {
+                globalSizeOfMethod = "Memoized.ObjectSize.Memory.SizeOf";
+            }
+
+            var returnTypeSizeOfMethod = new MemoizedMethodSizeOfFunction(typeInCache.RequiresSizeOfMethod(), selfSizeOfMethod, globalSizeOfMethod);
+
+            method = new MemoizedMethodMember(methodSymbol, args, slidingCache, isAsync, returnType.ToDisplayString(), typeInCache, typeIsNullable, returnTypeSizeOfMethod);
 
             return true;
         }
 
-        private MemoizedMethodMember(IMethodSymbol methodSymbol, IReadOnlyList<MemoizedMethodMemberArgument> parameters, SlidingCache? slidingCache, bool isAsync, string returnType, string typeInCache)
+        private MemoizedMethodMember(IMethodSymbol methodSymbol, IReadOnlyList<MemoizedMethodMemberArgument> parameters, SlidingCache? slidingCache,
+            bool isAsync, string returnType, ITypeSymbol typeInCache, bool typeCanBeNull, MemoizedMethodSizeOfFunction memoizedMethodSizeOfFunction)
         {
             Name = methodSymbol.Name;
             IsAsync = isAsync;
             ReturnType = returnType;
             TypeInCache = typeInCache;
+            TypeCanBeNull = typeCanBeNull;
+            MemoizedMethodSizeOfFunction = memoizedMethodSizeOfFunction;
 
             PartitionedParameter = parameters.FirstOrDefault(x => x.PartitionsCache);
 
@@ -125,7 +218,10 @@ namespace MemoizeSourceGenerator.Models
         /// <summary>
         /// This will be the same as ReturnType, unless its a Task<> method then its the value inside the Task.
         /// </summary>
-        public string TypeInCache { get; }
+        public ITypeSymbol TypeInCache { get; }
+
+        public bool TypeCanBeNull { get; }
+        public MemoizedMethodSizeOfFunction MemoizedMethodSizeOfFunction { get; }
 
         public void WriteParameters(StringBuilder sb, bool writeType = false, string? prefix = null)
         {

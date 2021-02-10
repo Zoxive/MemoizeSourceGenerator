@@ -57,6 +57,7 @@ namespace MemoizeSourceGenerator
             var createMemoizedAttribute = compilation.GetSymbol(nameof(CreateMemoizedImplementationAttribute));
             var partitionAttribute = compilation.GetSymbol(nameof(PartitionCacheAttribute));
             var slidingCacheAttribute = compilation.GetSymbol(nameof(SlidingCacheAttribute));
+            var sizeOfResultAttribute = compilation.GetSymbol(nameof(SizeOfResultAttribute));
             var memoizerFactoryInterface = compilation.GetSymbol(nameof(IMemoizerFactory));
 
             #pragma warning disable RS1024
@@ -76,7 +77,7 @@ namespace MemoizeSourceGenerator
                 createAttributes.Add(interfaceType, create);
             }
 
-            var myContext = new GeneratorContext(context, partitionAttribute, slidingCacheAttribute, memoizerFactoryInterface, createMemoizedAttribute, createAttributes);
+            var myContext = new GeneratorContext(context, partitionAttribute, slidingCacheAttribute, memoizerFactoryInterface, createMemoizedAttribute, sizeOfResultAttribute, createAttributes);
 
             foreach (var addMemoizedScopeCall in receiver.Candidate)
             {
@@ -134,6 +135,7 @@ namespace MemoizeSourceGenerator
         public INamedTypeSymbol SlidingCacheAttribute { get; }
         public INamedTypeSymbol MemoizerFactoryInterface { get; }
         public INamedTypeSymbol CreateMemoizedAttribute { get; }
+        public INamedTypeSymbol SizeOfResultAttribute { get; }
 
         public GeneratorContext
         (
@@ -142,6 +144,7 @@ namespace MemoizeSourceGenerator
             INamedTypeSymbol slidingCacheAttribute,
             INamedTypeSymbol memoizerFactoryInterface,
             INamedTypeSymbol createMemoizedAttribute,
+            INamedTypeSymbol sizeOfResultAttribute,
             IReadOnlyDictionary<ITypeSymbol, CreateMemoizeInterfaceContext> createMemoizeAttributeContexts
         )
         {
@@ -151,6 +154,7 @@ namespace MemoizeSourceGenerator
             SlidingCacheAttribute = slidingCacheAttribute;
             MemoizerFactoryInterface = memoizerFactoryInterface;
             CreateMemoizedAttribute = createMemoizedAttribute;
+            SizeOfResultAttribute = sizeOfResultAttribute;
         }
 
         public void ReportDiagnostic(Diagnostic diag)

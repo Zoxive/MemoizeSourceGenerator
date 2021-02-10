@@ -163,8 +163,22 @@ namespace ConsoleApp
 
         ValueType2 FindValueTypeByName(string name);
 
+        [return: SizeOfResult(SizeOfMethodName = nameof(IValueType1.SizeOfExample))]
+        IValueType1 FindValueTypeByNameInterface(string name);
+
+        [return: SizeOfResult(GlobalStaticMethod = "ConsoleApp.TestSizeOf.ValueType1SizeOf")]
+        IValueType1 FindValueTypeByNameInterface2(string name);
+
         [SlidingCache(5)]
         int SpecialMath([PartitionCache]string name, int arg1, int arg2);
+    }
+
+    public static class TestSizeOf
+    {
+        public static long ValueType1SizeOf(IValueType1 obj)
+        {
+            return obj.SizeOfExample();
+        }
     }
 
     public class DoMaths : IDoMaths
@@ -199,6 +213,16 @@ namespace ConsoleApp
             return new ValueType2(name.Length);
         }
 
+        public IValueType1 FindValueTypeByNameInterface(string name)
+        {
+            return new ValueType1(name.Length);
+        }
+
+        public IValueType1 FindValueTypeByNameInterface2(string name)
+        {
+            return new ValueType1(name.Length);
+        }
+
         public int SpecialMath(string name, int arg1, int arg2)
         {
             _logger.LogInformation("Calculating SpecialMath ({Name}) - {arg1} + {arg2}", name, arg1, arg2);
@@ -209,6 +233,12 @@ namespace ConsoleApp
     public class ValueType1 : IValueType1
     {
         public int Value { get; }
+
+        public long SizeOfExample()
+        {
+            // not real just testing
+            return 2L * Value;
+        }
 
         public ValueType1(int value)
         {
@@ -237,6 +267,8 @@ namespace ConsoleApp
     public interface IValueType1 : IEquatable<IValueType1>
     {
         int Value { get; }
+
+        long SizeOfExample();
     }
 
     public class ValueType2 : IEquatable<ValueType2>
@@ -261,6 +293,12 @@ namespace ConsoleApp
             if (ReferenceEquals(this, obj)) return true;
             if (obj.GetType() != this.GetType()) return false;
             return Equals((ValueType2) obj);
+        }
+
+        public long SizeOfInBytes()
+        {
+            // Wrong but just an example
+            return sizeof(int) + 8;
         }
 
         public override int GetHashCode()

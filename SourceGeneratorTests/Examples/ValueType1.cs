@@ -29,6 +29,12 @@ namespace SourceGeneratorTests.Examples
             return Value;
         }
 
+        public long SizeOfInBytes()
+        {
+            // wrong but just an example
+            return sizeof(int) + 8;
+        }
+
         public override string ToString()
         {
             return $"{nameof(ValueType1)}-{Value}";
@@ -38,5 +44,7 @@ namespace SourceGeneratorTests.Examples
     public interface IValueType1 : IEquatable<IValueType1>
     {
         int Value { get; }
+
+        long SizeOfInBytes();
     }
 }

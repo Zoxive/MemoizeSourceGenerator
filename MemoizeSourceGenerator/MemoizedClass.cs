@@ -71,7 +71,14 @@ namespace {call.Namespace}
                 sb.Append($"\t\t\tvar key = new {method.ClassName}(cache.PartitionKey,");
                 method.WriteParameters(sb, prefix: "__");
                 sb.AppendLine(");");
-                sb.AppendLine($"\t\t\tif (cache.TryGetValue<{method.TypeInCache}>(key, out var returnValue))");
+                sb.Append($"\t\t\tif (cache.TryGetValue<{method.TypeInCache}>(key, out var returnValue)");
+
+                if (method.TypeCanBeNull)
+                {
+                    sb.Append(" && returnValue != null");
+                }
+
+                sb.AppendLine(")");
                 sb.AppendLine("\t\t\t{");
                 sb.Append("\t\t\t\tif (_logger.IsEnabled(LogLevel.Debug))");
                 sb.AppendLine(" _logger.LogDebug(\"Cache hit. {CacheName}~{key} => {value}\", cache.DisplayName, key, returnValue);");
@@ -97,8 +104,19 @@ namespace {call.Namespace}
                 sb.AppendLine(" _logger.LogDebug(\"Cache miss. {CacheName}~{key} => {value}\", cache.DisplayName, key, result);");
                 sb.AppendLine();
 
+                sb.Append("\t\t\tvar size = ");
+
+                if (method.MemoizedMethodSizeOfFunction.RequiresSizeOfMethod)
+                {
+                    method.MemoizedMethodSizeOfFunction.Write(sb, "result");
+                }
+                else
+                {
+                    sb.AppendLine("Memoized.ObjectSize.Memory.SizeOf(result);");
+                }
+
                 var slidingDuration = method.SlidingCache?.InMinutes ?? call.SlidingCache?.InMinutes ?? 10; // TODO fallback in global options
-                sb.AppendLine($"\t\t\tcache.CreateEntry(key, result, tokenSourceBeforeComputingEntry, {slidingDuration}, null, _configureEntry);");
+                sb.AppendLine($"\t\t\tcache.CreateEntry(key, result, tokenSourceBeforeComputingEntry, {slidingDuration}, size, _configureEntry);");
 
                 sb.AppendLine("\t\t\treturn result;");
 

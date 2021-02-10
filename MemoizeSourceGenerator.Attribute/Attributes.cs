@@ -25,4 +25,12 @@ namespace MemoizeSourceGenerator.Attribute
     public class PartitionCacheAttribute : System.Attribute
     {
     }
+
+    [AttributeUsage(AttributeTargets.ReturnValue)]
+    public class SizeOfResultAttribute : System.Attribute
+    {
+        public string? GlobalStaticMethod { get; set; }
+
+        public string? SizeOfMethodName { get; set; }
+    }
 }

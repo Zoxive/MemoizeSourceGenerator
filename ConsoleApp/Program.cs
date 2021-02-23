@@ -6,6 +6,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Memoized;
 
+[assembly: SizeOfResult(GlobalStaticMethod = "Caching.SizeOfObject.SizeOf")]
+
 namespace ConsoleApp
 {
     class Program

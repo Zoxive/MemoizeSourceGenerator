@@ -1,9 +1,9 @@
 ﻿#nullable enable
 using System;
 
-namespace Memoized.ObjectSize
+namespace SourceGeneratorTests
 {
-    public static class Memory
+    public static class SizeOfObject
     {
         public static long SizeOf(string? obj)
         {
@@ -15,5 +15,6 @@ namespace Memoized.ObjectSize
 
         public static long SizeOf(int obj) => sizeof(long);
         public static long SizeOf(decimal obj) => sizeof(decimal);
+        public static long SizeOf<T>(T obj) => 0;
     }
 }

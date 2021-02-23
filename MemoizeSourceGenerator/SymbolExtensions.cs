@@ -37,14 +37,6 @@ namespace MemoizeSourceGenerator
             return false;
         }
 
-        public static bool RequiresSizeOfMethod(this ITypeSymbol symbol)
-        {
-            if (symbol.SpecialType != SpecialType.None)
-                return false;
-
-            return symbol.IsReferenceType || symbol.IsValueType;
-        }
-
         public static bool IsLong(this ITypeSymbol symbol)
         {
             return symbol.SpecialType == SpecialType.System_Int64;

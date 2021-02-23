@@ -12,9 +12,9 @@
             </e>
           </e>
         </e>
-        <e p="ObjectSize.cs" t="Include" />
         <e p="Program.cs" t="Include" />
         <e p="ScopedMemoizer.cs" t="Include" />
+        <e p="SizeOfObject.cs" t="Include" />
       </e>
       <e p="MemoizeSourceGenerator" t="IncludeRecursive">
         <e p="AddMemoizedExtensionCall.cs" t="Include" />
@@ -28,6 +28,7 @@
           <e p="MemoizedMethodMember.cs" t="Include" />
           <e p="MemoizedMethodMemberArgument.cs" t="Include" />
           <e p="MemoizerCall.cs" t="Include" />
+          <e p="SizeOfAttributeData.cs" t="Include" />
           <e p="SlidingCache.cs" t="Include" />
         </e>
         <e p="obj" t="ExcludeRecursive">
@@ -63,6 +64,7 @@
       <e p="MemoizeSourceGenerator.sln" t="IncludeFlat" />
       <e p="packages" t="ExcludeRecursive" />
       <e p="SourceGeneratorTests" t="IncludeRecursive">
+        <e p="Assembly.cs" t="Include" />
         <e p="bin" t="ExcludeRecursive" />
         <e p="CachePartitionTests.cs" t="Include" />
         <e p="CacheStatsTests.cs" t="Include" />

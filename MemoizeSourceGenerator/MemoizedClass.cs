@@ -106,14 +106,8 @@ namespace {call.Namespace}
 
                 sb.Append("\t\t\tvar size = ");
 
-                if (method.MemoizedMethodSizeOfFunction.RequiresSizeOfMethod)
-                {
-                    method.MemoizedMethodSizeOfFunction.Write(sb, "result");
-                }
-                else
-                {
-                    sb.AppendLine("Memoized.ObjectSize.Memory.SizeOf(result);");
-                }
+                method.MemoizedMethodSizeOfFunction.Write(sb, "result");
+
 
                 var slidingDuration = method.SlidingCache?.InMinutes ?? call.SlidingCache?.InMinutes ?? 10; // TODO fallback in global options
                 sb.AppendLine($"\t\t\tcache.CreateEntry(key, result, tokenSourceBeforeComputingEntry, {slidingDuration}, size, _configureEntry);");

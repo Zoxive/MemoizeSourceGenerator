@@ -16,13 +16,10 @@ namespace MemoizeSourceGenerator.Models
         private readonly string? _selfMethodName;
         private readonly string? _globalStaticMethodName;
 
-        public bool RequiresSizeOfMethod { get; }
-
-        public MemoizedMethodSizeOfFunction(bool requiresSizeOfMethod, string? selfMethodName, string? globalStaticMethodName)
+        public MemoizedMethodSizeOfFunction(string? selfMethodName, string? globalStaticMethodName)
         {
             _selfMethodName = selfMethodName;
             _globalStaticMethodName = globalStaticMethodName;
-            RequiresSizeOfMethod = requiresSizeOfMethod;
         }
 
         public void Write(StringBuilder sb, string result)
@@ -116,45 +113,43 @@ namespace MemoizeSourceGenerator.Models
 
             // TODO [Attribute] set on the Interface that allows you to specify a class that can calculate this for you
             // Check TypeInCache has .SizeOfInBytes() method
-            if (typeInCache.RequiresSizeOfMethod())
-            {
-                // Check for Attribute
-                var sizeOfAttributeData = returnTypeAttributes.FirstOrDefault(x => SymbolEqualityComparer.Default.Equals(x.AttributeClass, context.SizeOfResultAttribute));
+            // Check for Attribute
+            var sizeOfAttributeData = returnTypeAttributes.FirstOrDefault(x => SymbolEqualityComparer.Default.Equals(x.AttributeClass, context.SizeOfResultAttribute));
 
+            if (sizeOfAttributeData == null && context.GlobalSizeOfAttribute == SizeOfAttributeData.Empty)
+            {
+                var sizeOfInBytesMethod = typeInCache.GetMembers().OfType<IMethodSymbol>().FirstOrDefault(x => x.Name == "SizeOfInBytes" && x.ReturnType.IsLong());
+                if (sizeOfInBytesMethod == null)
+                {
+                    context.CreateError("Missing SizeOfInBytes function", $"Return type '{typeInCache.ToDisplayString()}' must have a 'public long SizeOfInBytes()' function or use SizeOfResultAttribute.", interfaceContext.ErrorLocation);
+                    method = null;
+                    return false;
+                }
+                else
+                {
+                    selfSizeOfMethod = "SizeOfInBytes";
+                }
+            }
+            else
+            {
                 if (sizeOfAttributeData == null)
                 {
-                    var sizeOfInBytesMethod = typeInCache.GetMembers().OfType<IMethodSymbol>().FirstOrDefault(x => x.Name == "SizeOfInBytes" && x.ReturnType.IsLong());
-                    if (sizeOfInBytesMethod == null)
+                    if (context.GlobalSizeOfAttribute == SizeOfAttributeData.Empty)
                     {
                         context.CreateError("Missing SizeOfInBytes function", $"Return type '{typeInCache.ToDisplayString()}' must have a 'public long SizeOfInBytes()' function or use SizeOfResultAttribute.", interfaceContext.ErrorLocation);
                         method = null;
                         return false;
                     }
-                    else
-                    {
-                        selfSizeOfMethod = "SizeOfInBytes";
-                    }
+
+                    (globalSizeOfMethod, selfSizeOfMethod) = context.GlobalSizeOfAttribute;
                 }
                 else
                 {
-                    var selfSizeOfMethodName = sizeOfAttributeData.NamedArguments.FirstOrDefault(x => x.Key == nameof(SizeOfResultAttribute.SizeOfMethodName)).Value;
-                    if (!selfSizeOfMethodName.IsNull)
-                    {
-                        selfSizeOfMethod = selfSizeOfMethodName.Value?.ToString();
-                    }
-                    var globalStaticMethodName = sizeOfAttributeData.NamedArguments.FirstOrDefault(x => x.Key == nameof(SizeOfResultAttribute.GlobalStaticMethod)).Value;
-                    if (!globalStaticMethodName.IsNull)
-                    {
-                        globalSizeOfMethod = globalStaticMethodName.Value?.ToString();
-                    }
+                    (globalSizeOfMethod, selfSizeOfMethod) = SizeOfAttributeData.Parse(sizeOfAttributeData);
                 }
             }
-            else
-            {
-                globalSizeOfMethod = "Memoized.ObjectSize.Memory.SizeOf";
-            }
 
-            var returnTypeSizeOfMethod = new MemoizedMethodSizeOfFunction(typeInCache.RequiresSizeOfMethod(), selfSizeOfMethod, globalSizeOfMethod);
+            var returnTypeSizeOfMethod = new MemoizedMethodSizeOfFunction(selfSizeOfMethod, globalSizeOfMethod);
 
             method = new MemoizedMethodMember(methodSymbol, args, slidingCache, isAsync, returnType.ToDisplayString(), typeInCache, typeIsNullable, returnTypeSizeOfMethod);
 

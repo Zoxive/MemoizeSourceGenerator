@@ -26,7 +26,7 @@ namespace MemoizeSourceGenerator.Attribute
     {
     }
 
-    [AttributeUsage(AttributeTargets.ReturnValue)]
+    [AttributeUsage(AttributeTargets.ReturnValue | AttributeTargets.Assembly)]
     public class SizeOfResultAttribute : System.Attribute
     {
         public string? GlobalStaticMethod { get; set; }

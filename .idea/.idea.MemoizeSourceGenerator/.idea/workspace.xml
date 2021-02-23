@@ -5,8 +5,19 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="25fb4445-a3ad-4d6f-a730-0fe87988fee8" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/ConsoleApp/SizeOfObject.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/MemoizeSourceGenerator/Models/SizeOfAttributeData.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SourceGeneratorTests/Assembly.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.MemoizeSourceGenerator/.idea/contentModel.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.MemoizeSourceGenerator/.idea/contentModel.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.MemoizeSourceGenerator/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.MemoizeSourceGenerator/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ConsoleApp/ObjectSize.cs" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/ConsoleApp/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ConsoleApp/Program.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/MemoizeSourceGenerator.Attribute/Attributes.cs" beforeDir="false" afterPath="$PROJECT_DIR$/MemoizeSourceGenerator.Attribute/Attributes.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/MemoizeSourceGenerator/Generator.cs" beforeDir="false" afterPath="$PROJECT_DIR$/MemoizeSourceGenerator/Generator.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/MemoizeSourceGenerator/MemoizedClass.cs" beforeDir="false" afterPath="$PROJECT_DIR$/MemoizeSourceGenerator/MemoizedClass.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/MemoizeSourceGenerator/Models/MemoizedMethodMember.cs" beforeDir="false" afterPath="$PROJECT_DIR$/MemoizeSourceGenerator/Models/MemoizedMethodMember.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/MemoizeSourceGenerator/SymbolExtensions.cs" beforeDir="false" afterPath="$PROJECT_DIR$/MemoizeSourceGenerator/SymbolExtensions.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SourceGeneratorTests/ObjectSize.cs" beforeDir="false" afterPath="$PROJECT_DIR$/SourceGeneratorTests/ObjectSize.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -53,6 +64,7 @@
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/6E1C5770-EF3D-4D36-802B-3829D5207228/6/MemoryCache.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/D9481C48-DEDE-406B-80E9-12FDF0C86235/1B0/TypedConstantExtensions.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/2CDB5A9D-896E-4B73-8149-97583E450999/B2/SemanticModel.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock://C:/Github/CachedInterfaceSourceGenerator/ConsoleApp/Program.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/BC542A5C-3AD0-4C34-A080-02E941B52719/13E/ThreadPool.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/BC542A5C-3AD0-4C34-A080-02E941B52719/13D/ThreadPool.CoreCLR.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/2CDB5A9D-896E-4B73-8149-97583E450999/ef/7b5fcf6a/INamedTypeSymbol.cs" root0="SKIP_HIGHLIGHTING" />
@@ -98,16 +110,19 @@
       <option value="$PROJECT_DIR$/SourceGeneratorTests/GenTests/ScopedClassWithTenantSpecificMemoizerTests.cs" />
       <option value="$PROJECT_DIR$/ConsoleApp/ScopedMemoizer.cs" />
       <option value="$PROJECT_DIR$/../ObjectSizeSourceGenerator/SourceGenerator/Generator.cs" />
-      <option value="$PROJECT_DIR$/MemoizeSourceGenerator/SymbolExtensions.cs" />
       <option value="$PROJECT_DIR$/SourceGeneratorTests/Examples/ValueType1.cs" />
       <option value="$PROJECT_DIR$/ConsoleApp/ObjectSize.cs" />
-      <option value="$PROJECT_DIR$/SourceGeneratorTests/ObjectSize.cs" />
       <option value="$PROJECT_DIR$/SourceGeneratorTests/CachePartitionTests.cs" />
-      <option value="$PROJECT_DIR$/MemoizeSourceGenerator/Generator.cs" />
       <option value="$PROJECT_DIR$/MemoizeSourceGenerator.Attribute/Attributes.cs" />
-      <option value="$PROJECT_DIR$/MemoizeSourceGenerator/MemoizedClass.cs" />
-      <option value="$PROJECT_DIR$/MemoizeSourceGenerator/Models/MemoizedMethodMember.cs" />
       <option value="$PROJECT_DIR$/ConsoleApp/Program.cs" />
+      <option value="$PROJECT_DIR$/ConsoleApp/SizeOfObject.cs" />
+      <option value="$PROJECT_DIR$/MemoizeSourceGenerator/SymbolExtensions.cs" />
+      <option value="$PROJECT_DIR$/MemoizeSourceGenerator/MemoizedClass.cs" />
+      <option value="$PROJECT_DIR$/MemoizeSourceGenerator/Generator.cs" />
+      <option value="$PROJECT_DIR$/MemoizeSourceGenerator/Models/SizeOfAttributeData.cs" />
+      <option value="$PROJECT_DIR$/MemoizeSourceGenerator/Models/MemoizedMethodMember.cs" />
+      <option value="$PROJECT_DIR$/SourceGeneratorTests/Assembly.cs" />
+      <option value="$PROJECT_DIR$/SourceGeneratorTests/ObjectSize.cs" />
     </changedPaths>
   </component>
   <component name="ProjectId" id="1nw8guKGktxjmh4W1nyvSwPHyOs" />
@@ -166,7 +181,7 @@
       <workItem from="1612291780474" duration="687000" />
       <workItem from="1612292774901" duration="33315000" />
       <workItem from="1612788189824" duration="38285000" />
-      <workItem from="1614105534703" duration="1173000" />
+      <workItem from="1614105534703" duration="3734000" />
     </task>
     <task id="LOCAL-00001" summary="add autogenerated comment to generated files">
       <created>1612293141085</created>

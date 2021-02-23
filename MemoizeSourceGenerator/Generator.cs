@@ -77,7 +77,11 @@ namespace MemoizeSourceGenerator
                 createAttributes.Add(interfaceType, create);
             }
 
-            var myContext = new GeneratorContext(context, partitionAttribute, slidingCacheAttribute, memoizerFactoryInterface, createMemoizedAttribute, sizeOfResultAttribute, createAttributes);
+            var assemblyAttributes = context.Compilation.Assembly.GetAttributes();
+
+            var globalSizeOfAttribute = assemblyAttributes.FirstOrDefault(x => SymbolEqualityComparer.Default.Equals(x.AttributeClass, sizeOfResultAttribute));
+
+            var myContext = new GeneratorContext(context, partitionAttribute, slidingCacheAttribute, memoizerFactoryInterface, createMemoizedAttribute, sizeOfResultAttribute, createAttributes, globalSizeOfAttribute);
 
             foreach (var addMemoizedScopeCall in receiver.Candidate)
             {
@@ -138,15 +142,13 @@ namespace MemoizeSourceGenerator
         public INamedTypeSymbol SizeOfResultAttribute { get; }
 
         public GeneratorContext
-        (
-            GeneratorExecutionContext context,
+        (GeneratorExecutionContext context,
             INamedTypeSymbol partitionCacheAttribute,
             INamedTypeSymbol slidingCacheAttribute,
             INamedTypeSymbol memoizerFactoryInterface,
             INamedTypeSymbol createMemoizedAttribute,
             INamedTypeSymbol sizeOfResultAttribute,
-            IReadOnlyDictionary<ITypeSymbol, CreateMemoizeInterfaceContext> createMemoizeAttributeContexts
-        )
+            IReadOnlyDictionary<ITypeSymbol, CreateMemoizeInterfaceContext> createMemoizeAttributeContexts, AttributeData? globalSizeOfAttribute)
         {
             _createMemoizeAttributeContexts = createMemoizeAttributeContexts;
             Context = context;
@@ -155,7 +157,10 @@ namespace MemoizeSourceGenerator
             MemoizerFactoryInterface = memoizerFactoryInterface;
             CreateMemoizedAttribute = createMemoizedAttribute;
             SizeOfResultAttribute = sizeOfResultAttribute;
+            GlobalSizeOfAttribute = SizeOfAttributeData.Parse(globalSizeOfAttribute);
         }
+
+        public SizeOfAttributeData GlobalSizeOfAttribute { get; }
 
         public void ReportDiagnostic(Diagnostic diag)
         {

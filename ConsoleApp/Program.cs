@@ -161,9 +161,10 @@ namespace ConsoleApp
         [SlidingCache(1.25)]
         int GetValue(ValueType2 valueType);
 
+        [return: SizeOfResult(SizeOfMethodName = nameof(ValueType2.Size))]
         ValueType2 FindValueTypeByName(string name);
 
-        [return: SizeOfResult(SizeOfMethodName = nameof(IValueType1.SizeOfExample))]
+        [return: SizeOfResult(GlobalStaticMethod = "ConsoleApp.TestSizeOf.ValueType1SizeOf")]
         IValueType1 FindValueTypeByNameInterface(string name);
 
         [return: SizeOfResult(GlobalStaticMethod = "ConsoleApp.TestSizeOf.ValueType1SizeOf")]
@@ -177,7 +178,7 @@ namespace ConsoleApp
     {
         public static long ValueType1SizeOf(IValueType1 obj)
         {
-            return obj.SizeOfExample();
+            return 12;
         }
     }
 
@@ -267,8 +268,6 @@ namespace ConsoleApp
     public interface IValueType1 : IEquatable<IValueType1>
     {
         int Value { get; }
-
-        long SizeOfExample();
     }
 
     public class ValueType2 : IEquatable<ValueType2>
@@ -295,7 +294,7 @@ namespace ConsoleApp
             return Equals((ValueType2) obj);
         }
 
-        public long SizeOfInBytes()
+        public long Size()
         {
             // Wrong but just an example
             return sizeof(int) + 8;

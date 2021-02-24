@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>netstandard2.1</TargetFramework>
+        <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
+        <LangVersion>9</LangVersion>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\MemoizeSourceGenerator.Attribute\MemoizeSourceGenerator.Attribute.csproj" />
+        <ProjectReference Include="..\MemoizeSourceGenerator\MemoizeSourceGenerator.csproj" ReferenceOutputAssembly="false" OutputItemType="Analyzer" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="3.1.11" />
+        <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="3.1.11" />
+    </ItemGroup>
+
+</Project>

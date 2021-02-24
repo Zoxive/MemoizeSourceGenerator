@@ -82,9 +82,21 @@ namespace MemoizeSourceGenerator.Models
                 }
             }
 
-            call = new MemoizerCall(interfaceType, implementationType, className, methods, slidingCache, memoizerFactoryTypeSymbol, humanId);
+            var @namespace = GetNamespaceFrom(expressionSyntax);
+
+            call = new MemoizerCall(interfaceType, implementationType, className, methods, slidingCache, memoizerFactoryTypeSymbol, humanId, @namespace);
 
             return true;
+        }
+
+        private static string GetNamespaceFrom(SyntaxNode? s)
+        {
+            return s?.Parent switch
+            {
+                NamespaceDeclarationSyntax namespaceDeclarationSyntax => namespaceDeclarationSyntax.Name.ToString(),
+                null => "Memoized",
+                _ => GetNamespaceFrom(s.Parent)
+            };
         }
 
         private static bool TryGetClassName(AttributeData memoizeAttribute, ITypeSymbol interfaceType, out string className, out string humanId)
@@ -111,7 +123,8 @@ namespace MemoizeSourceGenerator.Models
             IReadOnlyList<MemoizedMethodMember> methods,
             SlidingCache? slidingCache,
             INamedTypeSymbol? memoizerFactoryType,
-            string humanId)
+            string humanId,
+            string @namespace)
         {
             InterfaceType = interfaceType;
             ImplementationsType = implementationType;
@@ -120,14 +133,14 @@ namespace MemoizeSourceGenerator.Models
             SlidingCache = slidingCache;
             MemoizerFactoryType = memoizerFactoryType;
             HumanId = humanId;
+            Namespace = @namespace;
         }
 
         public ITypeSymbol ImplementationsType { get; }
         public ITypeSymbol InterfaceType { get; }
         public string HumanId { get; }
         public string ClassName { get; }
-        //public string Namespace => $"{InterfaceType.ContainingNamespace.ToDisplayString()}.Memoized";
-        public string Namespace => "Memoized";
+        public string Namespace { get; }
         public IReadOnlyList<MemoizedMethodMember> Methods { get; }
         public SlidingCache? SlidingCache { get; }
         public INamedTypeSymbol? MemoizerFactoryType { get; }

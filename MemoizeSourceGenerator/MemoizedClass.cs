@@ -73,15 +73,15 @@ namespace {call.Namespace}
                 sb.AppendLine(");");
                 sb.Append($"\t\t\tif (cache.TryGetValue<{method.TypeInCache}>(key, out var returnValue)");
 
-                if (method.TypeCanBeNull)
+                if (method.TypeIsReferenceType && !method.TypeCanBeNull)
                 {
                     sb.Append(" && returnValue != null");
                 }
 
                 sb.AppendLine(")");
                 sb.AppendLine("\t\t\t{");
-                sb.Append("\t\t\t\tif (_logger.IsEnabled(LogLevel.Debug))");
-                sb.AppendLine(" _logger.LogDebug(\"Cache hit. {CacheName}~{key} => {value}\", cache.DisplayName, key, returnValue);");
+                sb.Append("\t\t\t\tif (_logger.IsEnabled(LogLevel.Trace))");
+                sb.AppendLine(" _logger.LogTrace(\"Cache hit. {CacheName}~{key} => {value}\", cache.DisplayName, key, returnValue);");
                 sb.AppendLine();
                 sb.AppendLine("\t\t\t\treturn returnValue;");
                 sb.AppendLine("\t\t\t}");

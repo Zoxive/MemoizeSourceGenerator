@@ -63,6 +63,7 @@ namespace MemoizeSourceGenerator.Models
             var isAsync = methodSymbol.IsTaskOfTOrValueTaskOfT();
 
             bool typeIsNullable;
+            bool typeIsReferenceType;
             ITypeSymbol typeInCache;
 
             if (isAsync)
@@ -90,20 +91,14 @@ namespace MemoizeSourceGenerator.Models
                 typeInCache = taskReturnObj;
                 typeIsNullable = taskReturnObj.NullableAnnotation == NullableAnnotation.Annotated;
 
-                if (!typeIsNullable)
-                {
-                    typeIsNullable = taskReturnObj.IsReferenceType;
-                }
+                typeIsReferenceType = taskReturnObj.IsReferenceType;
             }
             else
             {
                 typeInCache = methodSymbol.ReturnType;
                 typeIsNullable = methodSymbol.ReturnType.NullableAnnotation == NullableAnnotation.Annotated;
 
-                if (!typeIsNullable)
-                {
-                    typeIsNullable = methodSymbol.ReturnType.IsReferenceType;
-                }
+                typeIsReferenceType = methodSymbol.ReturnType.IsReferenceType;
             }
 
             var returnTypeAttributes = methodSymbol.GetReturnTypeAttributes();
@@ -151,19 +146,20 @@ namespace MemoizeSourceGenerator.Models
 
             var returnTypeSizeOfMethod = new MemoizedMethodSizeOfFunction(selfSizeOfMethod, globalSizeOfMethod);
 
-            method = new MemoizedMethodMember(methodSymbol, args, slidingCache, isAsync, returnType.ToDisplayString(), typeInCache, typeIsNullable, returnTypeSizeOfMethod);
+            method = new MemoizedMethodMember(methodSymbol, args, slidingCache, isAsync, returnType.ToDisplayString(), typeInCache, typeIsNullable, typeIsReferenceType, returnTypeSizeOfMethod);
 
             return true;
         }
 
         private MemoizedMethodMember(IMethodSymbol methodSymbol, IReadOnlyList<MemoizedMethodMemberArgument> parameters, SlidingCache? slidingCache,
-            bool isAsync, string returnType, ITypeSymbol typeInCache, bool typeCanBeNull, MemoizedMethodSizeOfFunction memoizedMethodSizeOfFunction)
+            bool isAsync, string returnType, ITypeSymbol typeInCache, bool typeCanBeNull, bool typeIsReferenceType, MemoizedMethodSizeOfFunction memoizedMethodSizeOfFunction)
         {
             Name = methodSymbol.Name;
             IsAsync = isAsync;
             ReturnType = returnType;
             TypeInCache = typeInCache;
             TypeCanBeNull = typeCanBeNull;
+            TypeIsReferenceType = typeIsReferenceType;
             MemoizedMethodSizeOfFunction = memoizedMethodSizeOfFunction;
 
             PartitionedParameter = parameters.FirstOrDefault(x => x.PartitionsCache);
@@ -216,6 +212,7 @@ namespace MemoizeSourceGenerator.Models
         public ITypeSymbol TypeInCache { get; }
 
         public bool TypeCanBeNull { get; }
+        public bool TypeIsReferenceType { get; }
         public MemoizedMethodSizeOfFunction MemoizedMethodSizeOfFunction { get; }
 
         public void WriteParameters(StringBuilder sb, bool writeType = false, string? prefix = null)

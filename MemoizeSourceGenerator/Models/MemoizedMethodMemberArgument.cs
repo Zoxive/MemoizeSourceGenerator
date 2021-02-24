@@ -11,7 +11,7 @@ namespace MemoizeSourceGenerator.Models
             GeneratorContext context,
             Location errorLocation,
             IParameterSymbol parameterSymbol,
-            [NotNullWhen(true)] out MemoizedMethodMemberArgument? arg
+            /*[NotNullWhen(true)]*/ out MemoizedMethodMemberArgument? arg
         )
         {
             var type = parameterSymbol.Type;

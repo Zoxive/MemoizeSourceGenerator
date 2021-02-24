@@ -83,8 +83,10 @@ namespace MemoizeSourceGenerator
 
             var myContext = new GeneratorContext(context, partitionAttribute, slidingCacheAttribute, memoizerFactoryInterface, createMemoizedAttribute, sizeOfResultAttribute, createAttributes, globalSizeOfAttribute);
 
-            foreach (var addMemoizedScopeCall in receiver.Candidate)
+            foreach (var call in receiver.Candidate)
             {
+                var (addMemoizedScopeCall, singleton) = call;
+
                 var model = compilation.GetSemanticModel(addMemoizedScopeCall.SyntaxTree);
 
                 var name = addMemoizedScopeCall.Name as GenericNameSyntax;
@@ -99,7 +101,9 @@ namespace MemoizeSourceGenerator
                         continue;
                     }
 
-                    if (!MemoizerCall.TryCreate(myContext, addMemoizedScopeCall, interfaceArg, implArg, out var scopedCall))
+                    var mode = singleton? "Singleton" : "Scoped";
+
+                    if (!MemoizerCall.TryCreate(myContext, addMemoizedScopeCall, interfaceArg, implArg, mode, out var scopedCall))
                         continue;
 
                     // Same Proj with multiple AddMemoizer() calls for same types
@@ -175,7 +179,7 @@ namespace MemoizeSourceGenerator
 
     public class RecieveExtensionCalls : ISyntaxReceiver
     {
-        public List<MemberAccessExpressionSyntax> Candidate { get; } = new();
+        public List<(MemberAccessExpressionSyntax, bool singleton)> Candidate { get; } = new();
         public List<InterfaceDeclarationSyntax> CandidateAttributes { get; } = new();
 
         public void OnVisitSyntaxNode(SyntaxNode syntaxNode)
@@ -185,9 +189,11 @@ namespace MemoizeSourceGenerator
                 case MemberAccessExpressionSyntax memberAccessExpressionSyntax:
                 {
                     var methodName = memberAccessExpressionSyntax.Name.Identifier.ValueText;
-                    if (methodName == "AddMemoizedScoped" || methodName == "AddMemoizedSingleton")
+                    var scoped = methodName == "AddMemoizedScoped";
+                    var singleton = methodName == "AddMemoizedSingleton";
+                    if (scoped || singleton)
                     {
-                        Candidate.Add(memberAccessExpressionSyntax);
+                        Candidate.Add((memberAccessExpressionSyntax, singleton));
                     }
                     break;
                 }

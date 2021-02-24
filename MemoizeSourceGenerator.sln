@@ -10,6 +10,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MemoizeSourceGenerator.Attr
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SourceGeneratorTests", "SourceGeneratorTests\SourceGeneratorTests.csproj", "{68DF590D-A1E9-4AAC-8955-A275D64495D5}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClassLibrary1", "ClassLibrary1\ClassLibrary1.csproj", "{594DAC7C-BA36-4B98-8C1A-3EC05B713604}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -36,5 +38,9 @@ Global
 		{68DF590D-A1E9-4AAC-8955-A275D64495D5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{68DF590D-A1E9-4AAC-8955-A275D64495D5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{68DF590D-A1E9-4AAC-8955-A275D64495D5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{594DAC7C-BA36-4B98-8C1A-3EC05B713604}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{594DAC7C-BA36-4B98-8C1A-3EC05B713604}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{594DAC7C-BA36-4B98-8C1A-3EC05B713604}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{594DAC7C-BA36-4B98-8C1A-3EC05B713604}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

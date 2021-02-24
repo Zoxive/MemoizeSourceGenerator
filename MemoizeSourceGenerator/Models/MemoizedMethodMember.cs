@@ -37,7 +37,7 @@ namespace MemoizeSourceGenerator.Models
 
     public class MemoizedMethodMember
     {
-        public static bool TryCreate(GeneratorContext context, CreateMemoizeInterfaceContext interfaceContext, IMethodSymbol methodSymbol, [NotNullWhen(true)] out MemoizedMethodMember? method)
+        public static bool TryCreate(GeneratorContext context, CreateMemoizeInterfaceContext interfaceContext, IMethodSymbol methodSymbol, /*[NotNullWhen(true)]*/ out MemoizedMethodMember? method)
         {
             var @params = methodSymbol.Parameters;
             var args = new List<MemoizedMethodMemberArgument>(@params.Length);

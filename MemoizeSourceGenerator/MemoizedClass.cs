@@ -17,7 +17,7 @@ using System;
 using MemoizeSourceGenerator.Attribute;
 #nullable enable
 
-namespace {call.Namespace}
+namespace {call.ClassNamespace}
 {{
     public class {call.ClassName} : {fullInterfaceName}
     {{

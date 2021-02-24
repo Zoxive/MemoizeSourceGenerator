@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace MemoizeSourceGenerator.Attribute
+﻿namespace MemoizeSourceGenerator.Attribute
 {
     public sealed class GlobalKey : IPartitionKey
     {
@@ -30,7 +28,7 @@ namespace MemoizeSourceGenerator.Attribute
 
         public override int GetHashCode()
         {
-            return HashCode.Combine(DisplayName);
+            return DisplayName.GetHashCode();
         }
     }
 }

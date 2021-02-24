@@ -36,7 +36,10 @@ namespace MemoizeSourceGenerator.Attribute
 
         public override int GetHashCode()
         {
-            return HashCode.Combine(PartitionKey, Key);
+            unchecked
+            {
+                return (PartitionKey.GetHashCode() * 397) ^ Key.GetHashCode();
+            }
         }
     }
 }

@@ -41,7 +41,7 @@ namespace MemoizeSourceGenerator.Attribute
         private readonly ILoggerFactory _loggerFactory;
 
         // Instance specific CachePartitions
-        private readonly ConcurrentDictionary<IPartitionKey, CachePartition> _cachePartitions = new();
+        private readonly ConcurrentDictionary<IPartitionKey, CachePartition> _cachePartitions = new ConcurrentDictionary<IPartitionKey, CachePartition>();
 
         public MemoizerFactory(IPartitionKey factoryKey, ILoggerFactory loggerFactory, MemoryCacheOptions? options = null)
         {

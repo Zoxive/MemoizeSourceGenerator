@@ -43,7 +43,7 @@ namespace Memoized
     {{
     */
 
-            var groupedCallsByNamespace = calls.GroupBy(x => x.Namespace).ToList();
+            var groupedCallsByNamespace = calls.GroupBy(x => x.CallNamespace).ToList();
 
             foreach (var diRegisterGroup in groupedCallsByNamespace)
             {
@@ -65,9 +65,25 @@ namespace Memoized
             sb.AppendLine("\tinternal static class ServiceCollectionExtensions");
             sb.AppendLine("\t\t{");
 
-            // TODOD dont register both, only register where it is..
-            GenerateExtensionMethod(calls, sb, "Scoped");
-            GenerateExtensionMethod(calls, sb, "Singleton");
+            var groupedByModes = calls.GroupBy(x => x.Mode).ToList();
+
+            var scoped = false;
+            var singleton = false;
+            foreach (var groupedModes in groupedByModes)
+            {
+                var key = groupedModes.Key;
+                GenerateExtensionMethod(groupedModes.ToList(), sb, key);
+
+                if (key == "Scoped")
+                    scoped = true;
+                else if (key == "Singleton")
+                    singleton = true;
+            }
+
+            if (!scoped)
+                GenerateExtensionMethod(Array.Empty<MemoizerCall>(), sb, "Scoped");
+            if (!singleton)
+                GenerateExtensionMethod(Array.Empty<MemoizerCall>(), sb, "Singleton");
 
             sb.AppendLine("\t}");
             sb.AppendLine("}");
@@ -108,7 +124,7 @@ namespace Memoized
             }
 
             sb.AppendLine(
-                $"\t\t\t\t\treturn new {call.Namespace}.{call.ClassName}(factory, s.GetRequiredService<{implName}>(), s.GetRequiredService<ILogger<{call.Namespace}.{call.ClassName}>>(), configureEntry);");
+                $"\t\t\t\t\treturn new {call.ClassNamespace}.{call.ClassName}(factory, s.GetRequiredService<{implName}>(), s.GetRequiredService<ILogger<{call.ClassNamespace}.{call.ClassName}>>(), configureEntry);");
             sb.AppendLine("\t\t\t\t});");
             sb.AppendLine("\t\t\t\treturn services;");
             sb.AppendLine("\t\t\t}");

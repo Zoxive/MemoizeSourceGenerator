@@ -16,7 +16,8 @@ namespace MemoizeSourceGenerator.Models
             MemberAccessExpressionSyntax expressionSyntax,
             ITypeSymbol interfaceType,
             ITypeSymbol implementationType,
-            [NotNullWhen(true)] out MemoizerCall? call)
+            string mode,
+            /*[NotNullWhen(true)]*/ out MemoizerCall? call)
         {
             var interfaceAttributes = interfaceType.GetAttributes();
 
@@ -84,7 +85,7 @@ namespace MemoizeSourceGenerator.Models
 
             var @namespace = GetNamespaceFrom(expressionSyntax);
 
-            call = new MemoizerCall(interfaceType, implementationType, className, methods, slidingCache, memoizerFactoryTypeSymbol, humanId, @namespace);
+            call = new MemoizerCall(interfaceType, implementationType, className, methods, slidingCache, memoizerFactoryTypeSymbol, humanId, @namespace, mode);
 
             return true;
         }
@@ -124,7 +125,8 @@ namespace MemoizeSourceGenerator.Models
             SlidingCache? slidingCache,
             INamedTypeSymbol? memoizerFactoryType,
             string humanId,
-            string @namespace)
+            string callNamespace,
+            string mode)
         {
             InterfaceType = interfaceType;
             ImplementationsType = implementationType;
@@ -133,14 +135,17 @@ namespace MemoizeSourceGenerator.Models
             SlidingCache = slidingCache;
             MemoizerFactoryType = memoizerFactoryType;
             HumanId = humanId;
-            Namespace = @namespace;
+            CallNamespace = callNamespace;
+            Mode = mode;
         }
 
         public ITypeSymbol ImplementationsType { get; }
         public ITypeSymbol InterfaceType { get; }
         public string HumanId { get; }
         public string ClassName { get; }
-        public string Namespace { get; }
+        public string CallNamespace { get; }
+        public string ClassNamespace { get; } = "Memoized";
+        public string Mode { get; }
         public IReadOnlyList<MemoizedMethodMember> Methods { get; }
         public SlidingCache? SlidingCache { get; }
         public INamedTypeSymbol? MemoizerFactoryType { get; }

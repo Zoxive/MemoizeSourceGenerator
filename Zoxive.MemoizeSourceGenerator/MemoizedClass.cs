@@ -69,7 +69,11 @@ namespace {call.ClassNamespace}
                     sb.AppendLine($"\t\t\tvar cache = _cacheFactory.GetGlobal();");
                 }
 
-                sb.Append($"\t\t\tvar key = new {method.ClassName}(cache.PartitionKey,");
+                sb.Append($"\t\t\tvar key = new {method.ClassName}(cache.PartitionKey");
+                if (method.Parameters.Count > 0)
+                {
+                    sb.Append(",");
+                }
                 method.WriteParameters(sb, prefix: "__");
                 sb.AppendLine(");");
                 sb.Append($"\t\t\tif (cache.TryGetValue<{method.TypeInCache}>(key, out var returnValue)");
@@ -147,22 +151,23 @@ namespace {call.ClassNamespace}
                 sb.AppendLine($"\t\t\tprivate readonly {arg.ArgType} _{arg.Name};");
             }
 
+            sb.AppendLine();
+            sb.Append($"\t\t\tpublic {methodClassName}(IPartitionKey partitionKey");
             if (method.Parameters.Count > 0)
             {
-                sb.AppendLine();
-                sb.Append($"\t\t\tpublic {methodClassName}(IPartitionKey partitionKey,");
-                method.WriteParameters(sb, writeType: true, prefix: "__");
-
-                sb.AppendLine(")");
-                sb.AppendLine("\t\t\t{");
-                sb.AppendLine($"\t\t\t\tPartitionKey = partitionKey;");
-                foreach (var arg in method.Parameters)
-                {
-                    sb.AppendLine($"\t\t\t\t_{arg.Name} = __{arg.Name};");
-                }
-
-                sb.AppendLine("\t\t\t}");
+                sb.Append(",");
             }
+            method.WriteParameters(sb, writeType: true, prefix: "__");
+
+            sb.AppendLine(")");
+            sb.AppendLine("\t\t\t{");
+            sb.AppendLine($"\t\t\t\tPartitionKey = partitionKey;");
+            foreach (var arg in method.Parameters)
+            {
+                sb.AppendLine($"\t\t\t\t_{arg.Name} = __{arg.Name};");
+            }
+
+            sb.AppendLine("\t\t\t}");
 
             sb.AppendLine();
 

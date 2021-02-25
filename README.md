@@ -2,6 +2,6 @@
 
 Install via nuget
 
-```Install-Package MemoizeSourceGenerator```
+```Install-Package Zoxive.MemoizeSourceGenerator```
 
-[![Version](https://img.shields.io/nuget/v/MemoizeSourceGenerator.svg)](https://nuget.org/packages/MemoizeSourceGenerator)
+[![Version](https://img.shields.io/nuget/v/Zoxive.MemoizeSourceGenerator.svg)](https://nuget.org/packages/Zoxive.MemoizeSourceGenerator)

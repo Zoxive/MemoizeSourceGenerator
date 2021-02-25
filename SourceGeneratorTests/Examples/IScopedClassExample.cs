@@ -1,4 +1,4 @@
-﻿using MemoizeSourceGenerator.Attribute;
+﻿using Zoxive.MemoizeSourceGenerator.Attribute;
 
 namespace SourceGeneratorTests.Examples
 {

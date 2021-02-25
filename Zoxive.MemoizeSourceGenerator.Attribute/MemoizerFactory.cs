@@ -5,7 +5,7 @@ using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 
-namespace MemoizeSourceGenerator.Attribute
+namespace Zoxive.MemoizeSourceGenerator.Attribute
 {
     // TODO split this into a Global vs Instance? right now its both.. and little confusing
     public sealed class MemoizerFactory : IMemoizerFactory

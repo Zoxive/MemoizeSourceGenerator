@@ -1,14 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
-using MemoizeSourceGenerator.Attribute;
-using MemoizeSourceGenerator.Models;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Zoxive.MemoizeSourceGenerator.Attribute;
+using Zoxive.MemoizeSourceGenerator.Models;
 
-namespace MemoizeSourceGenerator
+namespace Zoxive.MemoizeSourceGenerator
 {
     [Generator]
     public class Generator : ISourceGenerator
@@ -128,7 +127,7 @@ namespace MemoizeSourceGenerator
     {
         public static INamedTypeSymbol GetSymbol(this Compilation compilation, string name)
         {
-            var createMemoizedAttribute = compilation.GetTypeByMetadataName($"MemoizeSourceGenerator.Attribute.{name}");
+            var createMemoizedAttribute = compilation.GetTypeByMetadataName($"Zoxive.MemoizeSourceGenerator.Attribute.{name}");
             if (createMemoizedAttribute == null)
                 throw new Exception($"Could not locate {name}");
             return createMemoizedAttribute;

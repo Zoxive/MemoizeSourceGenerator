@@ -4,7 +4,7 @@ using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Primitives;
 
-namespace MemoizeSourceGenerator.Attribute
+namespace Zoxive.MemoizeSourceGenerator.Attribute
 {
     public sealed class CachePartition
     {
@@ -169,48 +169,6 @@ namespace MemoizeSourceGenerator.Attribute
 
             return new CacheStatistics(DisplayName, accessCount, misses, _partitionCount, _totalSize);
         }
-
-        /*
-        private void ComputeSizeAndUpdateResult(CacheResult result, CachePartition cachePartition, ICacheEntry e)
-        {
-            var sw = Stopwatch.StartNew();
-
-            var partitionName = cachePartition.Name;
-            var m = MemorySizeComputePool.Get();
-            var size = (int)m.SizeOf(result.Value);
-            lock(result)
-            {
-                // don't cache larger objects if we are already running low on available memory
-                if (DefaultCacheDurationFactor < 0.2 && size > 20*1024)
-                {
-                    result.Status = CacheStatus.NotCached;
-                    result.ByteSize = 0;
-                    // reset expiration to the non scaled default
-                    e.SetSlidingExpiration(DefaultExpirationTime);
-                    _logger.LogWarning("Not caching item due to memory constraints ({Id}) {Factory} {size}", partitionName != null ? $"{Id}-{partitionName}" : Id, DefaultCacheDurationFactor, size);
-                }
-                else if (result.Status != CacheStatus.NotCached)
-                {
-                    result.ByteSize = size;
-                    Interlocked.Add(ref cachePartition.TotalSize, size);
-                    result.Status = CacheStatus.Cached;
-                }
-                else
-                {
-                    result.ByteSize = 0;
-                    _logger.LogWarning("Not caching item status? {status} ({Id}) {Factory} {size}", result.Status, partitionName != null ? $"{Id}-{partitionName}" : Id, DefaultCacheDurationFactor, size);
-                }
-            }
-            MemorySizeComputePool.Return(m);
-
-            sw.Stop();
-
-            if (sw.Elapsed.TotalMilliseconds > 0.1 || size >= 10000)
-            {
-                _logger.LogTrace("Computing size of cached item took {timeMs}ms, {size} bytes ({Id})", sw.Elapsed.TotalMilliseconds, size, partitionName != null ? $"{Id}-{partitionName}" : Id);
-            }
-        }
-        */
 
         public void Dispose()
         {

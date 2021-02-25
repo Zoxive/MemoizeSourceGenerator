@@ -1,4 +1,4 @@
-﻿namespace MemoizeSourceGenerator.Attribute
+﻿namespace Zoxive.MemoizeSourceGenerator.Attribute
 {
     public readonly struct StringPartitionKey : IPartitionKey
     {

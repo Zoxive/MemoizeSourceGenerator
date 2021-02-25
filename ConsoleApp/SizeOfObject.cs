@@ -1,4 +1,4 @@
-﻿namespace Caching
+﻿namespace ConsoleApp
 {
     public static class SizeOfObject
     {

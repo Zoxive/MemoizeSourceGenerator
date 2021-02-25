@@ -1,5 +1,5 @@
 ﻿using System;
-using Memoized;
+using Zoxive.Memoized;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Moq;

@@ -1,6 +1,6 @@
 ﻿using Microsoft.CodeAnalysis;
 
-namespace MemoizeSourceGenerator
+namespace Zoxive.MemoizeSourceGenerator
 {
     public static class DiagError
     {

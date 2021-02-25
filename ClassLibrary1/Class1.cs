@@ -1,7 +1,7 @@
 ﻿using System;
 using Microsoft.Extensions.DependencyInjection;
-using Memoized;
-using MemoizeSourceGenerator.Attribute;
+using Zoxive.Memoized;
+using Zoxive.MemoizeSourceGenerator.Attribute;
 
 namespace ClassLibrary1
 {

@@ -2,7 +2,7 @@
 using System.Linq;
 using Microsoft.CodeAnalysis;
 
-namespace MemoizeSourceGenerator.Models
+namespace Zoxive.MemoizeSourceGenerator.Models
 {
     public class SlidingCache
     {

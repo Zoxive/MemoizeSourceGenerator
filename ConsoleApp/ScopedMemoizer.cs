@@ -3,9 +3,9 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using MemoizeSourceGenerator.Attribute;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Zoxive.MemoizeSourceGenerator.Attribute;
 
 namespace ConsoleApp
 {

@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using MemoizeSourceGenerator.Attribute;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Zoxive.MemoizeSourceGenerator.Attribute;
 
-namespace MemoizeSourceGenerator.Models
+namespace Zoxive.MemoizeSourceGenerator.Models
 {
     public class MemoizerCall
     {
@@ -17,7 +17,7 @@ namespace MemoizeSourceGenerator.Models
             ITypeSymbol interfaceType,
             ITypeSymbol implementationType,
             string mode,
-            /*[NotNullWhen(true)]*/ out MemoizerCall? call)
+            [NotNullWhen(true)] out MemoizerCall? call)
         {
             var interfaceAttributes = interfaceType.GetAttributes();
 
@@ -95,7 +95,7 @@ namespace MemoizeSourceGenerator.Models
             return s?.Parent switch
             {
                 NamespaceDeclarationSyntax namespaceDeclarationSyntax => namespaceDeclarationSyntax.Name.ToString(),
-                null => "Memoized",
+                null => AddMemoizedExtensionCall.MemoizedNamespace,
                 _ => GetNamespaceFrom(s.Parent)
             };
         }
@@ -144,7 +144,7 @@ namespace MemoizeSourceGenerator.Models
         public string HumanId { get; }
         public string ClassName { get; }
         public string CallNamespace { get; }
-        public string ClassNamespace { get; } = "Memoized";
+        public string ClassNamespace { get; } = AddMemoizedExtensionCall.MemoizedNamespace;
         public string Mode { get; }
         public IReadOnlyList<MemoizedMethodMember> Methods { get; }
         public SlidingCache? SlidingCache { get; }

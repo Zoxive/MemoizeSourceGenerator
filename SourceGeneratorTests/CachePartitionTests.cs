@@ -1,8 +1,6 @@
-﻿using FluentAssertions;
-using MemoizeSourceGenerator.Attribute;
-using Microsoft.Extensions.Logging.Abstractions;
-using SourceGeneratorTests.Extensions;
+﻿using SourceGeneratorTests.Extensions;
 using Xunit;
+using Zoxive.MemoizeSourceGenerator.Attribute;
 
 namespace SourceGeneratorTests
 {

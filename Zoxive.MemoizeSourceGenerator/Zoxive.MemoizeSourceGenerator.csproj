@@ -1,0 +1,28 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <Version>0.0.1</Version>
+    <AssemblyName>Zoxive.MemoizeSourceGenerator</AssemblyName>
+    <Description>Compiled time generate memoized services</Description>
+    <PackageTags>sourcegenerator;memoize;cache</PackageTags>
+    <Authors>Kyle Wascher</Authors>
+    <PackageLicenseUrl>https://github.com/Zoxive/MemoizeSourceGenerator/blob/main/LICENSE</PackageLicenseUrl>
+    <RepositoryType>git</RepositoryType>
+    <RepositoryUrl>https://github.com/Zoxive/MemoizeSourceGenerator/</RepositoryUrl>
+    <IsPackable>true</IsPackable>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <LangVersion>9</LangVersion>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.1" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.CodeAnalysis" Version="3.8.0" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="3.8.0" PrivateAssets="all" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Zoxive.MemoizeSourceGenerator.Attribute\Zoxive.MemoizeSourceGenerator.Attribute.csproj" />
+  </ItemGroup>
+
+</Project>

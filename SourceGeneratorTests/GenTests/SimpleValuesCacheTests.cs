@@ -1,12 +1,12 @@
 ﻿using System;
-using MemoizeSourceGenerator.Attribute;
 using Microsoft.Extensions.DependencyInjection;
 using SourceGeneratorTests.Extensions;
 using Xunit;
-using Memoized;
+using Zoxive.Memoized;
 using Microsoft.Extensions.Logging;
 using Moq;
 using SourceGeneratorTests.Examples;
+using Zoxive.MemoizeSourceGenerator.Attribute;
 
 namespace SourceGeneratorTests.GenTests
 {

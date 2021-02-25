@@ -2,13 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using MemoizeSourceGenerator.Models;
+using Zoxive.MemoizeSourceGenerator.Models;
 
-
-namespace MemoizeSourceGenerator
+namespace Zoxive.MemoizeSourceGenerator
 {
     public static class AddMemoizedExtensionCall
     {
+        public static string MemoizedNamespace = "Zoxive.Memoized";
+
         public static string Generate(IReadOnlyList<MemoizerCall> calls)
         {
             /*
@@ -30,9 +31,10 @@ using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using MemoizeSourceGenerator.Attribute;
+using Zoxive.MemoizeSourceGenerator;
+using Zoxive.MemoizeSourceGenerator.Attribute;
 
-namespace Memoized
+namespace {MemoizedNamespace}
 {{
 }}
 ");
@@ -52,7 +54,7 @@ namespace Memoized
 
             if (!groupedCallsByNamespace.Any())
             {
-                Generate(sb, "Memoized", Array.Empty<MemoizerCall>());
+                Generate(sb, MemoizedNamespace, Array.Empty<MemoizerCall>());
             }
 
             return sb.ToString();

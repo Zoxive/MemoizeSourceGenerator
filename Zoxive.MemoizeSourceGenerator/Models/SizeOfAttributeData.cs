@@ -1,9 +1,8 @@
 ﻿using System.Linq;
-using MemoizeSourceGenerator.Attribute;
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Zoxive.MemoizeSourceGenerator.Attribute;
 
-namespace MemoizeSourceGenerator.Models
+namespace Zoxive.MemoizeSourceGenerator.Models
 {
     public class SizeOfAttributeData
     {

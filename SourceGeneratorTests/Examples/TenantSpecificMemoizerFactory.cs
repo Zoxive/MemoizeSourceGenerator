@@ -1,8 +1,8 @@
 ﻿#nullable enable
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using MemoizeSourceGenerator.Attribute;
 using Microsoft.Extensions.Logging;
+using Zoxive.MemoizeSourceGenerator.Attribute;
 
 namespace SourceGeneratorTests.Examples
 {

@@ -35,8 +35,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\MemoizeSourceGenerator.Attribute\MemoizeSourceGenerator.Attribute.csproj" />
-    <ProjectReference Include="..\MemoizeSourceGenerator\MemoizeSourceGenerator.csproj" ReferenceOutputAssembly="false" OutputItemType="Analyzer" />
+    <ProjectReference Include="..\Zoxive.MemoizeSourceGenerator.Attribute\Zoxive.MemoizeSourceGenerator.Attribute.csproj" />
+    <ProjectReference Include="..\Zoxive.MemoizeSourceGenerator\Zoxive.MemoizeSourceGenerator.csproj" ReferenceOutputAssembly="false" OutputItemType="Analyzer" />
   </ItemGroup>
 
 </Project>

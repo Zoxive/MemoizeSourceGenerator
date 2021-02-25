@@ -1,13 +1,12 @@
 using System;
 using System.Threading;
-using System.Threading.Tasks;
 using FluentAssertions;
-using MemoizeSourceGenerator.Attribute;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging.Abstractions;
 using SourceGeneratorTests.Extensions;
 using Xunit;
 using Xunit.Abstractions;
+using Zoxive.MemoizeSourceGenerator.Attribute;
 
 namespace SourceGeneratorTests
 {

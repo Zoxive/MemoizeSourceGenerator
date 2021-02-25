@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
-using MemoizeSourceGenerator.Attribute;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Memoized;
+using Zoxive.MemoizeSourceGenerator.Attribute;
 
-[assembly: SizeOfResult(GlobalStaticMethod = "Caching.SizeOfObject.SizeOf")]
+[assembly: SizeOfResult(GlobalStaticMethod = "ConsoleApp.SizeOfObject.SizeOf")]
 
 namespace ConsoleApp
 {

@@ -1,16 +1,16 @@
 ﻿using System;
 using System.Linq;
 using FluentAssertions;
-using MemoizeSourceGenerator.Attribute;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using SourceGeneratorTests.Extensions;
 using SourceGeneratorTests.GenTests;
 using Xunit;
-using Memoized;
+using Zoxive.Memoized;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using SourceGeneratorTests.Examples;
+using Zoxive.MemoizeSourceGenerator.Attribute;
 
 namespace SourceGeneratorTests
 {

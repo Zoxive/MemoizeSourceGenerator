@@ -1,8 +1,8 @@
 ﻿using System.Linq;
 using System.Text;
-using MemoizeSourceGenerator.Models;
+using Zoxive.MemoizeSourceGenerator.Models;
 
-namespace MemoizeSourceGenerator
+namespace Zoxive.MemoizeSourceGenerator
 {
     internal static class MemoizedClass
     {
@@ -14,7 +14,8 @@ namespace MemoizeSourceGenerator
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using System;
-using MemoizeSourceGenerator.Attribute;
+using Zoxive.MemoizeSourceGenerator;
+using Zoxive.MemoizeSourceGenerator.Attribute;
 #nullable enable
 
 namespace {call.ClassNamespace}

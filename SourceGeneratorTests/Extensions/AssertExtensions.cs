@@ -1,10 +1,10 @@
 ﻿using System;
 using FluentAssertions;
 using FluentAssertions.Primitives;
-using MemoizeSourceGenerator.Attribute;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using Moq;
+using Zoxive.MemoizeSourceGenerator.Attribute;
 
 namespace SourceGeneratorTests.Extensions
 {

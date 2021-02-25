@@ -2,7 +2,7 @@
 using System.Threading;
 using Microsoft.Extensions.Caching.Memory;
 
-namespace MemoizeSourceGenerator.Attribute
+namespace Zoxive.MemoizeSourceGenerator.Attribute
 {
     public static class CachePartitionExtensions
     {

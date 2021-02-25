@@ -2,11 +2,11 @@
 using System.Linq;
 using System.Net.Mime;
 using FluentAssertions;
-using MemoizeSourceGenerator.Attribute;
 using Microsoft.Extensions.Logging.Abstractions;
 using SourceGeneratorTests.Examples;
 using SourceGeneratorTests.Extensions;
 using Xunit;
+using Zoxive.MemoizeSourceGenerator.Attribute;
 
 namespace SourceGeneratorTests
 {

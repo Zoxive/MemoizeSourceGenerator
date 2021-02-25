@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace MemoizeSourceGenerator.Attribute
+namespace Zoxive.MemoizeSourceGenerator.Attribute
 {
     [AttributeUsage(AttributeTargets.Interface, Inherited = false)]
     public class CreateMemoizedImplementationAttribute : System.Attribute

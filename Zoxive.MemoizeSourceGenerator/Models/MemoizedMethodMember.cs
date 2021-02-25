@@ -1,15 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
+﻿using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
-using MemoizeSourceGenerator.Attribute;
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-namespace MemoizeSourceGenerator.Models
+namespace Zoxive.MemoizeSourceGenerator.Models
 {
     public class MemoizedMethodSizeOfFunction
     {
@@ -37,7 +32,7 @@ namespace MemoizeSourceGenerator.Models
 
     public class MemoizedMethodMember
     {
-        public static bool TryCreate(GeneratorContext context, CreateMemoizeInterfaceContext interfaceContext, IMethodSymbol methodSymbol, /*[NotNullWhen(true)]*/ out MemoizedMethodMember? method)
+        public static bool TryCreate(GeneratorContext context, CreateMemoizeInterfaceContext interfaceContext, IMethodSymbol methodSymbol, [NotNullWhen(true)] out MemoizedMethodMember? method)
         {
             var @params = methodSymbol.Parameters;
             var args = new List<MemoizedMethodMemberArgument>(@params.Length);

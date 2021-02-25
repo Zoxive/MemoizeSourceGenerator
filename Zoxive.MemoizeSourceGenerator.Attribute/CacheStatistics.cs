@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace MemoizeSourceGenerator.Attribute
+namespace Zoxive.MemoizeSourceGenerator.Attribute
 {
     public sealed class CacheStatistics
     {

@@ -3,7 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Memoized;
+using Zoxive.Memoized;
 using Zoxive.MemoizeSourceGenerator.Attribute;
 
 [assembly: SizeOfResult(GlobalStaticMethod = "ConsoleApp.SizeOfObject.SizeOf")]
@@ -119,7 +119,7 @@ namespace ConsoleApp
                 log.LogInformation("New Result: {result}", maths.Add(10, 10));
 
                 // manual bust
-                cacheFactory.GetGlobal().Remove(new Memoized.Memoized_DoMaths.ArgKey_IDoMaths_int_Add_int_int(GlobalKey.Instance, 5, 10));
+                cacheFactory.GetGlobal().Remove(new Memoized_DoMaths.ArgKey_IDoMaths_int_Add_int_int(GlobalKey.Instance, 5, 10));
 
                 log.LogInformation("Result: {result}", maths.Add(5, 10));
 

@@ -176,7 +176,7 @@ namespace {call.ClassNamespace}
             sb.AppendLine("\t\t\t\tif (ReferenceEquals(null, other)) return false;");
             sb.AppendLine("\t\t\t\tif (ReferenceEquals(this, other)) return true;");
 
-            sb.Append($"\t\t\t\treturn ");
+            sb.Append($"\t\t\t\treturn PartitionKey.Equals(other.PartitionKey) && ");
             foreach (var arg in method.Parameters)
             {
                 if (arg.IsNullable)
@@ -217,21 +217,14 @@ namespace {call.ClassNamespace}
 
             sb.AppendLine($"\t\t\tpublic override int GetHashCode()");
             sb.AppendLine("\t\t\t{");
-            if (method.Parameters.Count == 0)
+            sb.Append("\t\t\t\treturn HashCode.Combine(PartitionKey, ");
+            foreach (var arg in method.Parameters)
             {
-                sb.AppendLine("\t\t\t\treturn 0;");
+                sb.Append($"_{arg.Name}");
+                if (!ReferenceEquals(arg, lastArg))
+                    sb.Append(", ");
             }
-            else
-            {
-                sb.Append("\t\t\t\treturn HashCode.Combine(");
-                foreach (var arg in method.Parameters)
-                {
-                    sb.Append($"_{arg.Name}");
-                    if (!ReferenceEquals(arg, lastArg))
-                        sb.Append(", ");
-                }
-                sb.AppendLine(");");
-            }
+            sb.AppendLine(");");
             sb.AppendLine("\t\t\t}");
 
             sb.AppendLine($"\t\t\tpublic override string ToString()");

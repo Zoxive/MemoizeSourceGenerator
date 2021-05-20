@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <Version>0.0.4</Version>
+    <Version>0.0.7</Version>
     <AssemblyName>Zoxive.MemoizeSourceGenerator</AssemblyName>
     <Description>Compiled time generate memoized services</Description>
     <PackageTags>sourcegenerator;memoize;cache</PackageTags>

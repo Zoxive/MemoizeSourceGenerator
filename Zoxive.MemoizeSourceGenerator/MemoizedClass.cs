@@ -217,7 +217,11 @@ namespace {call.ClassNamespace}
 
             sb.AppendLine($"\t\t\tpublic override int GetHashCode()");
             sb.AppendLine("\t\t\t{");
-            sb.Append("\t\t\t\treturn HashCode.Combine(PartitionKey, ");
+            sb.Append("\t\t\t\treturn HashCode.Combine(PartitionKey");
+
+            if (method.Parameters.Count != 0)
+                sb.Append(", ");
+
             foreach (var arg in method.Parameters)
             {
                 sb.Append($"_{arg.Name}");

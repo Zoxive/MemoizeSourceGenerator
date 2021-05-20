@@ -156,6 +156,8 @@ namespace ConsoleApp
     [CreateMemoizedImplementation]
     public interface IDoMaths
     {
+        bool NoArgs();
+
         int Add(int arg1, int arg2);
 
         int GetValue(IValueType1 valueType);
@@ -191,6 +193,11 @@ namespace ConsoleApp
         public DoMaths(ILogger<DoMaths> logger)
         {
             _logger = logger;
+        }
+
+        public bool NoArgs()
+        {
+            return true;
         }
 
         public int Add(int arg1, int arg2)

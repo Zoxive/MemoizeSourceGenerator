@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Text;
 using Zoxive.MemoizeSourceGenerator.Models;
 
@@ -109,15 +110,24 @@ namespace {call.ClassNamespace}
                 sb.AppendLine(" _logger.LogDebug(\"Cache miss. {CacheName}~{key} => {value}\", cache.DisplayName, key, result);");
                 sb.AppendLine();
 
-                sb.Append("\t\t\tvar size = ");
+                sb.AppendLine("\t\t\ttry");
+                sb.AppendLine("\t\t\t{");
+
+                sb.Append("\t\t\t\tvar size = ");
 
                 method.MemoizedMethodSizeOfFunction.Write(sb, "result");
 
-
                 var slidingDuration = method.SlidingCache?.InMinutes ?? call.SlidingCache?.InMinutes ?? 10; // TODO fallback in global options
-                sb.AppendLine($"\t\t\tcache.CreateEntry(key, result, tokenSourceBeforeComputingEntry, {slidingDuration}, size, _configureEntry);");
+                sb.AppendLine($"\t\t\t\tcache.CreateEntry(key, result, tokenSourceBeforeComputingEntry, {slidingDuration}, size, _configureEntry);");
 
-                sb.AppendLine("\t\t\treturn result;");
+                sb.AppendLine("\t\t\t\treturn result;");
+
+                sb.AppendLine("\t\t\t}");
+                sb.AppendLine("\t\t\tcatch (Exception ex)");
+                sb.AppendLine("\t\t\t{");
+                sb.AppendLine("\t\t\t\t_logger.LogError(ex, \"Error while caching {CacheName}~{key} => {value}\", cache.DisplayName, key, result);");
+                sb.AppendLine("\t\t\t\treturn result;");
+                sb.AppendLine("\t\t\t}");
 
                 sb.AppendLine("\t\t}");
                 sb.AppendLine();

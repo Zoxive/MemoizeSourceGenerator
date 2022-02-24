@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using FluentAssertions;
 using FluentAssertions.Primitives;
 using Microsoft.Extensions.Caching.Memory;
@@ -50,13 +51,13 @@ namespace SourceGeneratorTests.Extensions
             return cache.CreateEntry(key, value, cache.ClearCacheTokenSource, 10, null, configureEntry);
         }
 
-        public static Mock<ILogger<T>> VerifyDebugWasCalled<T>(this Mock<ILogger<T>> logger, string expectedMessage)
+        public static Mock<ILogger<T>> VerifyWasCalled<T>(this Mock<ILogger<T>> logger, string expectedMessage, LogLevel logLevel)
         {
-            Func<object, Type, bool> state = (v, t) => v.ToString().CompareTo(expectedMessage) == 0;
+            Func<object, Type, bool> state = (v, t) => string.Equals(v.ToString(), expectedMessage, StringComparison.Ordinal);
 
             logger.Verify(
                 x => x.Log(
-                    It.Is<LogLevel>(l => l == LogLevel.Debug),
+                    It.Is<LogLevel>(l => l == logLevel),
                     It.IsAny<EventId>(),
                     It.Is<It.IsAnyType>((v, t) => state(v, t)),
                     It.IsAny<Exception>(),
@@ -65,11 +66,11 @@ namespace SourceGeneratorTests.Extensions
             return logger;
         }
 
-        public static Mock<ILogger<T>> VerifyDebugWasCalledTimes<T>(this Mock<ILogger<T>> logger, Times times)
+        public static Mock<ILogger<T>> VerifyWasCalledTimes<T>(this Mock<ILogger<T>> logger, Times times, LogLevel logLevel)
         {
             logger.Verify(
                 x => x.Log(
-                    It.Is<LogLevel>(l => l == LogLevel.Debug),
+                    It.Is<LogLevel>(l => l == logLevel),
                     It.IsAny<EventId>(),
                     It.Is<It.IsAnyType>((v, t) => true),
                     It.IsAny<Exception>(),
@@ -78,26 +79,26 @@ namespace SourceGeneratorTests.Extensions
             return logger;
         }
 
-        public static Mock<ILogger> VerifyDebugWasCalled(this Mock<ILogger> logger, string expectedMessage)
+        public static Mock<ILogger<T>> VerifyDebugWasCalled<T>(this Mock<ILogger<T>> logger, string expectedMessage)
         {
-            Func<object, Type, bool> state = (v, t) => v.ToString().CompareTo(expectedMessage) == 0;
-
-            logger.Verify(
-                x => x.Log(
-                    It.Is<LogLevel>(l => l == LogLevel.Debug),
-                    It.IsAny<EventId>(),
-                    It.Is<It.IsAnyType>((v, t) => state(v, t)),
-                    It.IsAny<Exception>(),
-                    It.Is<Func<It.IsAnyType, Exception, string>>((v, t) => true)));
-
-            return logger;
+            return VerifyWasCalled(logger, expectedMessage, LogLevel.Debug);
         }
 
-        public static Mock<ILogger> VerifyDebugWasCalledTimes(this Mock<ILogger> logger, Times times)
+        public static Mock<ILogger<T>> VerifyDebugWasCalledTimes<T>(this Mock<ILogger<T>> logger, Times times)
+        {
+            return VerifyWasCalledTimes(logger, times, LogLevel.Debug);
+        }
+
+        public static Mock<ILogger<T>> VerifyTraceWasCalled<T>(this Mock<ILogger<T>> logger, string expectedMessage)
+        {
+            return VerifyWasCalled(logger, expectedMessage, LogLevel.Trace);
+        }
+
+        public static Mock<ILogger<T>> VerifyTraceWasCalledTimes<T>(this Mock<ILogger<T>> logger, Times times)
         {
             logger.Verify(
                 x => x.Log(
-                    It.Is<LogLevel>(l => l == LogLevel.Debug),
+                    It.Is<LogLevel>(l => l == LogLevel.Trace),
                     It.IsAny<EventId>(),
                     It.Is<It.IsAnyType>((v, t) => true),
                     It.IsAny<Exception>(),

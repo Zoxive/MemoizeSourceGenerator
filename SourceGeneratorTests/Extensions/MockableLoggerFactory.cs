@@ -6,7 +6,7 @@ namespace SourceGeneratorTests.Extensions
 {
     public class MockableLoggerFactory : ILoggerFactory
     {
-        public static Mock<ILogger> Logger = new Mock<ILogger>();
+        public static Mock<ILogger<MockableLoggerFactory>> Logger = new Mock<ILogger<MockableLoggerFactory>>();
 
         static MockableLoggerFactory()
         {

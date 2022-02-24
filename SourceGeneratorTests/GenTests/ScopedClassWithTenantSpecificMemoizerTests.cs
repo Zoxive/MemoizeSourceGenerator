@@ -12,7 +12,7 @@ namespace SourceGeneratorTests.GenTests
     public class ScopedClassWithTenantSpecificMemoizerTests
     {
         private readonly ServiceProvider _serviceProvider;
-        private Mock<ILogger> _mockLogger;
+        private Mock<ILogger<MockableLoggerFactory>> _mockLogger;
 
         public ScopedClassWithTenantSpecificMemoizerTests()
         {
@@ -63,8 +63,9 @@ namespace SourceGeneratorTests.GenTests
 
                 // Cache Exists
                 scope.Sut.Add(1, 2).Is(new ValueType1(3));
-                _mockLogger.VerifyDebugWasCalled("Cache hit. Tenant1~IScopedClassExample.Add(1, 2) => ValueType1-3");
-                _mockLogger.VerifyDebugWasCalledTimes(Times.Exactly(2));
+                _mockLogger.VerifyTraceWasCalled("Cache hit. Tenant1~IScopedClassExample.Add(1, 2) => ValueType1-3");
+                _mockLogger.VerifyDebugWasCalledTimes(Times.Exactly(1));
+                _mockLogger.VerifyTraceWasCalledTimes(Times.Exactly(1));
             }
         }
 
@@ -82,8 +83,9 @@ namespace SourceGeneratorTests.GenTests
 
                 // Cache Exists
                 scope.Sut.TestPartition(name, 3).Is(new ValueType1(9));
-                _mockLogger.VerifyDebugWasCalled("Cache hit. Tenant1>Bob~IScopedClassExample.TestPartition(Bob, 3) => ValueType1-9");
-                _mockLogger.VerifyDebugWasCalledTimes(Times.Exactly(2));
+                _mockLogger.VerifyTraceWasCalled("Cache hit. Tenant1>Bob~IScopedClassExample.TestPartition(Bob, 3) => ValueType1-9");
+                _mockLogger.VerifyDebugWasCalledTimes(Times.Exactly(1));
+                _mockLogger.VerifyTraceWasCalledTimes(Times.Exactly(1));
             }
         }
     }

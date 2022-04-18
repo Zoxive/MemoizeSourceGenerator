@@ -37,6 +37,12 @@ namespace Zoxive.MemoizeSourceGenerator.Attribute
                 _global = value;
             }
         }
+        
+        public static void ResetGlobal(MemoizerFactory factory)
+        {
+            _global?.InvalidateAll();
+            _global = factory;
+        }
 
         private readonly ILoggerFactory _loggerFactory;
 
@@ -70,15 +76,17 @@ namespace Zoxive.MemoizeSourceGenerator.Attribute
 
         public void InvalidateAll()
         {
-            foreach (var c in _cachePartitions.Values)
+            foreach (var partition in _cachePartitions.Values)
             {
-                c.Invalidate();
+                partition.Invalidate();
             }
+            
+            _cachePartitions.Clear();
         }
 
         public void InvalidatePartition(IPartitionKey partitionKey)
         {
-            if (_cachePartitions.TryGetValue(partitionKey, out var cachePartition))
+            if (_cachePartitions.TryRemove(partitionKey, out var cachePartition))
             {
                 cachePartition.Invalidate();
             }

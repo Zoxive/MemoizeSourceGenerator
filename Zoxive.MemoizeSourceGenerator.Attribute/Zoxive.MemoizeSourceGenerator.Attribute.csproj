@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <Version>0.0.4</Version>
+        <Version>0.0.5</Version>
         <PackageTags>sourcegenerator;memoize;cache</PackageTags>
         <Authors>Kyle Wascher</Authors>
         <PackageLicenseUrl>https://github.com/Zoxive/MemoizeSourceGenerator/blob/main/LICENSE</PackageLicenseUrl>

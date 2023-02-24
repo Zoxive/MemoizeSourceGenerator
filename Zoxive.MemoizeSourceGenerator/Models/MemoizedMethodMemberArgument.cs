@@ -58,6 +58,14 @@ namespace Zoxive.MemoizeSourceGenerator.Models
             PartitionsCache = partitionsCache;
             Name = parameterSymbol.Name;
             ArgType = parameterSymbol.ToDisplayString();
+
+            // Hack fix
+            // https://github.com/dotnet/roslyn/pull/65606
+            // ToDisplayString() has changed to include the variable name.. and theres no way to turn it off.
+            // (The methods are Internal Only to customize SymbolDisplayFormat)
+            if (ArgType.Contains(' '))
+                ArgType = ArgType.Split(' ').First();
+
             IsNullable = parameterSymbol.NullableAnnotation == NullableAnnotation.Annotated;
         }
 

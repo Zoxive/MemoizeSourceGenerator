@@ -7,6 +7,8 @@ namespace Zoxive.MemoizeSourceGenerator
 {
     internal static class MemoizedClass
     {
+        private static string Prefix = "_sg_";
+
         public static string Generate(MemoizerCall call)
         {
             var fullInterfaceName = call.InterfaceType.ToDisplayString();
@@ -57,13 +59,13 @@ namespace {call.ClassNamespace}
                     sb.Append("async ");
                 }
                 sb.Append($"{returnType} {methodName}(");
-                method.WriteParameters(sb, writeType: true, prefix: "__");
+                method.WriteParameters(sb, writeType: true, prefix: Prefix);
                 sb.AppendLine(")");
                 sb.AppendLine("\t\t{");
 
                 if (method.PartitionedParameter != null)
                 {
-                    sb.AppendLine($"\t\t\tvar cache = _cacheFactory.GetOrCreatePartition(__{method.PartitionedParameter.Name});");
+                    sb.AppendLine($"\t\t\tvar cache = _cacheFactory.GetOrCreatePartition({Prefix}{method.PartitionedParameter.Name});");
                 }
                 else
                 {
@@ -75,7 +77,7 @@ namespace {call.ClassNamespace}
                 {
                     sb.Append(",");
                 }
-                method.WriteParameters(sb, prefix: "__");
+                method.WriteParameters(sb, prefix: Prefix);
                 sb.AppendLine(");");
                 sb.Append($"\t\t\tif (cache.TryGetValue<{method.TypeInCache}>(key, out var returnValue)");
 
@@ -101,7 +103,7 @@ namespace {call.ClassNamespace}
                     sb.Append("await ");
                 }
                 sb.Append($"_impl.{methodName}(");
-                method.WriteParameters(sb, prefix: "__");
+                method.WriteParameters(sb, prefix: Prefix);
                 sb.AppendLine(");");
 
                 sb.AppendLine();
@@ -167,14 +169,14 @@ namespace {call.ClassNamespace}
             {
                 sb.Append(",");
             }
-            method.WriteParameters(sb, writeType: true, prefix: "__");
+            method.WriteParameters(sb, writeType: true, prefix: Prefix);
 
             sb.AppendLine(")");
             sb.AppendLine("\t\t\t{");
             sb.AppendLine($"\t\t\t\tPartitionKey = partitionKey;");
             foreach (var arg in method.Parameters)
             {
-                sb.AppendLine($"\t\t\t\t_{arg.Name} = __{arg.Name};");
+                sb.AppendLine($"\t\t\t\t_{arg.Name} = {Prefix}{arg.Name};");
             }
 
             sb.AppendLine("\t\t\t}");
